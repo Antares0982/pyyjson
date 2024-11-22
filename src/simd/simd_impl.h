@@ -478,8 +478,13 @@ force_inline u64 tzcnt_u64(u64 x) {
     return _mm_tzcnt_64(x);
 #endif
 #else
-    // TODO: maybe use _bit_scan_forward64 in WIN32 MSVC
-    return __builtin_ctzll(x);
+    #if defined(_MSC_VER)
+        unsigned long index = 0;
+        _BitScanForward64(&index, x);
+        return index;
+    #else
+        return __builtin_ctzll(x);
+    #endif
 #endif
 }
 
