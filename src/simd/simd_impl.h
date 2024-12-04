@@ -463,7 +463,7 @@ force_inline u32 tzcnt_u32(u32 x) {
     return _mm_tzcnt_32(x);
 #endif
 #else
-    return _bit_scan_forward(x);
+    return _BitScanForward(x);
 #endif
 }
 
