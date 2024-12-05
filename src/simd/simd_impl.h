@@ -463,7 +463,13 @@ force_inline u32 tzcnt_u32(u32 x) {
     return _mm_tzcnt_32(x);
 #endif
 #else
-    return _BitScanForward(x);
+    #if defined(_MSC_VER)
+        unsigned long index = 0;
+        _BitScanForward(&index, x);
+        return index
+    #else
+        return __builtin_ctz(x);
+    #endif
 #endif
 }
 
