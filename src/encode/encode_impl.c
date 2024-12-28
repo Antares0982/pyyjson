@@ -351,7 +351,7 @@ force_inline PyObject *pyyjson_dumps_single_float(PyObject *val) {
     u8 buffer[32];
     double v = PyFloat_AS_DOUBLE(val);
     u64 *raw = (u64 *)&v;
-    u8 *buffer_end = write_f64_raw(buffer, *raw);
+    u8 *buffer_end =  buffer + d2s_buffered_n(f64_from_raw(*raw), (char*)buffer);
     size_t size = buffer_end - buffer;
     PyObject *unicode = PyUnicode_New(size, 127);
     if (unlikely(!unicode)) return NULL;
