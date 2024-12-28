@@ -2,6 +2,7 @@
 #define PYYJSON_ENCODE_FLOAT_H
 
 #include "encode_shared.h"
+#include "ryu/ryu.h"
 
 /* These codes are modified from yyjson. */
 
@@ -1224,143 +1225,7 @@ force_inline void f64_bin_to_dec(u64 sig_raw, u32 exp_raw,
  3. Remove positive sign of exponent part.
  */
 force_inline u8 *write_f64_raw(u8 *buf, u64 raw) {
-    u64 sig_bin, sig_dec, sig_raw;
-    i32 exp_bin, exp_dec, sig_len, dot_pos, i, max;
-    u32 exp_raw, hi, lo;
-    u8 *hdr, *num_hdr, *num_end, *dot_end;
-    bool sign;
-
-    /* decode raw bytes from IEEE-754 double format. */
-    sign = (bool)(raw >> (F64_BITS - 1));
-    sig_raw = raw & F64_SIG_MASK;
-    exp_raw = (u32)((raw & F64_EXP_MASK) >> F64_SIG_BITS);
-
-    /* return inf and nan */
-    if (unlikely(exp_raw == ((u32)1 << F64_EXP_BITS) - 1)) {
-        if (sig_raw == 0) {
-            buf[0] = '-';
-            buf += sign;
-            byte_copy_8(buf, "Infinity");
-            buf += 8;
-            return buf;
-        } else {
-            byte_copy_4(buf, "NaN");
-            return buf + 3;
-        }
-        return NULL;
-    }
-
-    /* add sign for all finite double value, including 0.0 and inf */
-    buf[0] = '-';
-    buf += sign;
-    hdr = buf;
-
-    /* return zero */
-    if ((raw << 1) == 0) {
-        byte_copy_4(buf, "0.0");
-        buf += 3;
-        return buf;
-    }
-
-    if (likely(exp_raw != 0)) {
-        /* normal number */
-        sig_bin = sig_raw | ((u64)1 << F64_SIG_BITS);
-        exp_bin = (i32)exp_raw - F64_EXP_BIAS - F64_SIG_BITS;
-
-        /* fast path for small integer number without fraction */
-        if (-F64_SIG_BITS <= exp_bin && exp_bin <= 0) {
-            if (u64_tz_bits(sig_bin) >= (u32)-exp_bin) {
-                /* number is integer in range 1 to 0x1FFFFFFFFFFFFF */
-                sig_dec = sig_bin >> -exp_bin;
-                buf = write_u64_len_1_to_16(sig_dec, buf);
-                byte_copy_2(buf, ".0");
-                buf += 2;
-                return buf;
-            }
-        }
-
-        /* binary to decimal */
-        f64_bin_to_dec(sig_raw, exp_raw, sig_bin, exp_bin, &sig_dec, &exp_dec);
-
-        /* the sig length is 15 to 17 */
-        sig_len = 17;
-        sig_len -= (sig_dec < (u64)100000000 * 100000000);
-        sig_len -= (sig_dec < (u64)100000000 * 10000000);
-
-        /* the decimal point position relative to the first digit */
-        dot_pos = sig_len + exp_dec;
-
-        if (-6 < dot_pos && dot_pos <= 21) {
-            /* no need to write exponent part */
-            if (dot_pos <= 0) {
-                /* dot before first digit */
-                /* such as 0.1234, 0.000001234 */
-                num_hdr = hdr + (2 - dot_pos);
-                num_end = write_u64_len_15_to_17_trim(num_hdr, sig_dec);
-                hdr[0] = '0';
-                hdr[1] = '.';
-                hdr += 2;
-                max = -dot_pos;
-                for (i = 0; i < max; i++) hdr[i] = '0';
-                return num_end;
-            } else {
-                /* dot after first digit */
-                /* such as 1.234, 1234.0, 123400000000000000000.0 */
-                memset(hdr + 0, '0', 8);
-                memset(hdr + 8, '0', 8);
-                memset(hdr + 16, '0', 8);
-                num_hdr = hdr + 1;
-                num_end = write_u64_len_15_to_17_trim(num_hdr, sig_dec);
-                for (i = 0; i < dot_pos; i++) hdr[i] = hdr[i + 1];
-                hdr[dot_pos] = '.';
-                dot_end = hdr + dot_pos + 2;
-                return dot_end < num_end ? num_end : dot_end;
-            }
-        } else {
-            /* write with scientific notation */
-            /* such as 1.234e56 */
-            u8 *end = write_u64_len_15_to_17_trim(buf + 1, sig_dec);
-            end -= (end == buf + 2); /* remove '.0', e.g. 2.0e34 -> 2e34 */
-            exp_dec += sig_len - 1;
-            hdr[0] = hdr[1];
-            hdr[1] = '.';
-            end[0] = 'e';
-            buf = write_f64_exp(exp_dec, end + 1);
-            return buf;
-        }
-
-    } else {
-        /* subnormal number */
-        sig_bin = sig_raw;
-        exp_bin = 1 - F64_EXP_BIAS - F64_SIG_BITS;
-
-        /* binary to decimal */
-        f64_bin_to_dec(sig_raw, exp_raw, sig_bin, exp_bin, &sig_dec, &exp_dec);
-
-        /* write significand part */
-        buf = write_u64_len_1_to_17(sig_dec, buf + 1);
-        hdr[0] = hdr[1];
-        hdr[1] = '.';
-        do {
-            buf--;
-            exp_dec++;
-        } while (*buf == '0');
-        exp_dec += (i32)(buf - hdr - 2);
-        buf += (*buf != '.');
-        buf[0] = 'e';
-        buf++;
-
-        /* write exponent part */
-        buf[0] = '-';
-        buf++;
-        exp_dec = -exp_dec;
-        hi = ((u32)exp_dec * 656) >> 16; /* exp / 100 */
-        lo = (u32)exp_dec - hi * 100;    /* exp % 100 */
-        buf[0] = (u8)((u8)hi + (u8)'0');
-        byte_copy_2(buf + 1, digit_table + lo * 2);
-        buf += 3;
-        return buf;
-    }
+    return buf + d2s_buffered_n(f64_from_raw(raw), (char*)buf);
 }
 
 
