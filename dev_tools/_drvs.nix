@@ -12,14 +12,11 @@ let
           self = x;
           packageOverrides = (
             self: super:
-            if !py.isPy39 then
-              { }
-            else
-              {
-                # for py39 there is an upstream bug
-                # https://github.com/NixOS/nixpkgs/issues/353830
-                setuptools = pkgs.callPackage ./py39setuptools.nix { inherit super; };
-              }
+            lib.optionalAttrs py.isPy39 {
+              # for py39 there is an upstream bug
+              # https://github.com/NixOS/nixpkgs/issues/353830
+              setuptools = pkgs.callPackage ./py39setuptools.nix { inherit super; };
+            }
           );
         }
       );
@@ -36,16 +33,18 @@ let
   required_python_packages = import ./py_requirements.nix;
   pyenvs_map = py: (py.withPackages required_python_packages);
   pyenvs = builtins.map pyenvs_map using_pythons;
+  sde = pkgs.callPackage ./sde.nix { };
 in
 {
   inherit pyenvs; # list
   inherit using_pythons; # list
   inherit (pkgs)
-    cmake
-    gdb
-    valgrind
     clang
+    cmake
     gcc
+    gdb
     python-launcher
+    valgrind
     ; # packages
+  inherit sde;
 }
