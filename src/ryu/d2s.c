@@ -341,6 +341,9 @@ static inline int to_chars(const floating_decimal_64 v, const bool sign, char *c
         memset(result + index + 2, '0', ofs - 2);
         index += ofs;
     }
+#else
+    const bool skipDecimalPoint = 0;
+#endif
 
 #ifdef RYU_DEBUG
     printf("DIGITS=%" PRIu64 "\n", v.mantissa);
@@ -412,8 +415,8 @@ static inline int to_chars(const floating_decimal_64 v, const bool sign, char *c
         result[index] = (char)('0' + output2);
     }
 
-    // --- write decimal point ---
-
+// --- write decimal point ---
+#ifdef RYU_HUMAN_READABLE
     if (expendTailPosExp) {
         memset(result + index + olength, '0', v.exponent);
         result[index + olength + v.exponent] = '.';
@@ -426,6 +429,7 @@ static inline int to_chars(const floating_decimal_64 v, const bool sign, char *c
         return index + olength;
     }
     if (expendTailNegExpEx) return index + olength;
+#endif
 
     // Print decimal point if needed.
     if (olength > 1) {
@@ -438,7 +442,7 @@ static inline int to_chars(const floating_decimal_64 v, const bool sign, char *c
     // --- write exponent ---
 
     // Print the exponent.
-    result[index++] = 'e';
+    result[index++] = 'E';
     int32_t exp = v.exponent + (int32_t)olength - 1;
     if (exp < 0) {
         result[index++] = '-';
