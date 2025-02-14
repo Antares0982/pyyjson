@@ -322,7 +322,7 @@ static inline int to_chars(const floating_decimal_64 v, const bool sign, char *c
 
     uint64_t output = v.mantissa;
     const uint32_t olength = decimalLength17(output);
-
+#ifdef RYU_HUMAN_READABLE
     const ptrdiff_t tmpLimit = (ptrdiff_t)v.exponent + olength;
     // 1234e7 => 12340000000.0
     const bool expendTailPosExp = v.exponent >= 0 && tmpLimit <= 16;
