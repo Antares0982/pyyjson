@@ -27,6 +27,9 @@
 //     size by about 10x (only one case, and only double) at the cost of some
 //     performance. Currently requires MSVC intrinsics.
 
+#ifndef RYUD2S_H
+#define RYUD2S_H
+
 #include "pyyjson.h"
 
 #include <assert.h>
@@ -545,3 +548,5 @@ force_inline int d2s_buffered_n(double f, char *result) {
 
     return to_chars(v, ieeeSign, result);
 }
+
+#endif // RYUD2S_H
