@@ -20,6 +20,6 @@
 
 // A table of all two-digit numbers. This is used to speed up decimal digit
 // generation by copying pairs of digits into the final output.
-extern const uint8_t DIGIT_TABLE[200];
+extern const char DIGIT_TABLE[200];
 
 #endif // RYU_DIGIT_TABLE_H
