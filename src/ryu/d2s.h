@@ -30,15 +30,19 @@
 #ifndef RYUD2S_H
 #define RYUD2S_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "pyyjson.h"
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <inttypes.h>
 
 #ifdef RYU_DEBUG
 #    include <stdio.h>
@@ -548,5 +552,9 @@ force_inline int d2s_buffered_n(double f, char *result) {
 
     return to_chars(v, ieeeSign, result);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // RYUD2S_H
