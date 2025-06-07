@@ -2,7 +2,7 @@
 #define SSRJSON_DECODE_STR_H
 
 #include "common.h"
-#include "decode/decode.h"
+#include "decode/decode_shared.h"
 #include "decoder_impl_wrap.h"
 #include "simd/simd_impl.h"
 #include "simd/union_vector.h"

@@ -2,7 +2,7 @@
 #    ifndef COMPILE_UCS_LEVEL
 #        include "cache_key.h"
 #        include "copy_to_new.h"
-#        include "decode/decode.h"
+#        include "decode/decode_shared.h"
 #        include "escape.h"
 #        include "simd/cvt.h"
 #        include "simd/long_cvt.h"

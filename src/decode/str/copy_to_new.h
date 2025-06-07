@@ -1,6 +1,6 @@
 #ifndef SSRJSON_DECODE_STR_COPY_TO_NEW_H
 #define SSRJSON_DECODE_STR_COPY_TO_NEW_H
-#include "decode/decode.h"
+#include "decode/decode_shared.h"
 #include "pythonlib.h"
 #include "simd/long_cvt.h"
 #include "simd/memcpy.h"

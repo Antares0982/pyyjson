@@ -1,5 +1,5 @@
 #ifdef SSRJSON_CLANGD_DUMMY
-#    include "decode/decode.h"
+#    include "decode/decode_shared.h"
 #    include "simd/simd_impl.h"
 #    ifndef COMPILE_UCS_LEVEL
 #        define COMPILE_UCS_LEVEL 0

@@ -1,7 +1,7 @@
 #define COMPILE_CONTEXT_DECODE
 
 #define XXH_INLINE_ALL
-#include "decode.h"
+#include "decode_shared.h"
 
 #include "simd/cvt.h"
 #include "simd/mask_table.h"

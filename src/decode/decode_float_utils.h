@@ -1,6 +1,6 @@
 #ifndef DECODE_FLOAT_UTILS_H
 #define DECODE_FLOAT_UTILS_H
-#include "decode.h"
+#include "decode_shared.h"
 
 
 #if SSRJSON_HAS_IEEE_754

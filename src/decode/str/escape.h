@@ -1,7 +1,7 @@
 #ifndef SSRJSON_DECODE_STR_ESCAPE_H
 #define SSRJSON_DECODE_STR_ESCAPE_H
 
-#include "decode/decode.h"
+#include "decode/decode_shared.h"
 
 force_inline int process_escape_ucs1_u8(
         EscapeInfo escape_info,

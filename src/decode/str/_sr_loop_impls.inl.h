@@ -1,6 +1,6 @@
 #ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_READ_UCS_LEVEL
-#        include "decode/decode.h"
+#        include "decode/decode_shared.h"
 #        include "simd/union_vector.h"
 //
 #        define COMPILE_READ_UCS_LEVEL 1

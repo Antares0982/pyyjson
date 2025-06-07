@@ -1,7 +1,7 @@
 #ifndef SSRJSON_DECODE_STR_DECODER_IMPL_WRAP_H
 #define SSRJSON_DECODE_STR_DECODER_IMPL_WRAP_H
 
-#include "decode/decode.h"
+#include "decode/decode_shared.h"
 #include "simd/compile_feature_check.h"
 #include "simd/simd_impl.h"
 #include "simd/union_vector.h"

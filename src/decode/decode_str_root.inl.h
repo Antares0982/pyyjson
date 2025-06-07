@@ -1,6 +1,6 @@
 #ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_SIMD_BITS
-#        include "decode.h"
+#        include "decode_shared.h"
 #        define DECODE_READ_PRETTY 1
 #        define COMPILE_SIMD_BITS 256
 #        define COMPILE_READ_UCS_LEVEL 1

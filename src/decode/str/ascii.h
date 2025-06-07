@@ -2,7 +2,7 @@
 #define SSRJSON_DECODE_STR_ASCII_H
 #include "xxhash.h"
 
-#include "decode/decode.h"
+#include "decode/decode_shared.h"
 #include "simd/cvt.h"
 #include "simd/memcpy.h"
 #include "simd/simd_impl.h"

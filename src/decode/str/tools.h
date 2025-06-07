@@ -1,7 +1,7 @@
 #ifndef SSRJSON_DECODE_TOOLS_H
 #define SSRJSON_DECODE_TOOLS_H
 
-#include "decode/decode.h"
+#include "decode/decode_shared.h"
 #include "simd/simd_impl.h"
 
 // _r_tools

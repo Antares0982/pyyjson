@@ -1,5 +1,5 @@
 #ifdef SSRJSON_CLANGD_DUMMY
-#    include "decode/decode.h"
+#    include "decode/decode_shared.h"
 #    ifndef COMPILE_READ_UCS_LEVEL
 #        define COMPILE_READ_UCS_LEVEL 1
 #    endif
