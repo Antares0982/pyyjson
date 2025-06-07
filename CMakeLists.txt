@@ -169,7 +169,7 @@ set(SRC_FILES
     src/simd/mask_table.c
     src/tls.c
     src/float/tables.c
-    src/decode/utils.c
+    src/decode/decode_utils.c
     src/pyutils.c
     src/encode/encode_utils.c
 )
