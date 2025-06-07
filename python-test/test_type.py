@@ -4,6 +4,7 @@ import io
 import sys
 
 import pytest
+import random
 
 try:
     import xxhash
@@ -54,6 +55,105 @@ class TestType:
         for obj in ("aaaa" * 1024, "üýþÿ" * 1024, "好" * 1024, "�" * 1024):
             assert pyyjson.loads(pyyjson.dumps(obj)) == obj
             assert pyyjson.loads(pyyjson.dumps_to_bytes(obj)) == obj
+
+    def test_str_other(self):
+        """
+        various str
+        """
+        for s in (
+            '{"a":"aa","aaüý":"üýüý","aa":"aüaüýaa","üýüý":"üýüýüýüý","aaa":"aaaaaaaaaaa"}',  # range 0-255
+            '{"a":"aa","aaüý":"üýüý","üý":"aüý好üý","aaa":"aü好ü好aaaüý好好üý好好aa","üý好好üý":"üýüýüýüý","aaaa":"aaaaaaa"}',  # range 0-65535
+            '{"a":"aa","aaüý":"üýüý","üý":"aüý好üý","aaa":"aü好🐈ü🐈a好a🐈ü好a🐈好üaaaüý好好🐈🐈üý🐈🐈aa好好aa🐈🐈üý好好aa🐈🐈好好üýaa","üý好好üý":"üýüý好好好üýüý","üýüýüý":"üýüý","aaaa":"aaaaaaa"}',  # range 0-1114110
+        ):
+            obj = pyyjson.loads(s)
+            assert pyyjson.loads(pyyjson.dumps(obj)) == obj
+            d = dict()
+            for k, v in obj.items():
+                k2 = ""
+                v2 = ""
+                for c in k:
+                    k2 += c * 64
+                for c in v:
+                    v2 += c * 64
+                d[k2] = v2
+            assert pyyjson.loads(pyyjson.dumps(d)) == d
+
+    def test_str_other_escape(self):
+        """
+        various str
+        """
+        escapes = [
+            "\\\\",
+            '\\"',
+            "\\u0061",
+            "\\u00ff",
+            "\\u0666",
+            "\\u597d",
+            "\\ud83d\\udc08",
+        ]
+        escape_refs = [
+            "\\\\",
+            '\\"',
+            "a",
+            "ÿ",
+            "٦",
+            "好",
+            "🐈",
+        ]
+
+        def update_immutable_indices(_s: str, pattern: str, immutable_indices: set):
+            left = 0
+            _l = len(pattern)
+            while True:
+                index = _s.find(pattern, left)
+                if index == -1:
+                    break
+                for i in range(1, _l):
+                    immutable_indices.add(index + i)
+                left = index + _l
+
+        def get_random_indices(_l: int, immutable_indices: set, indices_set: set):
+            count = random.randint(1, _l - 1)
+            for _ in range(count):
+                index = random.randint(2, _l - 2)
+                if index not in immutable_indices:
+                    indices_set.add(index)
+
+        def get_variant(_s: str):
+            _l = len(_s)
+            immutable_indices = set()
+            update_immutable_indices(_s, '":"', immutable_indices)
+            update_immutable_indices(_s, '","', immutable_indices)
+            rand_indices = set()
+            get_random_indices(_l, immutable_indices, rand_indices)
+            all_indices = sorted([x for x in rand_indices], reverse=True)
+            escapes_size = len(escapes)
+            ref = s
+            for index in all_indices:
+                _r = random.randint(0, escapes_size - 1)
+                escape = escapes[_r]
+                escape_ref = escape_refs[_r]
+                _s = _s[:index] + escape + _s[index:]
+                ref = ref[:index] + escape_ref + ref[index:]
+            return _s, ref
+
+        def split_kv(_s: str):
+            return list(map(lambda x: x.split(":"), _s[1 : len(_s) - 1]))
+
+        for s in (
+            '{"a":"aa","aaüý":"üýüý","aa":"aüaüýaa","üýüý":"üýüýüýüý","aaa":"aaaaaaaaaaa"}',  # range 0-255
+            '{"a":"aa","aaüý":"üýüý","üý":"aüý好üý","aaa":"aü好ü好aaaüý好好üý好好aa","üý好好üý":"üýüýüýüý","aaaa":"aaaaaaa"}',  # range 0-65535
+            '{"a":"aa","aaüý":"üýüý","üý":"aüý好üý","aaa":"aü好🐈ü🐈a好a🐈ü好a🐈好üaaaüý好好🐈🐈üý🐈🐈aa好好aa🐈🐈üý好好aa🐈🐈好好üýaa","üý好好üý":"üýüý好好好üýüý","üýüýüý":"üýüý","aaaa":"aaaaaaa"}',  # range 0-1114110
+        ):
+            for _ in range(10):
+                while True:
+                    var, ref = get_variant(s)
+                    dumped = pyyjson.dumps(pyyjson.loads(var))
+                    a = sorted(split_kv(dumped))
+                    b = sorted(split_kv(ref))
+                    if len(a) == len(b):
+                        assert a == b
+                        break
 
     def test_str_2mib(self):
         ref = '🐈🐈🐈🐈🐈"üýa0s9999🐈🐈🐈🐈🐈9\0999\\9999' * 1 * 1
