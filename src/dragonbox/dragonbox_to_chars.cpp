@@ -39,13 +39,7 @@
     #define JKJ_IF_CONSTEXPR if
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
-    #define JKJ_FORCEINLINE inline __attribute__((always_inline))
-#elif defined(_MSC_VER)
-    #define JKJ_FORCEINLINE __forceinline
-#else
-    #define JKJ_FORCEINLINE inline
-#endif
+
 
 namespace jkj {
     namespace dragonbox {
@@ -344,7 +338,7 @@ namespace jkj {
             // }
 
             template <>
-            char*
+            JKJ_FORCEINLINE char*
             to_chars<ieee754_binary64, stdr::uint_least64_t>(stdr::uint_least64_t const significand,
                                                              int exponent, char* buffer) noexcept {
                 // Print significand by decomposing it into a 9-digit block and a 8-digit block.

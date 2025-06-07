@@ -148,6 +148,14 @@
     #define JKJ_CONSTEXPR20
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+    #define JKJ_FORCEINLINE inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+    #define JKJ_FORCEINLINE __forceinline
+#else
+    #define JKJ_FORCEINLINE inline
+#endif
+
 namespace jkj {
     namespace dragonbox {
         namespace detail {
@@ -214,7 +222,7 @@ namespace jkj {
 
                     template <class DecimalToBinaryRoundingPolicy, class BinaryToDecimalRoundingPolicy,
                               class CachePolicy, class PreferredIntegerTypesPolicy, class FormatTraits>
-                    static char* to_chars(signed_significand_bits<FormatTraits> s,
+                    static JKJ_FORCEINLINE char* to_chars(signed_significand_bits<FormatTraits> s,
                                           typename FormatTraits::exponent_int exponent_bits,
                                           char* buffer) noexcept {
                         auto result = to_decimal_ex(
@@ -261,7 +269,7 @@ namespace jkj {
             template <class DecimalToBinaryRoundingPolicy, class BinaryToDecimalRoundingPolicy,
                       class CachePolicy, class PreferredIntegerTypesPolicy, class DigitGenerationPolicy,
                       class FormatTraits>
-            JKJ_CONSTEXPR20 char* to_chars_n_impl(float_bits<FormatTraits> br, char* buffer) noexcept {
+            JKJ_FORCEINLINE JKJ_CONSTEXPR20 char* to_chars_n_impl(float_bits<FormatTraits> br, char* buffer) noexcept {
                 auto const exponent_bits = br.extract_exponent_bits();
                 auto const s = br.remove_exponent_bits();
 
@@ -327,7 +335,7 @@ namespace jkj {
                   class FormatTraits = ieee754_binary_traits<typename ConversionTraits::format,
                                                              typename ConversionTraits::carrier_uint>,
                   class... Policies>
-        JKJ_CONSTEXPR20 char* to_chars_n(Float x, char* buffer, Policies...) noexcept {
+        JKJ_FORCEINLINE JKJ_CONSTEXPR20 char* to_chars_n(Float x, char* buffer, Policies...) noexcept {
             using policy_holder = detail::make_policy_holder<
                 detail::detector_default_pair_list<
                     detail::detector_default_pair<

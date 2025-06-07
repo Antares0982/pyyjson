@@ -3254,7 +3254,7 @@ namespace jkj {
                 template <class SignPolicy, class TrailingZeroPolicy, class IntervalTypeProvider,
                           class BinaryToDecimalRoundingPolicy, class CachePolicy,
                           class PreferredIntegerTypesPolicy>
-                JKJ_SAFEBUFFERS static JKJ_CONSTEXPR20
+                JKJ_SAFEBUFFERS JKJ_FORCEINLINE static JKJ_CONSTEXPR20
                     return_type<SignPolicy, TrailingZeroPolicy, PreferredIntegerTypesPolicy>
                     compute_nearest(signed_significand_bits<FormatTraits> s,
                                     exponent_int exponent_bits) noexcept {
