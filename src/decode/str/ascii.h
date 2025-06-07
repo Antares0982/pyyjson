@@ -709,7 +709,7 @@ failed:;
 #undef CAN_LOOP
 }
 
-static force_noinline PyObject *decode_str_ascii(
+force_inline PyObject *decode_str_ascii(
         const _src_t **src_addr,
         const _src_t *const src_end,
         void *temp_buffer,
@@ -803,6 +803,12 @@ failed:;
 #undef LOOP_SWITCHER
 #undef CAN_LOOP4
 #undef CAN_LOOP
+}
+
+static force_noinline PyObject *decode_str_ascii_not_key(const _src_t **src_addr,
+                                                         const _src_t *const src_end,
+                                                         void *temp_buffer) {
+    return decode_str_ascii(src_addr, src_end, temp_buffer, false);
 }
 
 #include "compile_context/sr_out.inl.h"

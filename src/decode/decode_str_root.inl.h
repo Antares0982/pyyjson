@@ -107,7 +107,12 @@ arr_val_begin:
     }
     if (*cur == '"') {
         cur++;
-        PyObject *str_obj = decode_str(&cur, end, string_buffer_head, false);
+        PyObject *str_obj =
+#if COMPILE_UCS_LEVEL == 0
+                decode_str_ascii_not_key(&cur, end, string_buffer_head);
+#else
+                decode_str(&cur, end, string_buffer_head, false);
+#endif
         if (likely(str_obj && pyyjson_push_obj(decode_obj_stack_info, str_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
@@ -290,7 +295,12 @@ obj_key_end:;
 obj_val_begin:
     if (*cur == '"') {
         cur++;
-        PyObject *str_obj = decode_str(&cur, end, string_buffer_head, false);
+        PyObject *str_obj =
+#if COMPILE_UCS_LEVEL == 0
+                decode_str_ascii_not_key(&cur, end, string_buffer_head);
+#else
+                decode_str(&cur, end, string_buffer_head, false);
+#endif
         if (likely(str_obj && pyyjson_push_obj(decode_obj_stack_info, str_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
