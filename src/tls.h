@@ -3,29 +3,30 @@
 
 #include "ssrjson.h"
 #include <threads.h>
+#if defined(Py_GIL_DISABLED)
 
 /*==============================================================================
  * TLS related macros
  *============================================================================*/
-#if defined(_POSIX_THREADS)
-#    define SSRJSON_DECLARE_TLS_GETTER(_key, _getter_name) \
-        force_inline void *_getter_name(void) {            \
-            return pthread_getspecific((_key));            \
-        }
-#    define SSRJSON_DECLARE_TLS_SETTER(_key, _setter_name) \
-        force_inline bool _setter_name(void *ptr) {        \
-            return 0 == pthread_setspecific(_key, ptr);    \
-        }
-#else
-#    define SSRJSON_DECLARE_TLS_GETTER(_key, _getter_name) \
-        force_inline void *_getter_name(void) {            \
-            return FlsGetValue((_key));                    \
-        }
-#    define SSRJSON_DECLARE_TLS_SETTER(_key, _setter_name) \
-        force_inline bool _setter_name(void *ptr) {        \
-            return FlsSetValue(_key, ptr);                 \
-        }
-#endif
+#    if defined(_POSIX_THREADS)
+#        define SSRJSON_DECLARE_TLS_GETTER(_key, _getter_name) \
+            force_inline void *_getter_name(void) {            \
+                return pthread_getspecific((_key));            \
+            }
+#        define SSRJSON_DECLARE_TLS_SETTER(_key, _setter_name) \
+            force_inline bool _setter_name(void *ptr) {        \
+                return 0 == pthread_setspecific(_key, ptr);    \
+            }
+#    else
+#        define SSRJSON_DECLARE_TLS_GETTER(_key, _getter_name) \
+            force_inline void *_getter_name(void) {            \
+                return FlsGetValue((_key));                    \
+            }
+#        define SSRJSON_DECLARE_TLS_SETTER(_key, _setter_name) \
+            force_inline bool _setter_name(void *ptr) {        \
+                return FlsSetValue(_key, ptr);                 \
+            }
+#    endif
 
 /*==============================================================================
  * TLS related API
@@ -41,10 +42,7 @@ bool ssrjson_tls_free(void);
 extern TLS_KEY_TYPE _EncodeObjStackBuffer_Key;
 
 /* The underlying data type to be stored. */
-typedef struct EncodeCtnWithIndex {
-    PyObject *ctn;
-    Py_ssize_t index;
-} EncodeCtnWithIndex;
+
 
 SSRJSON_DECLARE_TLS_GETTER(_EncodeObjStackBuffer_Key, _get_encode_obj_stack_buffer_pointer)
 SSRJSON_DECLARE_TLS_SETTER(_EncodeObjStackBuffer_Key, _set_encode_obj_stack_buffer_pointer)
@@ -117,5 +115,6 @@ force_inline PyObject **get_decode_obj_stack_buffer(void) {
     return (PyObject **)value;
 }
 
+#endif // defined(Py_GIL_DISABLED)
 
 #endif // SSRJSON_TLS_H

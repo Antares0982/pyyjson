@@ -39,7 +39,7 @@ force_inline bool check_and_reserve_str_buffer(Py_ssize_t len, _src_t **buffer_h
         *buffer_head_addr = (_src_t *)(new_buffer + TAIL_PADDING);
         *need_dealloc = true;
     } else {
-        *buffer_head_addr = (_src_t *)(ssrjson_string_buffer + TAIL_PADDING);
+        *buffer_head_addr = (_src_t *)(_DecodeTempBuffer + TAIL_PADDING);
         *need_dealloc = false;
     }
     return true;

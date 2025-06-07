@@ -3,16 +3,16 @@
 #define XXH_INLINE_ALL
 #include "decode.h"
 
-#include "ssrjson.h"
 #include "simd/cvt.h"
 #include "simd/mask_table.h"
 #include "simd/memcpy.h"
 #include "simd/simd_impl.h"
+#include "ssrjson.h"
 #include "str/ascii.h"
-#include "tls.h"
 #include "str/ucs.h"
+#include "tls.h"
 
-extern thread_local u8 ssrjson_string_buffer[SSRJSON_STRING_BUFFER_SIZE];
+extern u8 _DecodeTempBuffer[SSRJSON_STRING_BUFFER_SIZE];
 
 static_assert((SSRJSON_STRING_BUFFER_SIZE % 64) == 0, "(SSRJSON_STRING_BUFFER_SIZE % 64) == 0");
 
@@ -230,7 +230,7 @@ force_inline bool init_decode_ctn_stack_info(DecodeCtnStackInfo *restrict decode
 bool _ssrjson_decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_stack_info);
 
 force_inline bool ssrjson_push_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, PyObject *obj) {
-    static_assert(((Py_ssize_t)SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1) > 0, "(SSRJSON_DECODE_OBJSTACK_BUFFER_SIZE << 1) > 0");
+    static_assert(((Py_ssize_t)SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1) > 0, "(SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1) > 0");
     if (unlikely(decode_obj_stack_info->cur_write_result_addr >= decode_obj_stack_info->result_stack_end)) {
         bool c = _ssrjson_decode_obj_stack_resize(decode_obj_stack_info);
         RETURN_ON_UNLIKELY_ERR(!c);

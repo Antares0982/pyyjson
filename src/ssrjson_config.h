@@ -43,17 +43,8 @@
 #    define SSRJSON_KEY_CACHE_SIZE (1 << 11)
 #endif
 
-// /* Stack buffer for PyObject*. Default cost: 8 * 1024 = 8kb (per thread). */
-// #ifndef SSRJSON_DECODE_OBJSTACK_BUFFER_SIZE
-// #define SSRJSON_DECODE_OBJSTACK_BUFFER_SIZE (1024)
-// #endif
-
-#ifndef SSRJSON_READER_ESTIMATED_PRETTY_RATIO
-#    define SSRJSON_READER_ESTIMATED_PRETTY_RATIO 16
-#endif
-
 /*
- Init buffer size for decode object buffer.
+ Buffer size for decoding object buffer.
  Cost: SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE * sizeof(void*) bytes per thread.
  */
 #ifndef SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE

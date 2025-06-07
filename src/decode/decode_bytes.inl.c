@@ -1110,7 +1110,7 @@ static force_noinline PyObject *read_root_single_bytes(const u8 *dat, usize len)
             if (unlikely(!write_buffer)) goto fail_alloc;
             dynamic = true;
         } else {
-            write_buffer = ssrjson_string_buffer;
+            write_buffer = _DecodeTempBuffer;
         }
         ret = read_bytes(&cur, write_buffer, false);
         if (dynamic) free(write_buffer);
@@ -1190,7 +1190,7 @@ fail_cleanup:
 #undef return_err
 }
 
-extern ssrjson_align(64) u8 ssrjson_bytes_temp_buffer[SSRJSON_STRING_BUFFER_SIZE];
+extern ssrjson_align(64) u8 _DecodeBytesSrcBuffer[SSRJSON_STRING_BUFFER_SIZE];
 
 force_inline bool _skip_starting_space(char **buffer_addr, Py_ssize_t *len_addr) {
     /* skip empty contents before json document */
@@ -1224,7 +1224,7 @@ force_inline void _alloc_aligned_bytes_buffer(Py_ssize_t len, bool *dynamic, u8 
         }
         *dynamic = true;
     } else {
-        *buffer = ssrjson_bytes_temp_buffer;
+        *buffer = _DecodeBytesSrcBuffer;
         *dynamic = false;
     }
 }

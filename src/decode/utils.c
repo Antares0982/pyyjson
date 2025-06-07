@@ -32,6 +32,10 @@ bool _ssrjson_decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_st
     return true;
 }
 
-thread_local ssrjson_align(64) u8 ssrjson_string_buffer[SSRJSON_STRING_BUFFER_SIZE];
+#if !defined(Py_GIL_DISABLED)
+ssrjson_align(64) u8 _DecodeTempBuffer[SSRJSON_STRING_BUFFER_SIZE];
 ssrjson_cache_type AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
-ssrjson_align(64) u8 ssrjson_bytes_temp_buffer[SSRJSON_STRING_BUFFER_SIZE];
+ssrjson_align(64) u8 _DecodeBytesSrcBuffer[SSRJSON_STRING_BUFFER_SIZE];
+DecodeCtnWithSize _DecodeCtnBuffer[SSRJSON_DECODE_MAX_RECURSION];
+PyObject *_DecodeObjBuffer[SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE];
+#endif

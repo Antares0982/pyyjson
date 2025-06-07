@@ -1,9 +1,9 @@
 #ifndef SSRJSON_DECODE_H
 #define SSRJSON_DECODE_H
 #include "pyutils.h"
-#include "ssrjson.h"
 #include "simd/memcmp.h"
 #include "simd/simd_impl.h"
+#include "ssrjson.h"
 #include "xxhash.h"
 
 typedef struct DecodeObjStackInfo {
@@ -12,7 +12,24 @@ typedef struct DecodeObjStackInfo {
     PyObject **result_stack_end;
 } DecodeObjStackInfo;
 
-typedef struct DecodeCtnWithSize DecodeCtnWithSize;
+typedef struct DecodeCtnWithSize {
+    Py_ssize_t raw;
+} DecodeCtnWithSize;
+
+
+#if !defined(Py_GIL_DISABLED)
+extern DecodeCtnWithSize _DecodeCtnBuffer[SSRJSON_DECODE_MAX_RECURSION];
+
+force_inline DecodeCtnWithSize *get_decode_ctn_stack_buffer(void) {
+    return _DecodeCtnBuffer;
+}
+
+extern PyObject *_DecodeObjBuffer[SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE];
+
+force_inline PyObject **get_decode_obj_stack_buffer(void) {
+    return _DecodeObjBuffer;
+}
+#endif
 
 typedef struct DecodeCtnStackInfo {
     DecodeCtnWithSize *ctn;

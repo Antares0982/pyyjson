@@ -1,8 +1,8 @@
 #ifndef SSRJSON_ENCODE_SHARED_H
 #define SSRJSON_ENCODE_SHARED_H
 
-#include "ssrjson.h"
 #include "simd/simd_detect.h"
+#include "ssrjson.h"
 #include "tls.h"
 #include "unicode/unicode.h"
 
@@ -52,6 +52,20 @@
  *============================================================================*/
 
 static_assert((SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE % 64) == 0, "(SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE % 64) == 0");
+
+typedef struct EncodeCtnWithIndex {
+    PyObject *ctn;
+    Py_ssize_t index;
+} EncodeCtnWithIndex;
+
+#if !defined(Py_GIL_DISABLED)
+
+extern EncodeCtnWithIndex _EncodeCtnBuffer[SSRJSON_ENCODE_MAX_RECURSION];
+
+force_inline EncodeCtnWithIndex *get_encode_obj_stack_buffer(void) {
+    return _EncodeCtnBuffer;
+}
+#endif
 
 /*==============================================================================
  * Utils

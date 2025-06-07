@@ -26,7 +26,7 @@ static force_noinline PyObject *READ_ROOT_IMPL(const u8 *dat, usize len) {
     memset(decode_obj_stack_info, 0, sizeof(DecodeObjStackInfo));
     // init
     if (!init_decode_ctn_stack_info(decode_ctn_info) || !init_decode_obj_stack_info(decode_obj_stack_info)) goto failed_cleanup;
-    u8 *string_buffer_head = (u8 *)ssrjson_string_buffer;
+    u8 *string_buffer_head = (u8 *)_DecodeTempBuffer;
 
     //
     if (unlikely(len > ((size_t)(-1)) / 4)) {
@@ -418,7 +418,7 @@ success:;
     assert(obj && !PyErr_Occurred());
     assert(obj->ob_refcnt == 1);
     // free string buffer
-    if (unlikely(string_buffer_head != ssrjson_string_buffer)) {
+    if (unlikely(string_buffer_head != _DecodeTempBuffer)) {
         free(string_buffer_head);
     }
     // free obj stack buffer if allocated dynamically
@@ -487,7 +487,7 @@ failed_cleanup:
         Py_XDECREF(*obj_ptr);
     }
     // free string buffer
-    if (unlikely(string_buffer_head != ssrjson_string_buffer)) {
+    if (unlikely(string_buffer_head != _DecodeTempBuffer)) {
         free(string_buffer_head);
     }
     // free obj stack buffer if allocated dynamically

@@ -60,10 +60,13 @@ static void module_free(void *m) {
         Py_XDECREF(AssociativeKeyCache[i]);
     }
 
+#if defined(Py_GIL_DISABLED)
     if (unlikely(!ssrjson_tls_free())) {
         // critical
         printf("ssrjson: failed to free TLS\n");
     }
+#endif
+
 #if SSRJSON_ENABLE_TRACE
     size_t cached = 0;
     for (size_t i = 0; i < SSRJSON_KEY_CACHE_SIZE; i++) {
@@ -116,6 +119,7 @@ PyMODINIT_FUNC PyInit_ssrjson(void) {
         return NULL;
     }
 
+#if defined(Py_GIL_DISABLED)
     // TLS init.
     if (unlikely(!ssrjson_tls_init())) {
         PyErr_SetString(PyExc_RuntimeError, "Failed to initialize TLS");
@@ -124,6 +128,7 @@ PyMODINIT_FUNC PyInit_ssrjson(void) {
         Py_DECREF(module);
         return NULL;
     }
+#endif
 
     // do ssrjson internal init.
     memset(AssociativeKeyCache, 0, sizeof(AssociativeKeyCache));

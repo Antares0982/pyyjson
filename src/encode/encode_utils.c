@@ -4,7 +4,6 @@
 #define RESERVE_MAX ((~(usize)PY_SSIZE_T_MAX) >> 1)
 static_assert((SSRJSON_CAST(usize, RESERVE_MAX) & (SSRJSON_CAST(usize, RESERVE_MAX) - 1)) == 0, "");
 
-
 bool _unicode_buffer_reserve(EncodeUnicodeBufferInfo *unicode_buffer_info, usize target_size) {
     usize u8len = SSRJSON_CAST(uintptr_t, unicode_buffer_info->end) - SSRJSON_CAST(uintptr_t, unicode_buffer_info->head);
     assert((u8len & (u8len - 1)) == 0);
@@ -37,3 +36,7 @@ force_noinline bool resize_to_fit_pyunicode(EncodeUnicodeBufferInfo *unicode_buf
     unicode_buffer_info->head = new_ptr;
     return true;
 }
+
+#if !defined(Py_GIL_DISABLED)
+EncodeCtnWithIndex _EncodeCtnBuffer[SSRJSON_ENCODE_MAX_RECURSION];
+#endif
