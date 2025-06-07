@@ -15,7 +15,6 @@ option(BUILD_AVX512 "Force build avx512, non-shipping" OFF)
 option(BUILD_AVX2 "Force build avx2, non-shipping" OFF)
 option(BUILD_SSE4 "Force build sse4, non-shipping" OFF)
 option(BUILD_NATIVE "Force build with -march=native, non-shipping" OFF)
-option(RYU_HUMAN_READABLE "Not use scientific notation output in ryu" OFF)
 
 if(BUILD_SHIPPING_SIMD)
     if(BUILD_AVX512 OR BUILD_AVX2 OR BUILD_SSE4 OR BUILD_NATIVE)
@@ -144,10 +143,6 @@ endif()
 if(BUILD_BENCHMARK)
     message("ENABLE BENCHMARK")
     target_compile_definitions(commonBuild INTERFACE PYYJSON_BUILD_BENCHMARK=1)
-endif()
-
-if(RYU_HUMAN_READABLE)
-    target_compile_definitions(commonBuild INTERFACE RYU_HUMAN_READABLE=1)
 endif()
 
 if(ASAN_ENABLED)
