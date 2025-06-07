@@ -258,12 +258,14 @@ force_inline PyObject *pyyjson_dumps_single_long(PyObject *val, bool to_bytes_ob
 }
 
 force_inline PyObject *pyyjson_dumps_single_float(PyObject *val, bool to_bytes_obj) {
-    u8 buffer[64];
+    u8 buffer[32];
     double v = PyFloat_AS_DOUBLE(val);
     u64 *raw = (u64 *)&v;
-    size_t size = d2s_buffered_n(f64_from_raw(*raw), (char *)buffer);
+    u8 *buffer_end = dragonbox_to_chars_n(f64_from_raw(*raw), buffer);
+    usize size = buffer_end - buffer;
+    // size_t size = d2s_buffered_n(f64_from_raw(*raw), (char *)buffer);
     assert(size < 64);
-    u8 *buffer_end = buffer + size;
+    // u8 *buffer_end = buffer + size;
     PyObject *unicode;
     if (to_bytes_obj) {
         unicode = PyObject_Malloc(PYBYTES_START_OFFSET + size + 1);

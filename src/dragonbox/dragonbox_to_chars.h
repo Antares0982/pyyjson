@@ -283,7 +283,7 @@ namespace jkj {
                     }
                     else {
                         buffer[0] = '0';
-                        buffer[1] = 'E';
+                        buffer[1] = '.';
                         buffer[2] = '0';
                         return buffer + 3;
                     }

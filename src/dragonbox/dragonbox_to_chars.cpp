@@ -172,7 +172,9 @@ namespace jkj {
                         //   3, otherwise.
                         // Note that buffer[2] is never '0' if s32 is of 7 digits, because the input is
                         // never zero.
-                        buffer += (1 + (int(head_digits >= 10) & int(buffer[2] > '0')) * 2);
+                        // buffer += (1 + (int(head_digits >= 10) & int(buffer[2] > '0')) * 2);
+                        buffer += (1 + (int(head_digits >= 10) & (int(buffer[2] > '0') | int(exponent == 0))) * 2);
+                        // MARK
                     }
                     else {
                         // At least one of the remaining 6 digits are nonzero.
@@ -230,7 +232,9 @@ namespace jkj {
                         stdr::uint_least32_t((stdr::uint_least64_t(1) << 32) / 10000)) {
                         // The number of characters actually written is 1 or 3, similarly to the case of
                         // 7 or 8 digits.
-                        buffer += (1 + (int(head_digits >= 10) & int(buffer[2] > '0')) * 2);
+                        // buffer += (1 + (int(head_digits >= 10) & int(buffer[2] > '0')) * 2);
+                        buffer += (1 + (int(head_digits >= 10) & (int(buffer[2] > '0') | int(exponent == 0))) * 2);
+                        // MARK
                     }
                     else {
                         // At least one of the remaining 4 digits are nonzero.
@@ -275,7 +279,9 @@ namespace jkj {
                         stdr::uint_least32_t((stdr::uint_least64_t(1) << 32) / 100)) {
                         // The number of characters actually written is 1 or 3, similarly to the case of
                         // 7 or 8 digits.
-                        buffer += (1 + (int(head_digits >= 10) & int(buffer[2] > '0')) * 2);
+                        // buffer += (1 + (int(head_digits >= 10) & int(buffer[2] > '0')) * 2);
+                        buffer += (1 + (int(head_digits >= 10) & (int(buffer[2] > '0') | int(exponent == 0))) * 2);
+                        // MARK
                     }
                     else {
                         // At least one of the remaining 2 digits are nonzero.
@@ -301,39 +307,41 @@ namespace jkj {
 
                     // The number of characters actually written is 1 or 3, similarly to the case of
                     // 7 or 8 digits.
-                    buffer += (1 + (int(s32 >= 10) & int(buffer[2] > '0')) * 2);
+                    // buffer += (1 + (int(s32 >= 10) & int(buffer[2] > '0')) * 2);
+                    buffer += (1 + (int(s32 >= 10) & (int(buffer[2] > '0') | int(exponent == 0))) * 2);
+                    // MARK
                 }
             }
 
-            template <>
-            char* to_chars<ieee754_binary32, stdr::uint_least32_t>(stdr::uint_least32_t s32,
-                                                                   int exponent,
-                                                                   char* buffer) noexcept {
-                // Print significand.
-                print_9_digits(s32, exponent, buffer);
+            // template <>
+            // char* to_chars<ieee754_binary32, stdr::uint_least32_t>(stdr::uint_least32_t s32,
+            //                                                        int exponent,
+            //                                                        char* buffer) noexcept {
+            //     // Print significand.
+            //     print_9_digits(s32, exponent, buffer);
 
-                // Print exponent and return
-                if (exponent < 0) {
-                    stdr::memcpy(buffer, "E-", 2);
-                    buffer += 2;
-                    exponent = -exponent;
-                }
-                else {
-                    buffer[0] = 'E';
-                    buffer += 1;
-                }
+            //     // Print exponent and return
+            //     if (exponent < 0) {
+            //         stdr::memcpy(buffer, "e-", 2);
+            //         buffer += 2;
+            //         exponent = -exponent;
+            //     }
+            //     else if (exponent > 0) {
+            //         buffer[0] = 'e';
+            //         buffer += 1;
+            //     }
 
-                if (exponent >= 10) {
-                    print_2_digits(exponent, buffer);
-                    buffer += 2;
-                }
-                else {
-                    print_1_digit(exponent, buffer);
-                    buffer += 1;
-                }
+            //     if (exponent >= 10) {
+            //         print_2_digits(exponent, buffer);
+            //         buffer += 2;
+            //     }
+            //     else {
+            //         print_1_digit(exponent, buffer);
+            //         buffer += 1;
+            //     }
 
-                return buffer;
-            }
+            //     return buffer;
+            // }
 
             template <>
             char*
@@ -510,12 +518,12 @@ namespace jkj {
 
                 // Print exponent and return
                 if (exponent < 0) {
-                    stdr::memcpy(buffer, "E-", 2);
+                    stdr::memcpy(buffer, "e-", 2);
                     buffer += 2;
                     exponent = -exponent;
                 }
-                else {
-                    buffer[0] = 'E';
+                else if (exponent > 0) {
+                    buffer[0] = 'e';
                     buffer += 1;
                 }
 
@@ -532,7 +540,7 @@ namespace jkj {
                     print_2_digits(exponent, buffer);
                     buffer += 2;
                 }
-                else {
+                else if (exponent > 0) {
                     print_1_digit(exponent, buffer);
                     buffer += 1;
                 }
@@ -541,4 +549,16 @@ namespace jkj {
             }
         }
     }
+}
+
+extern "C" {
+typedef uint8_t u8;
+static_assert(sizeof(u8) == sizeof(char), "");
+
+u8 *dragonbox_to_chars_n(double value, u8 *buffer) {
+    constexpr int max_output_string_length = jkj::dragonbox::max_output_string_length<jkj::dragonbox::ieee754_binary64>;
+    static_assert(max_output_string_length == 24, "");
+    auto ret_ptr = jkj::dragonbox::to_chars_n(value, reinterpret_cast<char *>(buffer));
+    return reinterpret_cast<u8 *>(ret_ptr);
+}
 }
