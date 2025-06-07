@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
-project(pyyjson LANGUAGES C)
+project(pyyjson LANGUAGES C CXX)
 set(CMAKE_C_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
 
 # ------------------------------------------------------------------------------
 # Build Options for tests and docs
@@ -184,6 +185,10 @@ set(SRC_WITH_SIMD
     src/simd/cvt.c
 )
 
+set(SRC_DRAGON_BOX
+    src/dragonbox/dragonbox_to_chars.cpp
+)
+
 set(SRC_TEST
     src/ctests/tools.c
     src/ctests/main.c
@@ -202,6 +207,9 @@ if(BUILD_BENCHMARK)
     set(SRC_FILES ${SRC_FILES} src/benchmark.c)
 endif()
 
+add_library(dragon_box OBJECT ${SRC_DRAGON_BOX})
+target_link_libraries(dragon_box PUBLIC commonBuild)
+
 # add library pyyjson
 if(BUILD_MULTI_LIB)
     set(SRC_FILES ${SRC_FILES} src/multilib.c)
@@ -218,7 +226,7 @@ if(BUILD_MULTI_LIB)
         target_link_libraries(pyyjson_sse4 PUBLIC pyyjson_common)
         # add_library(pyyjson_sse2 OBJECT ${SRC_WITH_SIMD})
         # target_link_libraries(pyyjson_sse2 PUBLIC pyyjson_common)
-        add_library(pyyjson SHARED $<TARGET_OBJECTS:pyyjson_avx512> $<TARGET_OBJECTS:pyyjson_avx2> $<TARGET_OBJECTS:pyyjson_sse4> $<TARGET_OBJECTS:pyyjson_common>)
+        add_library(pyyjson SHARED $<TARGET_OBJECTS:pyyjson_avx512> $<TARGET_OBJECTS:pyyjson_avx2> $<TARGET_OBJECTS:pyyjson_sse4> $<TARGET_OBJECTS:pyyjson_common> $<TARGET_OBJECTS:dragon_box>)
         target_link_libraries(pyyjson PUBLIC ${Python3_LIBRARIES})
 
         add_avx512_compile_option(pyyjson_avx512)
@@ -230,7 +238,7 @@ if(BUILD_MULTI_LIB)
         target_link_libraries(pyyjson_common PUBLIC commonBuild)
         add_library(pyyjson_neon OBJECT ${SRC_WITH_SIMD})
         target_link_libraries(pyyjson_neon PUBLIC pyyjson_common)
-        add_library(pyyjson SHARED $<TARGET_OBJECTS:pyyjson_neon> $<TARGET_OBJECTS:pyyjson_common>)
+        add_library(pyyjson SHARED $<TARGET_OBJECTS:pyyjson_neon> $<TARGET_OBJECTS:pyyjson_common> $<TARGET_OBJECTS:pyyjson_common> $<TARGET_OBJECTS:dragon_box>)
         target_link_libraries(pyyjson PUBLIC ${Python3_LIBRARIES})
 
     else()
