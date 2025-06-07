@@ -1,6 +1,6 @@
-#define PY_SSIZE_T_CLEAN
 #include "pyyjson.h"
 #include "tls.h"
+#include "version.h"
 
 
 typedef PyObject *pyyjson_cache_type;
@@ -134,4 +134,3 @@ PyMODINIT_FUNC PyInit_pyyjson(void) {
 
     return module;
 }
-

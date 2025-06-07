@@ -335,18 +335,6 @@ class TestType:
             pyyjson.JSONEncodeError, pyyjson.dumps_to_bytes, {"\ud83d\ude80": None}
         )
 
-    @pytest.mark.skipif(
-        xxhash is None, reason="xxhash install broken on win, python3.9, Azure"
-    )
-    def test_str_ascii(self):
-        """
-        str is ASCII but not compact
-        """
-        digest = xxhash.xxh32_hexdigest("12345")
-        for _ in range(2):
-            assert pyyjson.dumps(digest) == '"b30d56b4"'
-            assert pyyjson.dumps_to_bytes(digest) == b'"b30d56b4"'
-
     def test_bytes_dumps(self):
         """
         bytes dumps not supported

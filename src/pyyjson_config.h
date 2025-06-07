@@ -1,8 +1,6 @@
 #ifndef PYYJSON_CONFIG_H
 #define PYYJSON_CONFIG_H
 
-#include "version.h"
-
 #ifdef _DEBUG
 #    undef _DEBUG
 #    include <Python.h>
