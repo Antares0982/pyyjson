@@ -28,7 +28,7 @@ force_inline bool DIGI_IS_FP(_src_t d) {
     return d <= U8MAX && _digi_is_fp((u8)d);
 }
 
-#if PYYJSON_HAS_IEEE_754
+#if SSRJSON_HAS_IEEE_754
 #    define DIGI_IS_NONZERO MAKE_R_NAME(digi_is_nonzero)
 #    define BIGINT_SET_BUF MAKE_R_NAME(bigint_set_buf)
 
@@ -119,7 +119,7 @@ static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *bu
         do {                                                                                              \
             *end = cur;                                                                                   \
             u64 temp = (sign ? (u64)(~(_v) + 1) : (u64)(_v));                                             \
-            if (unlikely(PYYJSON_CAST(i64, temp) < 0 && !sign)) return PyLong_FromUnsignedLongLong(temp); \
+            if (unlikely(SSRJSON_CAST(i64, temp) < 0 && !sign)) return PyLong_FromUnsignedLongLong(temp); \
             return PyLong_FromLongLong((i64)temp);                                                        \
         } while (false)
 
@@ -407,7 +407,7 @@ digi_finish:
      Fast path 1:
      
      1. The floating-point number calculation should be accurate, see the
-        comments of macro `PYYJSON_DOUBLE_MATH_CORRECT`.
+        comments of macro `SSRJSON_DOUBLE_MATH_CORRECT`.
      2. Correct rounding should be performed (fegetround() == FE_TONEAREST).
      3. The input of floating point number calculation does not lose precision,
         which means: 64 - leading_zero(input) - trailing_zero(input) < 53.
@@ -415,7 +415,7 @@ digi_finish:
      We don't check all available inputs here, because that would make the code
      more complicated, and not friendly to branch predictor.
      */
-#    if PYYJSON_DOUBLE_MATH_CORRECT
+#    if SSRJSON_DOUBLE_MATH_CORRECT
     if (sig < ((u64)1 << 53) &&
         exp >= -F64_POW10_EXP_MAX_EXACT &&
         exp <= +F64_POW10_EXP_MAX_EXACT) {
@@ -709,7 +709,7 @@ digi_finish:
 #    undef BIGINT_SET_BUF
 #    undef DIGI_IS_NONZERO
 
-#else /* !PYYJSON_HAS_IEEE_754 */
+#else /* !SSRJSON_HAS_IEEE_754 */
 
 /**
  Read a JSON number.
@@ -734,7 +734,7 @@ static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *bu
         do {                                                                                              \
             *end = cur;                                                                                   \
             u64 temp = (sign ? (u64)(~(_v) + 1) : (u64)(_v));                                             \
-            if (unlikely(PYYJSON_CAST(i64, temp) < 0 && !sign)) return PyLong_FromUnsignedLongLong(temp); \
+            if (unlikely(SSRJSON_CAST(i64, temp) < 0 && !sign)) return PyLong_FromUnsignedLongLong(temp); \
             return PyLong_FromLongLong((i64)temp);                                                        \
         } while (false)
 
@@ -888,7 +888,7 @@ read_double:
         }
         tmpbuf_ptr += TAIL_PADDING;
     }
-#        define DOWNGRADER PYYJSON_CONCAT3(downgrade_string, COMPILE_READ_UCS_LEVEL, 1)
+#        define DOWNGRADER SSRJSON_CONCAT3(downgrade_string, COMPILE_READ_UCS_LEVEL, 1)
     DOWNGRADER(hdr, _tmplength, tmpbuf_ptr);
 #        undef DOWNGRADER
     tmpbuf_ptr[_tmplength] = 0;
@@ -942,7 +942,7 @@ read_double:
 #    undef return_raw
 }
 
-#endif /* !PYYJSON_HAS_IEEE_754 */
+#endif /* !SSRJSON_HAS_IEEE_754 */
 
 #undef DIGI_IS_FP
 #undef DIGI_IS_SIGN

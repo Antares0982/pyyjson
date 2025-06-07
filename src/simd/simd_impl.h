@@ -1,12 +1,12 @@
-#ifndef PYYJSON_SIMD_IMPL_H
-#define PYYJSON_SIMD_IMPL_H
+#ifndef SSRJSON_SIMD_IMPL_H
+#define SSRJSON_SIMD_IMPL_H
 
-#include "pyyjson.h"
+#include "ssrjson.h"
 #include "simd/simd_detect.h"
 #include "vector_types.h"
 //
 
-#if PYYJSON_X86
+#if SSRJSON_X86
 #    if __AVX512VL__ && __AVX512DQ__ && __AVX512BW__
 #        include "avx512vl_dq_bw/full.h"
 #    endif
@@ -28,7 +28,7 @@
 #    include "sse2/full.h"
 
 
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
 
 force_inline void write_u8_128(void *dst, vector_a_u8_128 x) {
     memcpy(dst, &x, sizeof(x));
@@ -59,4 +59,4 @@ force_inline vector_a_u32_128 elevate_1_4_to_128(vector_a_u8_32 _in) {
 }
 
 #endif
-#endif // PYYJSON_SIMD_IMPL_H
+#endif // SSRJSON_SIMD_IMPL_H

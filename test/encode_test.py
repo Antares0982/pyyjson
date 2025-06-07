@@ -10,23 +10,23 @@ class TestEncode(unittest.TestCase):
         return check_obj_same(self, a, b)
 
     def test_fail(self):
-        import pyyjson
+        import ssrjson
 
         class A:
             pass
 
         # TypeError
-        test_cases = [(pyyjson.JSONEncodeError, [A(), 1 + 1j]),
+        test_cases = [(ssrjson.JSONEncodeError, [A(), 1 + 1j]),
                       (OverflowError, 18446744073709551615 + 1),
                       (OverflowError, -9223372036854775808 - 1), ]
 
         for err, case in test_cases:
             with self.subTest(msg=f"encoding_fail_test(case={case})"):
                 with self.assertRaises(err):
-                    pyyjson.dumps(case)
+                    ssrjson.dumps(case)
 
     # def test_default(self):
-    #     import pyyjson
+    #     import ssrjson
     #     import json
 
     #     class A:
@@ -47,11 +47,11 @@ class TestEncode(unittest.TestCase):
     #     for case in test_cases:
     #         with self.subTest(msg=f'encoding_default_test(case={case})'):
     #             result_json = json.dumps(case, default=d4, separators=(",", ":"))
-    #             result_pyyjson = pyyjson.dumps(case, default=d4)
-    #             self._check_obj_same(result_json, result_pyyjson)
+    #             result_ssrjson = ssrjson.dumps(case, default=d4)
+    #             self._check_obj_same(result_json, result_ssrjson)
 
     # def test_allow_nan(self):
-    #     import pyyjson
+    #     import ssrjson
     #     import json
     #     import math
 
@@ -65,11 +65,11 @@ class TestEncode(unittest.TestCase):
 
     #     for case in test_cases:
     #         with self.subTest(msg=f'encoding_allow_nan_test(case={case})'):
-    #             self.assertRaises(ValueError, pyyjson.dumps, case, allow_nan=False)
+    #             self.assertRaises(ValueError, ssrjson.dumps, case, allow_nan=False)
     #             self.assertRaises(ValueError, json.dumps, case, allow_nan=False, separators=(",", ":"))
 
     # def test_seperators(self):
-    #     import pyyjson
+    #     import ssrjson
     #     import json
 
     #     test_cases = [
@@ -81,11 +81,11 @@ class TestEncode(unittest.TestCase):
     #     for case in test_cases:
     #         with self.subTest(msg=f'encoding_separators_test(case={case})'):
     #             result_json = json.dumps(case, separators=(",-,-,", ":_:_:"))
-    #             result_pyyjson = pyyjson.dumps(case, separators=(",-,-,", ":_:_:"))
-    #             self._check_obj_same(result_json, result_pyyjson)
+    #             result_ssrjson = ssrjson.dumps(case, separators=(",-,-,", ":_:_:"))
+    #             self._check_obj_same(result_json, result_ssrjson)
 
     # def test_skipkeys(self):
-    #     import pyyjson
+    #     import ssrjson
     #     import json
 
     #     class A:
@@ -103,9 +103,9 @@ class TestEncode(unittest.TestCase):
     #         result_loadback_json = json.loads(result_json)
 
     #         with self.subTest(msg=f'encoding_skipkeys_test(case={case})'):
-    #             result_pyyjson = pyyjson.dumps(case, skipkeys=True)
-    #             result_loadback_pyyjson = json.loads(result_pyyjson)
-    #             self._check_obj_same(result_loadback_json, result_loadback_pyyjson)
+    #             result_ssrjson = ssrjson.dumps(case, skipkeys=True)
+    #             result_loadback_ssrjson = json.loads(result_ssrjson)
+    #             self._check_obj_same(result_loadback_json, result_loadback_ssrjson)
 
     def test_encode(self):
         import collections
@@ -113,7 +113,7 @@ class TestEncode(unittest.TestCase):
         import math
         import concurrent.futures
 
-        import pyyjson
+        import ssrjson
         from test_utils import get_benchfiles_fullpath
 
         test_cases = [
@@ -171,9 +171,9 @@ class TestEncode(unittest.TestCase):
                 result_loadback_json = json.loads(result_json)
 
                 with self.subTest(msg=f"encoding_test(case={_case})"):
-                    result_pyyjson = pyyjson.dumps(_case)
-                    result_loadback_pyyjson = json.loads(result_pyyjson)
-                    self._check_obj_same(result_loadback_json, result_loadback_pyyjson)
+                    result_ssrjson = ssrjson.dumps(_case)
+                    result_loadback_ssrjson = json.loads(result_ssrjson)
+                    self._check_obj_same(result_loadback_json, result_loadback_ssrjson)
             futures = []
             for case in test_cases:
                 futures.append(executor.submit(do_case, case))

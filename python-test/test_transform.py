@@ -2,7 +2,7 @@
 
 import pytest
 
-import pyyjson
+import ssrjson
 
 from util import read_fixture_bytes
 
@@ -14,13 +14,13 @@ def _read_file(filename):
 class TestJSONTestSuiteTransform:
     def _pass_transform(self, filename, reference=None):
         data = _read_file(filename)
-        assert pyyjson.dumps(pyyjson.loads(data)) == (reference or data.decode("utf-8"))
-        assert pyyjson.dumps_to_bytes(pyyjson.loads(data)) == (reference and reference.encode("utf-8") or data)
+        assert ssrjson.dumps(ssrjson.loads(data)) == (reference or data.decode("utf-8"))
+        assert ssrjson.dumps_to_bytes(ssrjson.loads(data)) == (reference and reference.encode("utf-8") or data)
 
     def _fail_transform(self, filename):
         data = _read_file(filename)
-        with pytest.raises(pyyjson.JSONDecodeError):
-            pyyjson.loads(data)
+        with pytest.raises(ssrjson.JSONDecodeError):
+            ssrjson.loads(data)
 
     def test_number_1(self):
         """
@@ -45,7 +45,7 @@ class TestJSONTestSuiteTransform:
         number_10000000000000000999.json
         """
         # cannot serialize due to range
-        assert pyyjson.loads(_read_file("number_10000000000000000999.json")) == [
+        assert ssrjson.loads(_read_file("number_10000000000000000999.json")) == [
             10000000000000000999
         ]
 

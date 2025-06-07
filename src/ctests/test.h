@@ -1,5 +1,5 @@
-#ifndef PYYJSON_CTESTS_TEST_H
-#define PYYJSON_CTESTS_TEST_H
+#ifndef SSRJSON_CTESTS_TEST_H
+#define SSRJSON_CTESTS_TEST_H
 #include "simd/mask_table.h"
 #include "simd/simd_impl.h"
 
@@ -77,12 +77,12 @@ force_inline u32 get_random_4bytes_u32(void) {
 }
 
 /* DECLARE_TEST macro. */
-#if BUILD_MULTI_LIB && PYYJSON_X86
+#if BUILD_MULTI_LIB && SSRJSON_X86
 #    define DECLARE_TEST(_name)   \
         int _name##_sse4_2(void); \
         int _name##_avx2(void);   \
         int _name##_avx512(void);
-#elif BUILD_MULTI_LIB && PYYJSON_AARCH
+#elif BUILD_MULTI_LIB && SSRJSON_AARCH
 #    define DECLARE_TEST(_name) int _name##_neon(void);
 #else
 #    define DECLARE_TEST(_name) int _name(void);
@@ -99,4 +99,4 @@ DECLARE_TEST(test_ucs4_encode_3bytes_utf8)
 DECLARE_TEST(test_ucs4_encode_2bytes_utf8)
 DECLARE_TEST(test_long_cvt_u8_u16)
 
-#endif // PYYJSON_CTESTS_TEST_H
+#endif // SSRJSON_CTESTS_TEST_H

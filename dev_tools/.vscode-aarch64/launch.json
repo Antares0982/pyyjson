@@ -188,7 +188,7 @@
             "name": "(gdb) Launch fuzzer",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/pyyjson_fuzzer",
+            "program": "${workspaceFolder}/build/ssrjson_fuzzer",
             "args": [
                 "-dict=fuzzer.dict",
                 "-max_total_time=300",
@@ -220,7 +220,7 @@
             "name": "(gdb) Launch C test",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/pyyjson_test",
+            "program": "${workspaceFolder}/build/ssrjson_test",
             "args": [
             ],
             "stopAtEntry": false,

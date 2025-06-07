@@ -1,7 +1,7 @@
-#ifndef PYYJSON_ENCODE_ENCODE_UTF8_SHARED_H
-#define PYYJSON_ENCODE_ENCODE_UTF8_SHARED_H
+#ifndef SSRJSON_ENCODE_ENCODE_UTF8_SHARED_H
+#define SSRJSON_ENCODE_ENCODE_UTF8_SHARED_H
 
-#include "pyyjson.h"
+#include "ssrjson.h"
 
 extern const u8 ControlEscapeTable_u8[(_Slash + 1) * 8];
 extern const Py_ssize_t _ControlJump[_Slash + 1];
@@ -101,7 +101,7 @@ force_inline bool encode_one_ucs4(u8 **writer_addr, u32 unicode) {
         *writer_addr = writer;
     } else {
         // 4 bytes
-#ifndef PYYJSON_ASAN_CHECK
+#ifndef SSRJSON_ASAN_CHECK
         assert(unicode <= 0x10ffff); // cannot create such unicode object
 #endif
         u8 *writer = *writer_addr;
@@ -126,4 +126,4 @@ force_inline int ucs4_get_type(u32 unicode, bool *is_escaped) {
     return 4;
 }
 
-#endif // PYYJSON_ENCODE_ENCODE_UTF8_SHARED_H
+#endif // SSRJSON_ENCODE_ENCODE_UTF8_SHARED_H

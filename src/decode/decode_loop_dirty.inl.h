@@ -11,7 +11,7 @@
  *  2. COMPILE_READ_UCS_LEVEL = COMPILE_UCS_LEVEL ? COMPILE_UCS_LEVEL : 1
  *  3. max_char_type == 4 || COMPILE_UCS_LEVEL == 0 => need_check_max_char == false
  */
-int new_write_as = PYYJSON_MAX(_read_state.max_char_type, COMPILE_READ_UCS_LEVEL);
+int new_write_as = SSRJSON_MAX(_read_state.max_char_type, COMPILE_READ_UCS_LEVEL);
 bool need_check_max_char = _read_state.max_char_type < COMPILE_UCS_LEVEL;
 int jump_code = new_write_as + (need_check_max_char ? 4 : 0);
 if (_read_state.need_copy) {
@@ -45,7 +45,7 @@ if (_read_state.need_copy) {
         }
 #endif
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         }
     }
 } else {
@@ -81,7 +81,7 @@ if (_read_state.need_copy) {
         }
 #endif
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         }
     }
 }

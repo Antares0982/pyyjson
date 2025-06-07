@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_SSE2_ENCODE_BYTES_UCS1_H
-#define PYYJSON_SIMD_SSE2_ENCODE_BYTES_UCS1_H
+#ifndef SSRJSON_SIMD_SSE2_ENCODE_BYTES_UCS1_H
+#define SSRJSON_SIMD_SSE2_ENCODE_BYTES_UCS1_H
 
 #include "simd/simd_detect.h"
 #include "simd/vector_types.h"
@@ -30,7 +30,7 @@ force_inline void bytes_write_ucs1_trailing_128(u8 **writer_addr, const u8 *src,
 restart:;
     vector_a x, m;
     int shift;
-    shift = PYYJSON_CAST(int, READ_BATCH_COUNT - len);
+    shift = SSRJSON_CAST(int, READ_BATCH_COUNT - len);
     x = runtime_byte_rshift_128(vec, shift);
     m = runtime_byte_rshift_128(m0, shift);
     *(vector_u *)writer = x;
@@ -54,4 +54,4 @@ restart:;
 #undef COMPILE_WRITE_UCS_LEVEL
 #undef COMPILE_READ_UCS_LEVEL
 
-#endif // PYYJSON_SIMD_SSE2_ENCODE_BYTES_UCS1_H
+#endif // SSRJSON_SIMD_SSE2_ENCODE_BYTES_UCS1_H

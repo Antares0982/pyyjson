@@ -3,7 +3,7 @@
   python ? pkgs.python3,
 }:
 python.pkgs.buildPythonApplication {
-  pname = "pyyjson";
+  pname = "ssrjson";
   version = "0.0.1";
   src = ./.;
   pyproject = false;

@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX2_DECODE_H
-#define PYYJSON_SIMD_AVX2_DECODE_H
+#ifndef SSRJSON_SIMD_AVX2_DECODE_H
+#define SSRJSON_SIMD_AVX2_DECODE_H
 #include "checker.h"
 #include "common.h"
 #include "simd/sse2/decode.h"
@@ -16,4 +16,4 @@
 #include "decode/_sr_decode_tools.inl.h"
 #undef COMPILE_READ_UCS_LEVEL
 
-#endif // PYYJSON_SIMD_AVX2_DECODE_H
+#endif // SSRJSON_SIMD_AVX2_DECODE_H

@@ -1,21 +1,21 @@
-#ifndef PYYJSON_MEMCPY_H
-#define PYYJSON_MEMCPY_H
+#ifndef SSRJSON_MEMCPY_H
+#define SSRJSON_MEMCPY_H
 
-#include "pyyjson.h"
+#include "ssrjson.h"
 
 // provide inline version of memcpy.
 #if __AVX512F__
-#    define pyyjson_memcpy(_d, _s, _size) pyyjson_memcpy_simd((_d), (_s), (_size), 512)
-#    define PYYJSON_MEMCPY_SIMD_SIZE 64
+#    define ssrjson_memcpy(_d, _s, _size) ssrjson_memcpy_simd((_d), (_s), (_size), 512)
+#    define SSRJSON_MEMCPY_SIMD_SIZE 64
 #elif __AVX__
-#    define pyyjson_memcpy(_d, _s, _size) pyyjson_memcpy_simd((_d), (_s), (_size), 256)
-#    define PYYJSON_MEMCPY_SIMD_SIZE 32
+#    define ssrjson_memcpy(_d, _s, _size) ssrjson_memcpy_simd((_d), (_s), (_size), 256)
+#    define SSRJSON_MEMCPY_SIMD_SIZE 32
 #else
-#    define pyyjson_memcpy(_d, _s, _size) pyyjson_memcpy_simd((_d), (_s), (_size), 128)
-#    define PYYJSON_MEMCPY_SIMD_SIZE 16
+#    define ssrjson_memcpy(_d, _s, _size) ssrjson_memcpy_simd((_d), (_s), (_size), 128)
+#    define SSRJSON_MEMCPY_SIMD_SIZE 16
 #endif
 // use libc memcpy if need noinline version.
-#define pyyjson_memcpy_noinline memcpy
+#define ssrjson_memcpy_noinline memcpy
 
 #if defined(_MSC_VER) && !defined(__clang__)
 typedef __declspec(align(1)) struct {
@@ -111,13 +111,13 @@ typedef u8 unaligned128 __attribute__((__vector_size__(128), __aligned__(1)));
 typedef u8 unaligned256 __attribute__((__vector_size__(256), __aligned__(1)));
 #endif
 
-force_inline void __pyyjson_memcpy(u8 **restrict dest_addr, const u8 **restrict src_addr, size_t n_bytes) {
+force_inline void __ssrjson_memcpy(u8 **restrict dest_addr, const u8 **restrict src_addr, size_t n_bytes) {
     memcpy((void *)*dest_addr, (const void *)*src_addr, n_bytes);
     *dest_addr += n_bytes;
     *src_addr += n_bytes;
 }
 
-force_inline void pyyjson_memcpy_aligned_all_power2(void *restrict dest, const void *restrict src, size_t n_bytes) {
+force_inline void ssrjson_memcpy_aligned_all_power2(void *restrict dest, const void *restrict src, size_t n_bytes) {
 #define COPY_ALIGNED(_size)                   \
     {                                         \
         register aligned##_size __tmp;        \
@@ -146,13 +146,13 @@ force_inline void pyyjson_memcpy_aligned_all_power2(void *restrict dest, const v
         case 256:
             COPY_ALIGNED(256);
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         }
     }
 #undef COPY_ALIGNED
 }
 
-force_inline void pyyjson_memcpy_aligned_store_power2(void *restrict dest, const void *restrict src, size_t n_bytes) {
+force_inline void ssrjson_memcpy_aligned_store_power2(void *restrict dest, const void *restrict src, size_t n_bytes) {
 #define COPY_TO_ALIGNED_DST(_size)                          \
     {                                                       \
         register aligned##_size __tmp;                      \
@@ -181,46 +181,46 @@ force_inline void pyyjson_memcpy_aligned_store_power2(void *restrict dest, const
         case 256:
             COPY_TO_ALIGNED_DST(256);
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         }
     }
 #undef COPY_TO_ALIGNED_DST
 }
 
-force_inline void __pyyjson_memcpy_aligned_store_power2(u8 **restrict dest_addr, const u8 **restrict src_addr, size_t n_bytes) {
-    pyyjson_memcpy_aligned_store_power2(*dest_addr, *src_addr, n_bytes);
+force_inline void __ssrjson_memcpy_aligned_store_power2(u8 **restrict dest_addr, const u8 **restrict src_addr, size_t n_bytes) {
+    ssrjson_memcpy_aligned_store_power2(*dest_addr, *src_addr, n_bytes);
     *dest_addr += n_bytes;
     *src_addr += n_bytes;
 }
 
-force_inline void __pyyjson_short_memcpy_small_first(u8 **restrict dest_addr, const u8 **restrict src_addr, size_t n_bytes, size_t size_less_than) {
-    if (size_less_than >= 2 && (n_bytes & 1)) __pyyjson_memcpy(dest_addr, src_addr, 1);
-    if (size_less_than >= 4 && (n_bytes & 2)) __pyyjson_memcpy(dest_addr, src_addr, 2);
-    if (size_less_than >= 8 && (n_bytes & 4)) __pyyjson_memcpy(dest_addr, src_addr, 4);
-    if (size_less_than >= 16 && (n_bytes & 8)) __pyyjson_memcpy(dest_addr, src_addr, 8);
-    if (size_less_than >= 32 && (n_bytes & 16)) __pyyjson_memcpy(dest_addr, src_addr, 16);
-    if (size_less_than >= 64 && (n_bytes & 32)) __pyyjson_memcpy(dest_addr, src_addr, 32);
+force_inline void __ssrjson_short_memcpy_small_first(u8 **restrict dest_addr, const u8 **restrict src_addr, size_t n_bytes, size_t size_less_than) {
+    if (size_less_than >= 2 && (n_bytes & 1)) __ssrjson_memcpy(dest_addr, src_addr, 1);
+    if (size_less_than >= 4 && (n_bytes & 2)) __ssrjson_memcpy(dest_addr, src_addr, 2);
+    if (size_less_than >= 8 && (n_bytes & 4)) __ssrjson_memcpy(dest_addr, src_addr, 4);
+    if (size_less_than >= 16 && (n_bytes & 8)) __ssrjson_memcpy(dest_addr, src_addr, 8);
+    if (size_less_than >= 32 && (n_bytes & 16)) __ssrjson_memcpy(dest_addr, src_addr, 16);
+    if (size_less_than >= 64 && (n_bytes & 32)) __ssrjson_memcpy(dest_addr, src_addr, 32);
 }
 
-force_inline void __pyyjson_short_memcpy_small_first_aligned_store(u8 **restrict dest_addr, const u8 **restrict src_addr, size_t n_bytes, size_t size_less_than) {
-    if (size_less_than >= 2 && (n_bytes & 1)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 1);
-    if (size_less_than >= 4 && (n_bytes & 2)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 2);
-    if (size_less_than >= 8 && (n_bytes & 4)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 4);
-    if (size_less_than >= 16 && (n_bytes & 8)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 8);
-    if (size_less_than >= 32 && (n_bytes & 16)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 16);
-    if (size_less_than >= 64 && (n_bytes & 32)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 32);
+force_inline void __ssrjson_short_memcpy_small_first_aligned_store(u8 **restrict dest_addr, const u8 **restrict src_addr, size_t n_bytes, size_t size_less_than) {
+    if (size_less_than >= 2 && (n_bytes & 1)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 1);
+    if (size_less_than >= 4 && (n_bytes & 2)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 2);
+    if (size_less_than >= 8 && (n_bytes & 4)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 4);
+    if (size_less_than >= 16 && (n_bytes & 8)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 8);
+    if (size_less_than >= 32 && (n_bytes & 16)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 16);
+    if (size_less_than >= 64 && (n_bytes & 32)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 32);
 }
 
-force_inline void __pyyjson_short_memcpy_large_first(u8 **restrict dest_addr, const u8 **restrict src_addr, size_t n_bytes, size_t size_less_than) {
-    if (size_less_than >= 64 && (n_bytes & 32)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 32);
-    if (size_less_than >= 32 && (n_bytes & 16)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 16);
-    if (size_less_than >= 16 && (n_bytes & 8)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 8);
-    if (size_less_than >= 8 && (n_bytes & 4)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 4);
-    if (size_less_than >= 4 && (n_bytes & 2)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 2);
-    if (size_less_than >= 2 && (n_bytes & 1)) __pyyjson_memcpy_aligned_store_power2(dest_addr, src_addr, 1);
+force_inline void __ssrjson_short_memcpy_large_first(u8 **restrict dest_addr, const u8 **restrict src_addr, size_t n_bytes, size_t size_less_than) {
+    if (size_less_than >= 64 && (n_bytes & 32)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 32);
+    if (size_less_than >= 32 && (n_bytes & 16)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 16);
+    if (size_less_than >= 16 && (n_bytes & 8)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 8);
+    if (size_less_than >= 8 && (n_bytes & 4)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 4);
+    if (size_less_than >= 4 && (n_bytes & 2)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 2);
+    if (size_less_than >= 2 && (n_bytes & 1)) __ssrjson_memcpy_aligned_store_power2(dest_addr, src_addr, 1);
 }
 
-force_inline void pyyjson_memcpy_simd(void *restrict dest, const void *restrict src, size_t n_bytes, size_t per_cpy_bitsize) {
+force_inline void ssrjson_memcpy_simd(void *restrict dest, const void *restrict src, size_t n_bytes, size_t per_cpy_bitsize) {
     const size_t per_cpy_bytesize = per_cpy_bitsize / 8;
     assert(per_cpy_bytesize && ((per_cpy_bytesize - 1) & per_cpy_bytesize) == 0);
     u8 *d = (u8 *)dest;
@@ -233,11 +233,11 @@ force_inline void pyyjson_memcpy_simd(void *restrict dest, const void *restrict 
     if (d_int & (per_cpy_bytesize - 1)) {
         size_t tmp = per_cpy_bytesize - (d_int & (per_cpy_bytesize - 1));
         if (tmp >= n) {
-            __pyyjson_short_memcpy_small_first(&d, &s, n, per_cpy_bytesize);
+            __ssrjson_short_memcpy_small_first(&d, &s, n, per_cpy_bytesize);
             return;
         }
         size_t nh = tmp;
-        __pyyjson_short_memcpy_small_first_aligned_store(&d, &s, nh, per_cpy_bytesize);
+        __ssrjson_short_memcpy_small_first_aligned_store(&d, &s, nh, per_cpy_bytesize);
         s_int += nh;
         n -= nh;
     }
@@ -245,13 +245,13 @@ force_inline void pyyjson_memcpy_simd(void *restrict dest, const void *restrict 
     if (s_int & (per_cpy_bytesize - 1)) { // src is not aligned to 256-bits
         // unroll 4
         while (n >= 4 * per_cpy_bytesize) {
-            pyyjson_memcpy_aligned_store_power2(d, s, 4 * per_cpy_bytesize);
+            ssrjson_memcpy_aligned_store_power2(d, s, 4 * per_cpy_bytesize);
             s += 4 * per_cpy_bytesize;
             d += 4 * per_cpy_bytesize;
             n -= 4 * per_cpy_bytesize;
         }
         while (n >= per_cpy_bytesize) {
-            pyyjson_memcpy_aligned_store_power2(d, s, per_cpy_bytesize);
+            ssrjson_memcpy_aligned_store_power2(d, s, per_cpy_bytesize);
             s += per_cpy_bytesize;
             d += per_cpy_bytesize;
             n -= per_cpy_bytesize;
@@ -259,19 +259,19 @@ force_inline void pyyjson_memcpy_simd(void *restrict dest, const void *restrict 
     } else { // or it IS aligned
         // unroll 4
         while (n >= 4 * per_cpy_bytesize) {
-            pyyjson_memcpy_aligned_all_power2(d, s, 4 * per_cpy_bytesize);
+            ssrjson_memcpy_aligned_all_power2(d, s, 4 * per_cpy_bytesize);
             s += 4 * per_cpy_bytesize;
             d += 4 * per_cpy_bytesize;
             n -= 4 * per_cpy_bytesize;
         }
         while (n >= per_cpy_bytesize) {
-            pyyjson_memcpy_aligned_all_power2(d, s, per_cpy_bytesize);
+            ssrjson_memcpy_aligned_all_power2(d, s, per_cpy_bytesize);
             s += per_cpy_bytesize;
             d += per_cpy_bytesize;
             n -= per_cpy_bytesize;
         }
     }
-    if (n) __pyyjson_short_memcpy_large_first(&d, &s, n, per_cpy_bytesize);
+    if (n) __ssrjson_short_memcpy_large_first(&d, &s, n, per_cpy_bytesize);
 }
 
-#endif // PYYJSON_MEMCPY_H
+#endif // SSRJSON_MEMCPY_H

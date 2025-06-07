@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX512VLDQBW_CHECKER_H
-#define PYYJSON_SIMD_AVX512VLDQBW_CHECKER_H
+#ifndef SSRJSON_SIMD_AVX512VLDQBW_CHECKER_H
+#define SSRJSON_SIMD_AVX512VLDQBW_CHECKER_H
 
 #include "simd/avx512vl_dq_bw/common.h"
 #include "simd/mask_table.h"
@@ -19,4 +19,4 @@
 #include "checker/_sr_escape.inl.h"
 #undef COMPILE_READ_UCS_LEVEL
 
-#endif // PYYJSON_SIMD_AVX512VLDQBW_CHECKER_H
+#endif // SSRJSON_SIMD_AVX512VLDQBW_CHECKER_H

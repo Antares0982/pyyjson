@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_CONTEXT_ENCODE
 #        define COMPILE_CONTEXT_ENCODE
 #    endif
@@ -102,7 +102,7 @@ force_inline bool unicode_buffer_append_key(PyObject *key, EncodeUnicodeWriter *
                     break;
                 }
                 default: {
-                    PYYJSON_UNREACHABLE();
+                    SSRJSON_UNREACHABLE();
                 }
             }
             break;
@@ -123,13 +123,13 @@ force_inline bool unicode_buffer_append_key(PyObject *key, EncodeUnicodeWriter *
                     break;
                 }
                 default: {
-                    PYYJSON_UNREACHABLE();
+                    SSRJSON_UNREACHABLE();
                 }
             }
             break;
         }
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         }
     }
     return true;
@@ -161,7 +161,7 @@ force_inline bool unicode_buffer_append_str(PyObject *val, EncodeUnicodeWriter *
                     break;
                 }
                 default: {
-                    PYYJSON_UNREACHABLE();
+                    SSRJSON_UNREACHABLE();
                 }
             }
             break;
@@ -182,13 +182,13 @@ force_inline bool unicode_buffer_append_str(PyObject *val, EncodeUnicodeWriter *
                     break;
                 }
                 default: {
-                    PYYJSON_UNREACHABLE();
+                    SSRJSON_UNREACHABLE();
                 }
             }
             break;
         }
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         }
     }
     return true;
@@ -346,7 +346,7 @@ force_inline bool unicode_buffer_append_null(_dst_t **writer_addr, EncodeUnicode
 force_inline bool unicode_buffer_append_float(_dst_t **writer_addr, EncodeUnicodeBufferInfo *unicode_buffer_info, Py_ssize_t cur_nested_depth, PyObject *val, bool is_in_obj) {
     WRITE_INDENT_RETURN_IF_FAIL(writer_addr, unicode_buffer_info, cur_nested_depth, is_in_obj, TAIL_PADDING);
     double v = PyFloat_AS_DOUBLE(val);
-    u64 raw = *PYYJSON_CAST(u64 *, &v); //(u64 *)&v;
+    u64 raw = *SSRJSON_CAST(u64 *, &v); //(u64 *)&v;
     _dst_t *writer = *writer_addr;
     f64_to_unicode(&writer, raw);
     *writer++ = ',';
@@ -450,7 +450,7 @@ force_inline bool unicode_buffer_append_arr_end(_dst_t **writer_addr, EncodeUnic
     return true;
 }
 
-// #define GET_UNICODE_BUFFER_FINAL_LEN PYYJSON_CONCAT2(get_unicode_buffer_final_len, COMPILE_UCS_LEVEL)
+// #define GET_UNICODE_BUFFER_FINAL_LEN SSRJSON_CONCAT2(get_unicode_buffer_final_len, COMPILE_UCS_LEVEL)
 // #if COMPILE_INDENT_LEVEL == 0
 // // avoid compile again
 // force_inline Py_ssize_t GET_UNICODE_BUFFER_FINAL_LEN(EncodeUnicodeBufferInfo *unicode_buffer_info) {
@@ -466,7 +466,7 @@ force_inline bool unicode_buffer_append_arr_end(_dst_t **writer_addr, EncodeUnic
 // }
 // #endif
 
-#define ENCODE_PROCESS_VAL PYYJSON_CONCAT3(encode_process_val, COMPILE_INDENT_LEVEL, COMPILE_UCS_LEVEL)
+#define ENCODE_PROCESS_VAL SSRJSON_CONCAT3(encode_process_val, COMPILE_INDENT_LEVEL, COMPILE_UCS_LEVEL)
 
 force_inline EncodeValJumpFlag ENCODE_PROCESS_VAL(
         EncodeUnicodeWriter *writer_addr,
@@ -480,7 +480,7 @@ force_inline EncodeValJumpFlag ENCODE_PROCESS_VAL(
         bool is_in_obj) {
 #define CTN_SIZE_GROW()                                                         \
     do {                                                                        \
-        if (unlikely(*cur_nested_depth_addr == PYYJSON_ENCODE_MAX_RECURSION)) { \
+        if (unlikely(*cur_nested_depth_addr == SSRJSON_ENCODE_MAX_RECURSION)) { \
             PyErr_SetString(JSONEncodeError, "Too many nested structures");     \
             return JumpFlag_Fail;                                               \
         }                                                                       \
@@ -595,8 +595,8 @@ force_inline EncodeValJumpFlag ENCODE_PROCESS_VAL(
 #undef CTN_SIZE_GROW
 }
 
-#define pyyjson_dumps_obj PYYJSON_CONCAT3(_pyyjson_dumps_obj, __UCS_NAME, __INDENT_NAME)
-#define dumps_next(_u_) PYYJSON_CONCAT3(_pyyjson_dumps_obj, _u_, __INDENT_NAME)
+#define ssrjson_dumps_obj SSRJSON_CONCAT3(_ssrjson_dumps_obj, __UCS_NAME, __INDENT_NAME)
+#define dumps_next(_u_) SSRJSON_CONCAT3(_ssrjson_dumps_obj, _u_, __INDENT_NAME)
 #define _DUMPS_PASS_ARGSDECL EncodeUnicodeWriter writer, PyObject *key, PyObject *val, PyObject *cur_obj, Py_ssize_t cur_pos, Py_ssize_t cur_nested_depth, Py_ssize_t cur_list_size, EncodeCtnWithIndex *ctn_stack, EncodeUnicodeInfo unicode_info, bool cur_is_tuple, EncodeUnicodeBufferInfo _unicode_buffer_info, EncodeCallFlag encode_call_flag
 #define _DUMPS_PASS_ARGS writer, key, val, cur_obj, cur_pos, cur_nested_depth, cur_list_size, ctn_stack, unicode_info, cur_is_tuple
 
@@ -606,7 +606,7 @@ static force_noinline PyObject *dumps_next(ucs2)(_DUMPS_PASS_ARGSDECL);
 static force_noinline PyObject *dumps_next(ucs4)(_DUMPS_PASS_ARGSDECL);
 
 static force_noinline PyObject *
-pyyjson_dumps_obj(
+ssrjson_dumps_obj(
 #if COMPILE_UCS_LEVEL > 0
         _DUMPS_PASS_ARGSDECL
 #else
@@ -686,7 +686,7 @@ pyyjson_dumps_obj(
         goto arr_val_begin;
     }
 
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 #else
     switch (encode_call_flag) {
         case CallFlag_ArrVal: {
@@ -708,11 +708,11 @@ pyyjson_dumps_obj(
             break;
         }
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
             break;
         }
     }
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 #endif
 
 dict_pair_begin:;
@@ -776,7 +776,7 @@ dict_pair_begin:;
             }
 #endif
             default: {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             }
         }
         goto dict_pair_begin;
@@ -808,7 +808,7 @@ dict_pair_begin:;
         }
     }
 
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 
 arr_val_begin:;
     assert(cur_list_size != 0);
@@ -856,7 +856,7 @@ arr_val_begin:;
             }
 #endif
             default: {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             }
         }
         //
@@ -888,7 +888,7 @@ arr_val_begin:;
             goto arr_val_begin;
         }
     }
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 
 success:;
     assert(cur_nested_depth == 0);
@@ -929,7 +929,7 @@ fail_keytype:;
 #undef _DUMPS_PASS_ARGS
 #undef _DUMPS_PASS_ARGSDECL
 #undef dumps_next
-#undef pyyjson_dumps_obj
+#undef ssrjson_dumps_obj
 
 #include "compile_context/sirw_out.inl.h"
 

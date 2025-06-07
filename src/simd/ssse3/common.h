@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_SSSE3_COMMON_H
-#define PYYJSON_SIMD_SSSE3_COMMON_H
+#ifndef SSRJSON_SIMD_SSSE3_COMMON_H
+#define SSRJSON_SIMD_SSSE3_COMMON_H
 #if !defined(__SSSE3__) || !__SSSE3__
 #    error "SSSE3 is required for this file"
 #endif
@@ -12,4 +12,4 @@
 #define shuffle_128 _mm_shuffle_epi8
 
 
-#endif // PYYJSON_SIMD_SSSE3_COMMON_H
+#endif // SSRJSON_SIMD_SSSE3_COMMON_H

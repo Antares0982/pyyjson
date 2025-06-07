@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(pyyjson LANGUAGES C CXX)
+project(ssrjson LANGUAGES C CXX)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -117,24 +117,24 @@ message("CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
 message("CMAKE_SYSTEM_PROCESSOR = ${CMAKE_SYSTEM_PROCESSOR}")
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "(^aarch64)|(^arm64)|(^ARM64)")
-    set(PYYJSON_DETECT_SIMD 1)
+    set(SSRJSON_DETECT_SIMD 1)
     set(TARGET_SIMD_ARCH aarch)
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
-    set(PYYJSON_DETECT_SIMD 1)
+    set(SSRJSON_DETECT_SIMD 1)
     set(TARGET_SIMD_ARCH aarch)
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(x86_64)|(AMD64|amd64)|(^i.86$)")
-    set(PYYJSON_DETECT_SIMD 1)
+    set(SSRJSON_DETECT_SIMD 1)
     set(TARGET_SIMD_ARCH x86)
 else()
-    set(PYYJSON_DETECT_SIMD 0)
+    set(SSRJSON_DETECT_SIMD 0)
 endif()
 
-if(PYYJSON_DETECT_SIMD)
-    target_compile_definitions(commonBuild INTERFACE PYYJSON_DETECT_SIMD=1)
+if(SSRJSON_DETECT_SIMD)
+    target_compile_definitions(commonBuild INTERFACE SSRJSON_DETECT_SIMD=1)
     if("${TARGET_SIMD_ARCH}" STREQUAL "x86")
-        target_compile_definitions(commonBuild INTERFACE PYYJSON_X86=1)
+        target_compile_definitions(commonBuild INTERFACE SSRJSON_X86=1)
     elseif("${TARGET_SIMD_ARCH}" STREQUAL "aarch")
-        target_compile_definitions(commonBuild INTERFACE PYYJSON_AARCH=1)
+        target_compile_definitions(commonBuild INTERFACE SSRJSON_AARCH=1)
     endif()
 else()
     # TODO cannot detect simd
@@ -142,12 +142,12 @@ endif()
 
 if(BUILD_BENCHMARK)
     message("ENABLE BENCHMARK")
-    target_compile_definitions(commonBuild INTERFACE PYYJSON_BUILD_BENCHMARK=1)
+    target_compile_definitions(commonBuild INTERFACE SSRJSON_BUILD_BENCHMARK=1)
 endif()
 
 if(ASAN_ENABLED)
     message("ENABLE ASAN")
-    target_compile_definitions(commonBuild INTERFACE PYYJSON_ASAN_CHECK=1)
+    target_compile_definitions(commonBuild INTERFACE SSRJSON_ASAN_CHECK=1)
 
     add_asan_compile_option(commonBuild INTERFACE)
 
@@ -160,11 +160,11 @@ if(ASAN_ENABLED)
 endif()
 
 # ------------------------------------------------------------------------------
-# setting up pyyjson
+# setting up ssrjson
 
-# set pyyjson src files
+# set ssrjson src files
 set(SRC_FILES
-    src/pyyjson.c
+    src/ssrjson.c
     src/unicode/utils.c
     src/simd/mask_table.c
     src/tls.c
@@ -205,36 +205,36 @@ endif()
 add_library(dragon_box OBJECT ${SRC_DRAGON_BOX})
 target_link_libraries(dragon_box PUBLIC commonBuild)
 
-# add library pyyjson
+# add library ssrjson
 if(BUILD_MULTI_LIB)
     set(SRC_FILES ${SRC_FILES} src/multilib.c)
 
     if("${TARGET_SIMD_ARCH}" STREQUAL "x86")
-        add_library(pyyjson_common OBJECT ${SRC_FILES})
-        target_link_libraries(pyyjson_common PUBLIC commonBuild)
-        add_library(pyyjson_avx512 OBJECT ${SRC_WITH_SIMD})
-        target_link_libraries(pyyjson_avx512 PUBLIC pyyjson_common)
-        add_library(pyyjson_avx2 OBJECT ${SRC_WITH_SIMD})
-        target_link_libraries(pyyjson_avx2 PUBLIC pyyjson_common)
+        add_library(ssrjson_common OBJECT ${SRC_FILES})
+        target_link_libraries(ssrjson_common PUBLIC commonBuild)
+        add_library(ssrjson_avx512 OBJECT ${SRC_WITH_SIMD})
+        target_link_libraries(ssrjson_avx512 PUBLIC ssrjson_common)
+        add_library(ssrjson_avx2 OBJECT ${SRC_WITH_SIMD})
+        target_link_libraries(ssrjson_avx2 PUBLIC ssrjson_common)
 
-        add_library(pyyjson_sse4 OBJECT ${SRC_WITH_SIMD})
-        target_link_libraries(pyyjson_sse4 PUBLIC pyyjson_common)
-        # add_library(pyyjson_sse2 OBJECT ${SRC_WITH_SIMD})
-        # target_link_libraries(pyyjson_sse2 PUBLIC pyyjson_common)
-        add_library(pyyjson SHARED $<TARGET_OBJECTS:pyyjson_avx512> $<TARGET_OBJECTS:pyyjson_avx2> $<TARGET_OBJECTS:pyyjson_sse4> $<TARGET_OBJECTS:pyyjson_common> $<TARGET_OBJECTS:dragon_box>)
-        target_link_libraries(pyyjson PUBLIC ${Python3_LIBRARIES})
+        add_library(ssrjson_sse4 OBJECT ${SRC_WITH_SIMD})
+        target_link_libraries(ssrjson_sse4 PUBLIC ssrjson_common)
+        # add_library(ssrjson_sse2 OBJECT ${SRC_WITH_SIMD})
+        # target_link_libraries(ssrjson_sse2 PUBLIC ssrjson_common)
+        add_library(ssrjson SHARED $<TARGET_OBJECTS:ssrjson_avx512> $<TARGET_OBJECTS:ssrjson_avx2> $<TARGET_OBJECTS:ssrjson_sse4> $<TARGET_OBJECTS:ssrjson_common> $<TARGET_OBJECTS:dragon_box>)
+        target_link_libraries(ssrjson PUBLIC ${Python3_LIBRARIES})
 
-        add_avx512_compile_option(pyyjson_avx512)
-        add_avx2_compile_option(pyyjson_avx2)
-        add_sse4_compile_option(pyyjson_sse4)
+        add_avx512_compile_option(ssrjson_avx512)
+        add_avx2_compile_option(ssrjson_avx2)
+        add_sse4_compile_option(ssrjson_sse4)
 
     elseif("${TARGET_SIMD_ARCH}" STREQUAL "aarch")
-        add_library(pyyjson_common OBJECT ${SRC_FILES})
-        target_link_libraries(pyyjson_common PUBLIC commonBuild)
-        add_library(pyyjson_neon OBJECT ${SRC_WITH_SIMD})
-        target_link_libraries(pyyjson_neon PUBLIC pyyjson_common)
-        add_library(pyyjson SHARED $<TARGET_OBJECTS:pyyjson_neon> $<TARGET_OBJECTS:pyyjson_common> $<TARGET_OBJECTS:pyyjson_common> $<TARGET_OBJECTS:dragon_box>)
-        target_link_libraries(pyyjson PUBLIC ${Python3_LIBRARIES})
+        add_library(ssrjson_common OBJECT ${SRC_FILES})
+        target_link_libraries(ssrjson_common PUBLIC commonBuild)
+        add_library(ssrjson_neon OBJECT ${SRC_WITH_SIMD})
+        target_link_libraries(ssrjson_neon PUBLIC ssrjson_common)
+        add_library(ssrjson SHARED $<TARGET_OBJECTS:ssrjson_neon> $<TARGET_OBJECTS:ssrjson_common> $<TARGET_OBJECTS:ssrjson_common> $<TARGET_OBJECTS:dragon_box>)
+        target_link_libraries(ssrjson PUBLIC ${Python3_LIBRARIES})
 
     else()
         message(FATAL_ERROR "TARGET_SIMD_ARCH=${TARGET_SIMD_ARCH} not supported")
@@ -243,11 +243,11 @@ if(BUILD_MULTI_LIB)
     endif()
 else()
     set(SRC_FILES ${SRC_FILES} src/singlelib.c)
-    add_library(pyyjson SHARED ${SRC_FILES} ${SRC_WITH_SIMD})
-    target_link_libraries(pyyjson PRIVATE commonBuild)
+    add_library(ssrjson SHARED ${SRC_FILES} ${SRC_WITH_SIMD})
+    target_link_libraries(ssrjson PRIVATE commonBuild)
 endif()
 
-set_target_properties(pyyjson PROPERTIES PREFIX "")
+set_target_properties(ssrjson PROPERTIES PREFIX "")
 
 if(ASAN_ENABLED AND MSVC)
     get_filename_component(MSVC_COMPILER_DIR "${CMAKE_C_COMPILER}" PATH)
@@ -257,10 +257,10 @@ if(ASAN_ENABLED AND MSVC)
         message(STATUS "Found AddressSanitizer runtime DLL at: ${ASAN_DLL_PATH}")
 
         add_custom_command(
-            TARGET pyyjson POST_BUILD
+            TARGET ssrjson POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${ASAN_DLL_PATH}"
-            $<TARGET_FILE_DIR:pyyjson>
+            $<TARGET_FILE_DIR:ssrjson>
             COMMENT "Copying AddressSanitizer runtime DLL to output directory"
         )
     else()
@@ -270,8 +270,8 @@ endif()
 
 # ------------------------------------------------------------------------------
 if(XCODE)
-    set(PYYJSON_FLAGS)
-    list(APPEND PYYJSON_FLAGS "-Wall" "-Wextra" "-Werror" "-pedantic" "-pedantic-errors" "-Wno-psabi")
+    set(SSRJSON_FLAGS)
+    list(APPEND SSRJSON_FLAGS "-Wall" "-Wextra" "-Werror" "-pedantic" "-pedantic-errors" "-Wno-psabi")
 
     set_default_xcode_property(commonBuild)
     set_xcode_deployment_version(commonBuild "10.13" "12.0" "12.0" "4.0")
@@ -280,23 +280,23 @@ if(XCODE)
     set_xcode_property(commonBuild CLANG_C_LANGUAGE_STANDARD "c17")
 
     # set_xcode_property(commonBuild CLANG_CXX_LANGUAGE_STANDARD "c++98")
-    set_xcode_property(commonBuild OTHER_CFLAGS[variant=Debug] ${PYYJSON_FLAGS})
-    set_xcode_property(commonBuild OTHER_CFLAGS[variant=MinSizeRel] ${PYYJSON_FLAGS})
-    set_xcode_property(commonBuild OTHER_CFLAGS[variant=RelWithDebInfo] ${PYYJSON_FLAGS})
-    set_xcode_property(commonBuild OTHER_CFLAGS[variant=Release] ${PYYJSON_FLAGS})
+    set_xcode_property(commonBuild OTHER_CFLAGS[variant=Debug] ${SSRJSON_FLAGS})
+    set_xcode_property(commonBuild OTHER_CFLAGS[variant=MinSizeRel] ${SSRJSON_FLAGS})
+    set_xcode_property(commonBuild OTHER_CFLAGS[variant=RelWithDebInfo] ${SSRJSON_FLAGS})
+    set_xcode_property(commonBuild OTHER_CFLAGS[variant=Release] ${SSRJSON_FLAGS})
 
 elseif(MSVC)
-    set(PYYJSON_FLAGS)
-    list(APPEND PYYJSON_FLAGS "/utf-8")
+    set(SSRJSON_FLAGS)
+    list(APPEND SSRJSON_FLAGS "/utf-8")
 
-    target_compile_options(commonBuild INTERFACE ${PYYJSON_FLAGS})
+    target_compile_options(commonBuild INTERFACE ${SSRJSON_FLAGS})
 
 elseif(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|Intel")
-    set(PYYJSON_FLAGS)
+    set(SSRJSON_FLAGS)
 
     if(CMAKE_C_COMPILER_ID MATCHES Clang)
         # https://github.com/llvm/llvm-project/issues/63963
-        list(APPEND PYYJSON_FLAGS "-Wno-constant-logical-operand")
+        list(APPEND SSRJSON_FLAGS "-Wno-constant-logical-operand")
     endif()
 
     if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
@@ -311,7 +311,7 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|Intel")
         message("Debug mode, enabling debug symbols")
     endif()
 
-    target_compile_options(commonBuild INTERFACE ${PYYJSON_FLAGS})
+    target_compile_options(commonBuild INTERFACE ${SSRJSON_FLAGS})
 endif()
 
 include(CheckIncludeFile)
@@ -342,61 +342,61 @@ endif()
 # ------------------------------------------------------------------------------
 # Install
 if(APPLE)
-    set_target_properties(pyyjson PROPERTIES SUFFIX ".so")
+    set_target_properties(ssrjson PROPERTIES SUFFIX ".so")
 endif(APPLE)
 
-install(TARGETS pyyjson LIBRARY DESTINATION .)
+install(TARGETS ssrjson LIBRARY DESTINATION .)
 
 if(BUILD_TEST)
     include(CTest)
 
     if(BUILD_MULTI_LIB)
         if("${TARGET_SIMD_ARCH}" STREQUAL "x86")
-            add_library(pyyjson_test_sse4 OBJECT ${SRC_TEST_WITH_SIMD})
-            target_link_libraries(pyyjson_test_sse4 PUBLIC commonBuild)
-            add_library(pyyjson_test_avx2 OBJECT ${SRC_TEST_WITH_SIMD})
-            target_link_libraries(pyyjson_test_avx2 PUBLIC commonBuild)
-            add_library(pyyjson_test_avx512 OBJECT ${SRC_TEST_WITH_SIMD})
-            target_link_libraries(pyyjson_test_avx512 PUBLIC commonBuild)
+            add_library(ssrjson_test_sse4 OBJECT ${SRC_TEST_WITH_SIMD})
+            target_link_libraries(ssrjson_test_sse4 PUBLIC commonBuild)
+            add_library(ssrjson_test_avx2 OBJECT ${SRC_TEST_WITH_SIMD})
+            target_link_libraries(ssrjson_test_avx2 PUBLIC commonBuild)
+            add_library(ssrjson_test_avx512 OBJECT ${SRC_TEST_WITH_SIMD})
+            target_link_libraries(ssrjson_test_avx512 PUBLIC commonBuild)
 
-            add_avx512_compile_option(pyyjson_test_avx512)
-            add_avx2_compile_option(pyyjson_test_avx2)
-            add_sse4_compile_option(pyyjson_test_sse4)
+            add_avx512_compile_option(ssrjson_test_avx512)
+            add_avx2_compile_option(ssrjson_test_avx2)
+            add_sse4_compile_option(ssrjson_test_sse4)
 
-            add_executable(pyyjson_test ${SRC_TEST} $<TARGET_OBJECTS:pyyjson_test_avx512> $<TARGET_OBJECTS:pyyjson_test_avx2> $<TARGET_OBJECTS:pyyjson_test_sse4>)
+            add_executable(ssrjson_test ${SRC_TEST} $<TARGET_OBJECTS:ssrjson_test_avx512> $<TARGET_OBJECTS:ssrjson_test_avx2> $<TARGET_OBJECTS:ssrjson_test_sse4>)
         elseif("${TARGET_SIMD_ARCH}" STREQUAL "aarch")
-            add_library(pyyjson_test_neon OBJECT ${SRC_TEST_WITH_SIMD})
-            target_link_libraries(pyyjson_test_neon PUBLIC commonBuild)
-            add_executable(pyyjson_test ${SRC_TEST} $<TARGET_OBJECTS:pyyjson_test_neon>)
+            add_library(ssrjson_test_neon OBJECT ${SRC_TEST_WITH_SIMD})
+            target_link_libraries(ssrjson_test_neon PUBLIC commonBuild)
+            add_executable(ssrjson_test ${SRC_TEST} $<TARGET_OBJECTS:ssrjson_test_neon>)
         else()
             message(FATAL_ERROR "TARGET_SIMD_ARCH=${TARGET_SIMD_ARCH} not supported")
         endif()
     else()
-        add_executable(pyyjson_test ${SRC_TEST} ${SRC_TEST_WITH_SIMD})
+        add_executable(ssrjson_test ${SRC_TEST} ${SRC_TEST_WITH_SIMD})
     endif()
 
-    target_link_libraries(pyyjson_test PUBLIC commonBuild)
-    target_link_libraries(pyyjson_test PUBLIC Python3::Python)
-    install(TARGETS pyyjson_test RUNTIME DESTINATION .)
-    add_test(pyyjson_test ${CMAKE_CURRENT_BINARY_DIR}/pyyjson_test)
+    target_link_libraries(ssrjson_test PUBLIC commonBuild)
+    target_link_libraries(ssrjson_test PUBLIC Python3::Python)
+    install(TARGETS ssrjson_test RUNTIME DESTINATION .)
+    add_test(ssrjson_test ${CMAKE_CURRENT_BINARY_DIR}/ssrjson_test)
 
     if((CMAKE_C_COMPILER_ID MATCHES Clang) AND NOT WIN32)
         file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/test_data/fuzzer/fuzzer.dict" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-        file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/test_data/fuzzer/pyyjson_fuzz.py" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+        file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/test_data/fuzzer/ssrjson_fuzz.py" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
         file(GLOB TEST_DATA_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test_data/json/**/*.json")
         file(COPY ${TEST_DATA_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/corpus")
-        add_executable(pyyjson_fuzzer ${SRC_FUZZER})
-        target_link_libraries(pyyjson_fuzzer PUBLIC commonBuild)
-        target_link_libraries(pyyjson_fuzzer PUBLIC Python3::Python)
+        add_executable(ssrjson_fuzzer ${SRC_FUZZER})
+        target_link_libraries(ssrjson_fuzzer PUBLIC commonBuild)
+        target_link_libraries(ssrjson_fuzzer PUBLIC Python3::Python)
 
-        add_asan_compile_option(pyyjson_fuzzer)
-        target_compile_options(pyyjson_fuzzer PRIVATE -fsanitize=fuzzer -g -O1)
-        target_link_options(pyyjson_fuzzer PRIVATE -fsanitize=fuzzer)
+        add_asan_compile_option(ssrjson_fuzzer)
+        target_compile_options(ssrjson_fuzzer PRIVATE -fsanitize=fuzzer -g -O1)
+        target_link_options(ssrjson_fuzzer PRIVATE -fsanitize=fuzzer)
 
         if(ASAN_ENABLED)
-            add_asan_compile_option(pyyjson_fuzzer)
+            add_asan_compile_option(ssrjson_fuzzer)
         endif()
 
-        add_test(pyyjson_fuzzer ${CMAKE_CURRENT_BINARY_DIR}/pyyjson_fuzzer -dict=fuzzer.dict -max_total_time=300 ${CMAKE_CURRENT_BINARY_DIR}/corpus)
+        add_test(ssrjson_fuzzer ${CMAKE_CURRENT_BINARY_DIR}/ssrjson_fuzzer -dict=fuzzer.dict -max_total_time=300 ${CMAKE_CURRENT_BINARY_DIR}/corpus)
     endif()
 endif()

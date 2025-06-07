@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    include "decode/decode.h"
 #    include "simd/simd_impl.h"
 #    ifndef COMPILE_UCS_LEVEL
@@ -29,14 +29,14 @@ force_inline void check_vector_max_char(
         ReadStrState *restrict read_state,
         bool need_mask, /* known at compile time */
         Py_ssize_t index /* only used when need_mask */) {
-#if COMPILE_UCS_LEVEL == PYYJSON_STRING_TYPE_ASCII
+#if COMPILE_UCS_LEVEL == SSRJSON_STRING_TYPE_ASCII
     return;
 #endif
-    if (read_state->max_char_type == PYYJSON_STRING_TYPE_UCS4) {
+    if (read_state->max_char_type == SSRJSON_STRING_TYPE_UCS4) {
         assert(false); // logic error
     }
     if (need_mask) {
-#define LOAD_HEAD_MASK PYYJSON_CONCAT2(read_head_mask_table, READ_BIT_SIZE)
+#define LOAD_HEAD_MASK SSRJSON_CONCAT2(read_head_mask_table, READ_BIT_SIZE)
         // need a mask
         const void *mask_addr = LOAD_HEAD_MASK(index);
         vec = vec & *(vector_a *)mask_addr;
@@ -44,34 +44,34 @@ force_inline void check_vector_max_char(
 #undef LOAD_HEAD_MASK
     }
     switch (read_state->max_char_type) {
-        case PYYJSON_STRING_TYPE_ASCII: {
-#if COMPILE_UCS_LEVEL == PYYJSON_STRING_TYPE_UCS4
-            __check_vector_max_char_internal(vec, read_state, 0xffff, PYYJSON_STRING_TYPE_UCS4) &&
+        case SSRJSON_STRING_TYPE_ASCII: {
+#if COMPILE_UCS_LEVEL == SSRJSON_STRING_TYPE_UCS4
+            __check_vector_max_char_internal(vec, read_state, 0xffff, SSRJSON_STRING_TYPE_UCS4) &&
 #endif
-#if COMPILE_UCS_LEVEL >= PYYJSON_STRING_TYPE_UCS2
-                    __check_vector_max_char_internal(vec, read_state, 0xff, PYYJSON_STRING_TYPE_UCS2) &&
+#if COMPILE_UCS_LEVEL >= SSRJSON_STRING_TYPE_UCS2
+                    __check_vector_max_char_internal(vec, read_state, 0xff, SSRJSON_STRING_TYPE_UCS2) &&
 #endif
-                    __check_vector_max_char_internal(vec, read_state, 0x7f, PYYJSON_STRING_TYPE_LATIN1);
+                    __check_vector_max_char_internal(vec, read_state, 0x7f, SSRJSON_STRING_TYPE_LATIN1);
             break;
         }
-#if COMPILE_UCS_LEVEL > PYYJSON_STRING_TYPE_LATIN1
-        case PYYJSON_STRING_TYPE_LATIN1: {
-#    if COMPILE_UCS_LEVEL == PYYJSON_STRING_TYPE_UCS4
-            __check_vector_max_char_internal(vec, read_state, 0xffff, PYYJSON_STRING_TYPE_UCS4) &&
+#if COMPILE_UCS_LEVEL > SSRJSON_STRING_TYPE_LATIN1
+        case SSRJSON_STRING_TYPE_LATIN1: {
+#    if COMPILE_UCS_LEVEL == SSRJSON_STRING_TYPE_UCS4
+            __check_vector_max_char_internal(vec, read_state, 0xffff, SSRJSON_STRING_TYPE_UCS4) &&
 #    endif
-                    __check_vector_max_char_internal(vec, read_state, 0xff, PYYJSON_STRING_TYPE_UCS2);
+                    __check_vector_max_char_internal(vec, read_state, 0xff, SSRJSON_STRING_TYPE_UCS2);
             break;
         }
 #endif
-#if COMPILE_UCS_LEVEL > PYYJSON_STRING_TYPE_UCS2
-        case PYYJSON_STRING_TYPE_UCS2: {
-            __check_vector_max_char_internal(vec, read_state, 0xffff, PYYJSON_STRING_TYPE_UCS4);
+#if COMPILE_UCS_LEVEL > SSRJSON_STRING_TYPE_UCS2
+        case SSRJSON_STRING_TYPE_UCS2: {
+            __check_vector_max_char_internal(vec, read_state, 0xffff, SSRJSON_STRING_TYPE_UCS4);
             break;
         }
 #endif
         // below are unreachable
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         }
     }
 }

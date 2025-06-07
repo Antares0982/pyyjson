@@ -50,15 +50,15 @@ class TestBenchmark(unittest.TestCase):
 
         from test_utils import get_benchfiles_fullpath
 
-        import pyyjson
+        import ssrjson
 
         bench_files = get_benchfiles_fullpath()
 
         std_calling_kwargs = {"ensure_ascii": False}
         std_json_setup = ("std", json.dumps, std_calling_kwargs)
-        pyyjson_setup = ("pyyjson", pyyjson.dumps, {})
+        ssrjson_setup = ("ssrjson", ssrjson.dumps, {})
 
-        calling_setups = [std_json_setup, pyyjson_setup]
+        calling_setups = [std_json_setup, ssrjson_setup]
         if self._orjson is not None:
             orjson = self._orjson
 
@@ -78,13 +78,13 @@ class TestBenchmark(unittest.TestCase):
 
         from test_utils import get_benchfiles_fullpath
 
-        import pyyjson
+        import ssrjson
 
         bench_files = get_benchfiles_fullpath()
 
         std_json_setup = ("std", json.loads, {})
-        pyyjson_setup = ("pyyjson", pyyjson.loads, {})
-        calling_setups = [std_json_setup, pyyjson_setup]
+        ssrjson_setup = ("ssrjson", ssrjson.loads, {})
+        calling_setups = [std_json_setup, ssrjson_setup]
         if self._orjson is not None:
             orjson_setup = ("orjson", self._orjson.loads, {})
             calling_setups.append(orjson_setup)

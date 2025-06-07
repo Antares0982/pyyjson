@@ -1,5 +1,5 @@
-#ifndef PYYJSON_DECODE_TOOLS_H
-#define PYYJSON_DECODE_TOOLS_H
+#ifndef SSRJSON_DECODE_TOOLS_H
+#define SSRJSON_DECODE_TOOLS_H
 
 #include "decode/decode.h"
 #include "simd/simd_impl.h"
@@ -17,4 +17,4 @@
 #include "_r_tools.inl.h"
 #undef COMPILE_READ_UCS_LEVEL
 
-#endif // PYYJSON_DECODE_TOOLS_H
+#endif // SSRJSON_DECODE_TOOLS_H

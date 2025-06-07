@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX512FCD_COMMON_H
-#define PYYJSON_SIMD_AVX512FCD_COMMON_H
+#ifndef SSRJSON_SIMD_AVX512FCD_COMMON_H
+#define SSRJSON_SIMD_AVX512FCD_COMMON_H
 #if !defined(__AVX512F__) || !__AVX512F__ || !defined(__AVX512CD__) || !__AVX512CD__
 #    error "AVX512F and AVX512CD is required for this file"
 #endif
@@ -79,4 +79,4 @@ force_inline u64 get_high_bitmask_512(usize len) {
     return ~get_low_bitmask_512(64 - len);
 }
 
-#endif // PYYJSON_SIMD_AVX512FCD_COMMON_H
+#endif // SSRJSON_SIMD_AVX512FCD_COMMON_H

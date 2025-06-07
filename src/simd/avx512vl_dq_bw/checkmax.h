@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX512VLDQBW_CHECKMAX_H
-#define PYYJSON_SIMD_AVX512VLDQBW_CHECKMAX_H
+#ifndef SSRJSON_SIMD_AVX512VLDQBW_CHECKMAX_H
+#define SSRJSON_SIMD_AVX512VLDQBW_CHECKMAX_H
 #if !defined(__AVX512VL__) || !__AVX512VL__ || !defined(__AVX512DQ__) || !__AVX512DQ__ || !defined(__AVX512BW__) || !__AVX512BW__
 #    error "AVX512VL, AVX512DQ and AVX512BW is required for this file"
 #endif
@@ -20,4 +20,4 @@ force_inline bool checkmax_u8_512(vector_a_u8_512 z, u8 lower_bound_minus_1) {
     return 0 == unsigned_cmpgt_bitmask_u8_512(z, t);
 }
 
-#endif // PYYJSON_SIMD_AVX512VLDQBW_CHECKMAX_H
+#endif // SSRJSON_SIMD_AVX512VLDQBW_CHECKMAX_H

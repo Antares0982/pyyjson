@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX_CVT_H
-#define PYYJSON_SIMD_AVX_CVT_H
+#ifndef SSRJSON_SIMD_AVX_CVT_H
+#define SSRJSON_SIMD_AVX_CVT_H
 
 #include "simd/simd_detect.h"
 #include "simd/vector_types.h"
@@ -18,4 +18,4 @@ force_inline void cvt_to_dst_u32_u32_256(u32 *dst, vector_a_u32_256 x) {
     *(vector_u_u32_256 *)dst = x;
 }
 
-#endif // PYYJSON_SIMD_AVX_CVT_H
+#endif // SSRJSON_SIMD_AVX_CVT_H

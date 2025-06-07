@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_CONTEXT_ENCODE
 #        define COMPILE_CONTEXT_ENCODE
 #    endif

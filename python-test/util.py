@@ -3,7 +3,7 @@
 import os
 from typing import Any, Dict
 
-import pyyjson
+import ssrjson
 
 dirname = os.path.join(os.path.dirname(__file__), "../")
 
@@ -31,5 +31,5 @@ def read_fixture_str(filename):
 
 def read_fixture_obj(filename):
     if filename not in OBJ_CACHE:
-        OBJ_CACHE[filename] = pyyjson.loads(read_fixture_str(filename))
+        OBJ_CACHE[filename] = ssrjson.loads(read_fixture_str(filename))
     return OBJ_CACHE[filename]

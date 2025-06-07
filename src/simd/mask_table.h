@@ -1,13 +1,13 @@
 #ifndef SIMD_MASK_TABLE_H
 #define SIMD_MASK_TABLE_H
 
-#include "pyyjson.h"
+#include "ssrjson.h"
 
 
-extern pyyjson_align(64) const u8 _TailmaskTable_8[65][64];
-extern pyyjson_align(64) const u8 _HeadmaskTable_8[65][64];
-// extern pyyjson_align(64) const u8 _TailmaskReversedTable_8[65][64];
-extern pyyjson_align(64) const u8 _RShiftMaskTable[16][16];
+extern ssrjson_align(64) const u8 _TailmaskTable_8[65][64];
+extern ssrjson_align(64) const u8 _HeadmaskTable_8[65][64];
+// extern ssrjson_align(64) const u8 _TailmaskReversedTable_8[65][64];
+extern ssrjson_align(64) const u8 _RShiftMaskTable[16][16];
 
 /*==============================================================================
  * Read mask from tail mask table.

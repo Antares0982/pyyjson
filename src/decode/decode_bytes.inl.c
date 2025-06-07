@@ -168,16 +168,16 @@ skip_ascii_end:
      
      MSVC, Clang, ICC can generate expected instructions without this hint.
      */
-#if PYYJSON_IS_REAL_GCC
+#if SSRJSON_IS_REAL_GCC
     __asm__ volatile("" : "=m"(*src));
 #endif
     if (likely(*src == '"')) {
         /* modified BEGIN */
         // this is a fast path for ascii strings. directly copy the buffer to pyobject
         *ptr = src + 1;
-        return make_string(src_start, src - src_start, PYYJSON_STRING_TYPE_ASCII, is_key);
+        return make_string(src_start, src - src_start, SSRJSON_STRING_TYPE_ASCII, is_key);
     } else if (src != src_start) {
-        pyyjson_memcpy(temp_string_buf, src_start, src - src_start);
+        ssrjson_memcpy(temp_string_buf, src_start, src - src_start);
         len_ucs1 = src - src_start;
         dst += len_ucs1;
     }
@@ -344,7 +344,7 @@ copy_escape_ucs1:
         // *dst++ = *src++;
         /* modified END */
     }
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 
     /* modified BEGIN */
 copy_ascii_ucs1:
@@ -357,7 +357,7 @@ copy_ascii_ucs1:
             *dst++ = *src++;
          })
      */
-#if PYYJSON_IS_REAL_GCC
+#if SSRJSON_IS_REAL_GCC
     /* modified BEGIN */
 #    define expr_jump(i)                             \
         if (likely(!(char_is_ascii_stop(src[i])))) { \
@@ -724,7 +724,7 @@ copy_escape_ucs2:
         // *dst++ = *src++;
         /* modified END */
     }
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 
     /* modified BEGIN */
 copy_ascii_ucs2:
@@ -937,7 +937,7 @@ copy_escape_ucs4:
         // *dst++ = *src++;
         /* modified END */
     }
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 
     /* modified BEGIN */
 copy_ascii_ucs4:
@@ -1048,7 +1048,7 @@ read_finalize:
             *start-- = *ucs1_back--;
             len_ucs1--;
         }
-        return make_string(temp_string_buf, dst_ucs4 - (u32 *)temp_string_buf, PYYJSON_STRING_TYPE_UCS4, is_key);
+        return make_string(temp_string_buf, dst_ucs4 - (u32 *)temp_string_buf, SSRJSON_STRING_TYPE_UCS4, is_key);
     } else if (unlikely(cur_max_ucs_size == 2)) {
         u16 *start = (u16 *)temp_string_buf + len_ucs1 - 1;
         u8 *ucs1_back = (u8 *)temp_string_buf + len_ucs1 - 1;
@@ -1056,9 +1056,9 @@ read_finalize:
             *start-- = *ucs1_back--;
             len_ucs1--;
         }
-        return make_string(temp_string_buf, dst_ucs2 - (u16 *)temp_string_buf, PYYJSON_STRING_TYPE_UCS2, is_key);
+        return make_string(temp_string_buf, dst_ucs2 - (u16 *)temp_string_buf, SSRJSON_STRING_TYPE_UCS2, is_key);
     } else {
-        return make_string(temp_string_buf, dst - (u8 *)temp_string_buf, is_ascii ? PYYJSON_STRING_TYPE_ASCII : PYYJSON_STRING_TYPE_LATIN1, is_key);
+        return make_string(temp_string_buf, dst - (u8 *)temp_string_buf, is_ascii ? SSRJSON_STRING_TYPE_ASCII : SSRJSON_STRING_TYPE_LATIN1, is_key);
     }
 
 #undef return_err
@@ -1105,12 +1105,12 @@ static force_noinline PyObject *read_root_single_bytes(const u8 *dat, usize len)
     if (*cur == '"') {
         u8 *write_buffer;
         bool dynamic = false;
-        if (unlikely(4 * len > PYYJSON_STRING_BUFFER_SIZE)) {
+        if (unlikely(4 * len > SSRJSON_STRING_BUFFER_SIZE)) {
             write_buffer = malloc(4 * len);
             if (unlikely(!write_buffer)) goto fail_alloc;
             dynamic = true;
         } else {
-            write_buffer = pyyjson_string_buffer;
+            write_buffer = ssrjson_string_buffer;
         }
         ret = read_bytes(&cur, write_buffer, false);
         if (dynamic) free(write_buffer);
@@ -1190,7 +1190,7 @@ fail_cleanup:
 #undef return_err
 }
 
-extern pyyjson_align(64) u8 pyyjson_bytes_temp_buffer[PYYJSON_STRING_BUFFER_SIZE];
+extern ssrjson_align(64) u8 ssrjson_bytes_temp_buffer[SSRJSON_STRING_BUFFER_SIZE];
 
 force_inline bool _skip_starting_space(char **buffer_addr, Py_ssize_t *len_addr) {
     /* skip empty contents before json document */
@@ -1210,21 +1210,21 @@ force_inline bool _skip_starting_space(char **buffer_addr, Py_ssize_t *len_addr)
 }
 
 force_inline void _alloc_aligned_bytes_buffer(Py_ssize_t len, bool *dynamic, u8 **buffer) {
-    if (unlikely(len > (Py_ssize_t)PY_SSIZE_T_MAX - 2 * PYYJSON_MEMCPY_SIMD_SIZE - 4)) {
+    if (unlikely(len > (Py_ssize_t)PY_SSIZE_T_MAX - 2 * SSRJSON_MEMCPY_SIMD_SIZE - 4)) {
         PyErr_NoMemory();
         *buffer = NULL;
         return;
     }
-    Py_ssize_t required_size = size_align_up(len + PYYJSON_MEMCPY_SIMD_SIZE + 4, PYYJSON_MEMCPY_SIMD_SIZE);
-    if (unlikely(required_size > PYYJSON_STRING_BUFFER_SIZE)) {
-        *buffer = PYYJSON_ALIGNED_ALLOC(PYYJSON_MEMCPY_SIMD_SIZE, required_size);
+    Py_ssize_t required_size = size_align_up(len + SSRJSON_MEMCPY_SIMD_SIZE + 4, SSRJSON_MEMCPY_SIMD_SIZE);
+    if (unlikely(required_size > SSRJSON_STRING_BUFFER_SIZE)) {
+        *buffer = SSRJSON_ALIGNED_ALLOC(SSRJSON_MEMCPY_SIMD_SIZE, required_size);
         if (unlikely(!*buffer)) {
             PyErr_NoMemory();
             return;
         }
         *dynamic = true;
     } else {
-        *buffer = pyyjson_bytes_temp_buffer;
+        *buffer = ssrjson_bytes_temp_buffer;
         *dynamic = false;
     }
 }
@@ -1246,7 +1246,7 @@ force_inline bool should_read_bytes_pretty(const u8 *buffer, Py_ssize_t len) {
     return false;
 }
 
-static force_noinline PyObject *pyyjson_decode_bytes(char *_buffer, Py_ssize_t len) {
+static force_noinline PyObject *ssrjson_decode_bytes(char *_buffer, Py_ssize_t len) {
     // some checks
     if (unlikely(!len)) {
         PyErr_Format(JSONDecodeError, "input data is empty");
@@ -1270,9 +1270,9 @@ static force_noinline PyObject *pyyjson_decode_bytes(char *_buffer, Py_ssize_t l
     u8 *buffer;
     {
         uintptr_t _buffer_int = (uintptr_t)_buffer;
-        usize align_offset = (_buffer_int & (PYYJSON_MEMCPY_SIMD_SIZE - 1));
+        usize align_offset = (_buffer_int & (SSRJSON_MEMCPY_SIMD_SIZE - 1));
         buffer = _new_buffer + align_offset;
-        pyyjson_memcpy((void *)buffer, (const void *)_buffer, (usize)len);
+        ssrjson_memcpy((void *)buffer, (const void *)_buffer, (usize)len);
     }
 
     u8 *const end = buffer + len;
@@ -1290,6 +1290,6 @@ static force_noinline PyObject *pyyjson_decode_bytes(char *_buffer, Py_ssize_t l
         ret = read_root_single_bytes(buffer, len);
     }
 
-    if (is_dynamic) PYYJSON_ALIGNED_FREE(_new_buffer);
+    if (is_dynamic) SSRJSON_ALIGNED_FREE(_new_buffer);
     return ret;
 }

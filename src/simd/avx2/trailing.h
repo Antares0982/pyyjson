@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX2_TRAILING_H
-#define PYYJSON_SIMD_AVX2_TRAILING_H
+#ifndef SSRJSON_SIMD_AVX2_TRAILING_H
+#define SSRJSON_SIMD_AVX2_TRAILING_H
 
 #include "cvt.h"
 #include "simd/sse2/encode.h"
@@ -43,4 +43,4 @@
 #undef COMPILE_WRITE_UCS_LEVEL
 
 
-#endif // PYYJSON_SIMD_AVX2_TRAILING_H
+#endif // SSRJSON_SIMD_AVX2_TRAILING_H

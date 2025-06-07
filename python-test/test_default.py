@@ -6,7 +6,7 @@
 
 # import pytest
 
-# import pyyjson
+# import ssrjson
 
 # try:
 #     import numpy
@@ -43,14 +43,14 @@
 #         """
 #         dumps() default not callable
 #         """
-#         with pytest.raises(pyyjson.JSONEncodeError):
-#             pyyjson.dumps(Custom(), default=NotImplementedError)
+#         with pytest.raises(ssrjson.JSONEncodeError):
+#             ssrjson.dumps(Custom(), default=NotImplementedError)
 
 #         ran = False
 #         try:
-#             pyyjson.dumps(Custom(), default=NotImplementedError)
+#             ssrjson.dumps(Custom(), default=NotImplementedError)
 #         except Exception as err:
-#             assert isinstance(err, pyyjson.JSONEncodeError)
+#             assert isinstance(err, ssrjson.JSONEncodeError)
 #             assert str(err) == "default serializer exceeds recursion limit"
 #             ran = True
 #         assert ran
@@ -64,13 +64,13 @@
 #         def default(obj):
 #             return str(obj)
 
-#         assert pyyjson.dumps(ref, default=default) == b'"%s"' % str(ref).encode("utf-8")
+#         assert ssrjson.dumps(ref, default=default) == b'"%s"' % str(ref).encode("utf-8")
 
 #     def test_default_func_none(self):
 #         """
 #         dumps() default function None ok
 #         """
-#         assert pyyjson.dumps(Custom(), default=lambda x: None) == b"null"
+#         assert ssrjson.dumps(Custom(), default=lambda x: None) == b"null"
 
 #     def test_default_func_empty(self):
 #         """
@@ -82,8 +82,8 @@
 #             if isinstance(obj, set):
 #                 return list(obj)
 
-#         assert pyyjson.dumps(ref, default=default) == b"null"
-#         assert pyyjson.dumps({ref}, default=default) == b"[null]"
+#         assert ssrjson.dumps(ref, default=default) == b"null"
+#         assert ssrjson.dumps({ref}, default=default) == b"[null]"
 
 #     def test_default_func_exc(self):
 #         """
@@ -93,26 +93,26 @@
 #         def default(obj):
 #             raise NotImplementedError
 
-#         with pytest.raises(pyyjson.JSONEncodeError):
-#             pyyjson.dumps(Custom(), default=default)
+#         with pytest.raises(ssrjson.JSONEncodeError):
+#             ssrjson.dumps(Custom(), default=default)
 
 #         ran = False
 #         try:
-#             pyyjson.dumps(Custom(), default=default)
+#             ssrjson.dumps(Custom(), default=default)
 #         except Exception as err:
-#             assert isinstance(err, pyyjson.JSONEncodeError)
+#             assert isinstance(err, ssrjson.JSONEncodeError)
 #             assert str(err) == "Type is not JSON serializable: Custom"
 #             ran = True
 #         assert ran
 
 #     def test_default_exception_type(self):
 #         """
-#         dumps() TypeError in default() raises pyyjson.JSONEncodeError
+#         dumps() TypeError in default() raises ssrjson.JSONEncodeError
 #         """
 #         ref = Custom()
 
-#         with pytest.raises(pyyjson.JSONEncodeError):
-#             pyyjson.dumps(ref, default=default_raises)
+#         with pytest.raises(ssrjson.JSONEncodeError):
+#             ssrjson.dumps(ref, default=default_raises)
 
 #     def test_default_vectorcall_str(self):
 #         """
@@ -125,7 +125,7 @@
 #         obj = SubStr("saasa")
 #         ref = b'"%s"' % str(obj).encode("utf-8")
 #         assert (
-#             pyyjson.dumps(obj, option=pyyjson.OPT_PASSTHROUGH_SUBCLASS, default=str)
+#             ssrjson.dumps(obj, option=ssrjson.OPT_PASSTHROUGH_SUBCLASS, default=str)
 #             == ref
 #         )
 
@@ -135,7 +135,7 @@
 #         """
 #         obj = {1, 2}
 #         ref = b"[1,2]"
-#         assert pyyjson.dumps(obj, default=list) == ref
+#         assert ssrjson.dumps(obj, default=list) == ref
 
 #     def test_default_func_nested_str(self):
 #         """
@@ -146,7 +146,7 @@
 #         def default(obj):
 #             return str(obj)
 
-#         assert pyyjson.dumps({"a": ref}, default=default) == b'{"a":"%s"}' % str(
+#         assert ssrjson.dumps({"a": ref}, default=default) == b'{"a":"%s"}' % str(
 #             ref
 #         ).encode("utf-8")
 
@@ -160,7 +160,7 @@
 #             if isinstance(obj, Custom):
 #                 return [str(obj)]
 
-#         assert pyyjson.dumps({"a": ref}, default=default) == b'{"a":["%s"]}' % str(
+#         assert ssrjson.dumps({"a": ref}, default=default) == b'{"a":["%s"]}' % str(
 #             ref
 #         ).encode("utf-8")
 
@@ -173,7 +173,7 @@
 #         def default(obj):
 #             return str(obj)
 
-#         assert pyyjson.dumps([ref] * 100, default=default) == b"[%s]" % b",".join(
+#         assert ssrjson.dumps([ref] * 100, default=default) == b"[%s]" % b",".join(
 #             b'"%s"' % str(ref).encode("utf-8") for _ in range(100)
 #         )
 
@@ -186,14 +186,14 @@
 #         def default(obj):
 #             return bytes(obj)
 
-#         with pytest.raises(pyyjson.JSONEncodeError):
-#             pyyjson.dumps(ref, default=default)
+#         with pytest.raises(ssrjson.JSONEncodeError):
+#             ssrjson.dumps(ref, default=default)
 
 #         ran = False
 #         try:
-#             pyyjson.dumps(ref, default=default)
+#             ssrjson.dumps(ref, default=default)
 #         except Exception as err:
-#             assert isinstance(err, pyyjson.JSONEncodeError)
+#             assert isinstance(err, ssrjson.JSONEncodeError)
 #             assert str(err) == "Type is not JSON serializable: Custom"
 #             ran = True
 #         assert ran
@@ -207,15 +207,15 @@
 #         def default(obj):
 #             return "\ud800"
 
-#         with pytest.raises(pyyjson.JSONEncodeError):
-#             pyyjson.dumps(ref, default=default)
+#         with pytest.raises(ssrjson.JSONEncodeError):
+#             ssrjson.dumps(ref, default=default)
 
 #     def test_default_lambda_ok(self):
 #         """
 #         dumps() default lambda
 #         """
 #         ref = Custom()
-#         assert pyyjson.dumps(ref, default=lambda x: str(x)) == b'"%s"' % str(ref).encode(
+#         assert ssrjson.dumps(ref, default=lambda x: str(x)) == b'"%s"' % str(ref).encode(
 #             "utf-8"
 #         )
 
@@ -236,20 +236,20 @@
 #         ref_obj = Custom()
 #         ref_bytes = b'"%s"' % str(ref_obj).encode("utf-8")
 #         for obj in [ref_obj] * 100:
-#             assert pyyjson.dumps(obj, default=CustomSerializer()) == ref_bytes
+#             assert ssrjson.dumps(obj, default=CustomSerializer()) == ref_bytes
 
 #     def test_default_recursion(self):
 #         """
 #         dumps() default recursion limit
 #         """
-#         assert pyyjson.dumps(Recursive(254), default=default_recursive) == b"0"
+#         assert ssrjson.dumps(Recursive(254), default=default_recursive) == b"0"
 
 #     def test_default_recursion_reset(self):
 #         """
 #         dumps() default recursion limit reset
 #         """
 #         assert (
-#             pyyjson.dumps(
+#             ssrjson.dumps(
 #                 [Recursive(254), {"a": "b"}, Recursive(254), Recursive(254)],
 #                 default=default_recursive,
 #             )
@@ -266,8 +266,8 @@
 #             return obj
 
 #         refcount = sys.getrefcount(ref)
-#         with pytest.raises(pyyjson.JSONEncodeError):
-#             pyyjson.dumps(ref, default=default)
+#         with pytest.raises(ssrjson.JSONEncodeError):
+#             ssrjson.dumps(ref, default=default)
 #         assert sys.getrefcount(ref) == refcount
 
 #     def test_reference_cleanup_default_custom_pass(self):
@@ -279,7 +279,7 @@
 #             raise TypeError
 
 #         refcount = sys.getrefcount(ref)
-#         pyyjson.dumps(ref, default=default)
+#         ssrjson.dumps(ref, default=default)
 #         assert sys.getrefcount(ref) == refcount
 
 #     def test_reference_cleanup_default_custom_error(self):
@@ -292,8 +292,8 @@
 #             raise TypeError
 
 #         refcount = sys.getrefcount(ref)
-#         with pytest.raises(pyyjson.JSONEncodeError):
-#             pyyjson.dumps(ref, default=default)
+#         with pytest.raises(ssrjson.JSONEncodeError):
+#             ssrjson.dumps(ref, default=default)
 #         assert sys.getrefcount(ref) == refcount
 
 #     def test_reference_cleanup_default_subclass(self):
@@ -305,15 +305,15 @@
 #             raise TypeError
 
 #         refcount = sys.getrefcount(ref)
-#         pyyjson.dumps(ref, option=pyyjson.OPT_PASSTHROUGH_DATETIME, default=default)
+#         ssrjson.dumps(ref, option=ssrjson.OPT_PASSTHROUGH_DATETIME, default=default)
 #         assert sys.getrefcount(ref) == refcount
 
 #     def test_reference_cleanup_default_subclass_lambda(self):
 #         ref = uuid.uuid4()
 
 #         refcount = sys.getrefcount(ref)
-#         pyyjson.dumps(
-#             ref, option=pyyjson.OPT_PASSTHROUGH_DATETIME, default=lambda val: str(val)
+#         ssrjson.dumps(
+#             ref, option=ssrjson.OPT_PASSTHROUGH_DATETIME, default=lambda val: str(val)
 #         )
 #         assert sys.getrefcount(ref) == refcount
 
@@ -321,8 +321,8 @@
 #     def test_default_numpy(self):
 #         ref = numpy.array([""] * 100)
 #         refcount = sys.getrefcount(ref)
-#         pyyjson.dumps(
-#             ref, option=pyyjson.OPT_SERIALIZE_NUMPY, default=lambda val: val.tolist()
+#         ssrjson.dumps(
+#             ref, option=ssrjson.OPT_SERIALIZE_NUMPY, default=lambda val: val.tolist()
 #         )
 #         assert sys.getrefcount(ref) == refcount
 
@@ -336,4 +336,4 @@
 #                 return list(obj)
 #             raise TypeError
 
-#         assert pyyjson.dumps({1, 2}, default=default) == b"[1,2]"
+#         assert ssrjson.dumps({1, 2}, default=default) == b"[1,2]"

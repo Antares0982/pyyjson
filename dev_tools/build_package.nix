@@ -5,7 +5,7 @@
   ...
 }:
 clangStdenv.mkDerivation rec {
-  pname = "pyyjson";
+  pname = "ssrjson";
   version = "0.0.0";
   src = ./.;
   unpackPhase = ''
@@ -14,8 +14,8 @@ clangStdenv.mkDerivation rec {
   '';
   # TODO aarch64?
   postInstall = ''
-    patchelf --set-rpath /lib64 $out/pyyjson.so
-    mv $out/pyyjson.so $out/pyyjson.cpython-3${python.sourceVersion.minor}-x86_64-linux-gnu.so
+    patchelf --set-rpath /lib64 $out/ssrjson.so
+    mv $out/ssrjson.so $out/ssrjson.cpython-3${python.sourceVersion.minor}-x86_64-linux-gnu.so
   '';
   nativeBuildInputs = [
     cmake

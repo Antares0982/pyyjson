@@ -1,5 +1,5 @@
-#ifndef PYYJSON_DECODE_STR_COPY_TO_NEW_H
-#define PYYJSON_DECODE_STR_COPY_TO_NEW_H
+#ifndef SSRJSON_DECODE_STR_COPY_TO_NEW_H
+#define SSRJSON_DECODE_STR_COPY_TO_NEW_H
 #include "decode/decode.h"
 #include "pythonlib.h"
 #include "simd/long_cvt.h"
@@ -13,14 +13,14 @@
 force_inline void copy_to_new_unicode_ucs1(void **dst_addr, PyObject *ret, bool need_cvt, const u8 *src, usize count, int kind) {
     u8 *dst = need_cvt ? PYUNICODE_ASCII_START(ret) : PYUNICODE_UCS1_START(ret);
     *dst_addr = dst;
-    pyyjson_memcpy(dst, src, count);
+    ssrjson_memcpy(dst, src, count);
 }
 
 force_inline void copy_to_new_unicode_ucs2(void **dst_addr, PyObject *ret, bool need_cvt, const u16 *src, usize count, int kind) {
     if (!need_cvt) {
         u16 *dst = PYUNICODE_UCS2_START(ret);
         *dst_addr = dst;
-        pyyjson_memcpy(dst, src, count * 2);
+        ssrjson_memcpy(dst, src, count * 2);
     } else {
         u8 *dst = (kind == 0) ? PYUNICODE_ASCII_START(ret) : PYUNICODE_UCS1_START(ret);
         *dst_addr = dst;
@@ -32,7 +32,7 @@ force_inline void copy_to_new_unicode_ucs4(void **dst_addr, PyObject *ret, bool 
     if (!need_cvt) {
         u32 *dst = PYUNICODE_UCS4_START(ret);
         *dst_addr = dst;
-        pyyjson_memcpy(dst, src, count * 4);
+        ssrjson_memcpy(dst, src, count * 4);
     } else {
         if (kind <= 1) {
             u8 *dst = (kind == 0) ? PYUNICODE_ASCII_START(ret) : PYUNICODE_UCS1_START(ret);
@@ -50,4 +50,4 @@ force_inline void copy_to_new_unicode_ucs4(void **dst_addr, PyObject *ret, bool 
 #undef COMPILE_SIMD_BITS
 #include "compile_context/s_out.inl.h"
 
-#endif // PYYJSON_DECODE_STR_COPY_TO_NEW_H
+#endif // SSRJSON_DECODE_STR_COPY_TO_NEW_H

@@ -1,5 +1,5 @@
-#ifndef PYYJSON_DECODE_STR_ESCAPE_H
-#define PYYJSON_DECODE_STR_ESCAPE_H
+#ifndef SSRJSON_DECODE_STR_ESCAPE_H
+#define SSRJSON_DECODE_STR_ESCAPE_H
 
 #include "decode/decode.h"
 
@@ -14,24 +14,24 @@ force_inline int process_escape_ucs1_u8(
     u32 escape_val;
     usize escape_len;
     escape_val = escape_info.escape_val;
-    *max_escapeval_addr = PYYJSON_MAX(*max_escapeval_addr, escape_val);
+    *max_escapeval_addr = SSRJSON_MAX(*max_escapeval_addr, escape_val);
     assert(escape_val != _DECODE_UNICODE_ERR);
     if (escape_val < 0x100) {
         *(*u8writer_addr)++ = (u8)escape_val;
         return 1;
     } else if (escape_val < 0x10000) {
         // R: ucs1,ucs2 W: ucs1,ucs2
-        usize u8size = (*u8writer_addr) - PYYJSON_CAST(u8 *, temp_buffer);
+        usize u8size = (*u8writer_addr) - SSRJSON_CAST(u8 *, temp_buffer);
         *u8size_addr = u8size;
         *u8writer_addr = NULL;
-        *u16writer_addr = PYYJSON_CAST(u16 *, temp_buffer) + u8size;
+        *u16writer_addr = SSRJSON_CAST(u16 *, temp_buffer) + u8size;
         *(*u16writer_addr)++ = (u16)escape_val;
         return 2;
     } else {
-        usize u8size = (*u8writer_addr) - PYYJSON_CAST(u8 *, temp_buffer);
+        usize u8size = (*u8writer_addr) - SSRJSON_CAST(u8 *, temp_buffer);
         *u8size_addr = u8size;
         *u8writer_addr = NULL;
-        *u32writer_addr = PYYJSON_CAST(u32 *, temp_buffer) + u8size;
+        *u32writer_addr = SSRJSON_CAST(u32 *, temp_buffer) + u8size;
         *(*u32writer_addr)++ = escape_val;
         return 4;
     }
@@ -48,16 +48,16 @@ force_inline int process_escape_ucs1_u16(
     u32 escape_val;
     usize escape_len;
     escape_val = escape_info.escape_val;
-    *max_escapeval_addr = PYYJSON_MAX(*max_escapeval_addr, escape_val);
+    *max_escapeval_addr = SSRJSON_MAX(*max_escapeval_addr, escape_val);
     assert(escape_val != _DECODE_UNICODE_ERR);
     if (escape_val < 0x10000) {
         *(*u16writer_addr)++ = (u16)escape_val;
         return 2;
     } else {
-        usize totalsize = (*u16writer_addr) - PYYJSON_CAST(u16 *, temp_buffer);
+        usize totalsize = (*u16writer_addr) - SSRJSON_CAST(u16 *, temp_buffer);
         *u16size_addr = totalsize - *u8size_addr;
         *u16writer_addr = NULL;
-        *u32writer_addr = PYYJSON_CAST(u32 *, temp_buffer) + totalsize;
+        *u32writer_addr = SSRJSON_CAST(u32 *, temp_buffer) + totalsize;
         *(*u32writer_addr)++ = escape_val;
         return 4;
     }
@@ -73,16 +73,16 @@ force_inline int process_escape_ucs2_u16(
     u32 escape_val;
     usize escape_len;
     escape_val = escape_info.escape_val;
-    *max_escapeval_addr = PYYJSON_MAX(*max_escapeval_addr, escape_val);
+    *max_escapeval_addr = SSRJSON_MAX(*max_escapeval_addr, escape_val);
     assert(escape_val != _DECODE_UNICODE_ERR);
     if (escape_val < 0x10000) {
         *(*u16writer_addr)++ = (u16)escape_val;
         return 2;
     } else {
-        usize u16size = (*u16writer_addr) - PYYJSON_CAST(u16 *, temp_buffer);
+        usize u16size = (*u16writer_addr) - SSRJSON_CAST(u16 *, temp_buffer);
         *u16size_addr = u16size;
         *u16writer_addr = NULL;
-        *u32writer_addr = PYYJSON_CAST(u32 *, temp_buffer) + u16size;
+        *u32writer_addr = SSRJSON_CAST(u32 *, temp_buffer) + u16size;
         *(*u32writer_addr)++ = escape_val;
         return 4;
     }
@@ -95,9 +95,9 @@ force_inline void process_escape_to_u32(
     u32 escape_val;
     usize escape_len;
     escape_val = escape_info.escape_val;
-    *max_escapeval_addr = PYYJSON_MAX(*max_escapeval_addr, escape_val);
+    *max_escapeval_addr = SSRJSON_MAX(*max_escapeval_addr, escape_val);
     assert(escape_val != _DECODE_UNICODE_ERR);
     *(*u32writer_addr)++ = escape_val;
 }
 
-#endif // PYYJSON_DECODE_STR_ESCAPE_H
+#endif // SSRJSON_DECODE_STR_ESCAPE_H

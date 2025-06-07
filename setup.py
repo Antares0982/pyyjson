@@ -13,7 +13,7 @@ class CustomBuildExt(build_ext):
         import subprocess
 
         file = subprocess.check_output(
-            ["find", ".", "-name", "pyyjson.cpython*.so"], encoding="utf-8"
+            ["find", ".", "-name", "ssrjson.cpython*.so"], encoding="utf-8"
         ).strip()
         precompiled_path = os.path.abspath(file if file else out_file)
         self.announce(
@@ -34,7 +34,7 @@ setup(
     packages=["ssrjson"],
     ext_modules=[
         Extension(
-            "pyyjson",
+            "ssrjson",
             sources=[
                 # "result/*" # TODO ???
             ],

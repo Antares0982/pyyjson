@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_READ_UCS_LEVEL
 #        include "simd/union_vector.h"
 #        define COMPILE_READ_UCS_LEVEL 1

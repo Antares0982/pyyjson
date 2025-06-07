@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX2_COMMON_H
-#define PYYJSON_SIMD_AVX2_COMMON_H
+#ifndef SSRJSON_SIMD_AVX2_COMMON_H
+#define SSRJSON_SIMD_AVX2_COMMON_H
 
 #if !defined(__AVX2__) || !__AVX2__
 #    error "AVX2 is required for this file"
@@ -74,11 +74,11 @@ force_inline vector_a_u8_128 cvt_u16_to_u8_256(vector_a_u16_256 y) {
 }
 
 force_inline u32 get_low_bitmask_256(usize len) {
-    return (PYYJSON_CAST(u32, 1) << len) - 1;
+    return (SSRJSON_CAST(u32, 1) << len) - 1;
 }
 
 force_inline u64 get_high_bitmask_256(usize len) {
     return ~get_low_bitmask_256(32 - len);
 }
 
-#endif // PYYJSON_SIMD_AVX2_COMMON_H
+#endif // SSRJSON_SIMD_AVX2_COMMON_H

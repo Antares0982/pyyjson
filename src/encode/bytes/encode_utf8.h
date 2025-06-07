@@ -1,6 +1,6 @@
-#ifndef PYYJSON_ENCODE_UTF8_H
-#define PYYJSON_ENCODE_UTF8_H
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifndef SSRJSON_ENCODE_UTF8_H
+#define SSRJSON_ENCODE_UTF8_H
+#ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_CONTEXT_ENCODE
 #        define COMPILE_CONTEXT_ENCODE
 #    endif
@@ -30,7 +30,7 @@ force_inline void check_ascii_in_ucs1_and_get_done_countx4(unionvector_a_x4 vec,
     vector_a t1 = broadcast(_Quote);
     vector_a t2 = broadcast(_Slash);
     vector_a t3 = broadcast(ControlMax);
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 512
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 512
     struct {
         u64 x[4];
     } m;
@@ -49,7 +49,7 @@ force_inline void check_ascii_in_ucs1_and_get_done_countx4(unionvector_a_x4 vec,
     m.x[3] = cmpeq_bitmask(vec.x[3], t1) |
              cmpeq_bitmask(vec.x[3], t2) |
              signed_cmpgt_bitmask(t3, vec.x[3]);
-#elif PYYJSON_X86
+#elif SSRJSON_X86
     // see CHECK_ESCAPE_LT512_USE_SIGNED_SATURATED_MINUS
     unionvector_a_x4 m;
     vector_a r;
@@ -57,7 +57,7 @@ force_inline void check_ascii_in_ucs1_and_get_done_countx4(unionvector_a_x4 vec,
     m.x[1] = (vec.x[1] == t1) | (vec.x[1] == t2) | signed_cmpgt(t3, vec.x[1]);
     m.x[2] = (vec.x[2] == t1) | (vec.x[2] == t2) | signed_cmpgt(t3, vec.x[2]);
     m.x[3] = (vec.x[3] == t1) | (vec.x[3] == t2) | signed_cmpgt(t3, vec.x[3]);
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
     unionvector_a_x4 m;
     vector_a r;
     m.x[0] = (vec.x[0] == t1) | (vec.x[0] == t2) | signed_cmpgt(t3, vec.x[0]);
@@ -90,13 +90,13 @@ force_inline void check_ascii_in_ucs1_and_get_done_count(vector_a vec, bool *out
     vector_a t1 = broadcast(_Quote);
     vector_a t2 = broadcast(_Slash);
     vector_a t3 = broadcast(ControlMax);
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 512
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 512
     u64 m;
 
     m = cmpeq_bitmask(vec, t1) |
         cmpeq_bitmask(vec, t2) |
         signed_cmpgt_bitmask(t3, vec);
-#elif PYYJSON_X86
+#elif SSRJSON_X86
     // see CHECK_ESCAPE_LT512_USE_SIGNED_SATURATED_MINUS
     vector_a m;
     m = (vec == t1) | (vec == t2) | signed_cmpgt(t3, vec);
@@ -238,7 +238,7 @@ force_inline void check_ascii_in_ucs2_and_get_done_countx4(unionvector_a_x4 vec,
     vector_a t2 = broadcast(_Slash);
     vector_a t3 = broadcast(ControlMax);
     vector_a t4 = broadcast(0x7f);
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 512
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 512
     struct {
         u32 x[4];
     } m;
@@ -260,7 +260,7 @@ force_inline void check_ascii_in_ucs2_and_get_done_countx4(unionvector_a_x4 vec,
              cmpeq_bitmask(vec.x[3], t2) |
              signed_cmpgt_bitmask(t3, vec.x[3]) |
              signed_cmpgt_bitmask(vec.x[3], t4);
-#elif PYYJSON_X86
+#elif SSRJSON_X86
     // see CHECK_ESCAPE_LT512_USE_SIGNED_SATURATED_MINUS
     unionvector_a_x4 m;
     vector_a r;
@@ -301,13 +301,13 @@ force_inline void check_ascii_in_ucs2_and_get_done_count(vector_a vec, bool *out
     vector_a t2 = broadcast(_Slash);
     vector_a t3 = broadcast(ControlMax);
     vector_a t4 = broadcast(0x7f);
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 512
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 512
     u32 m;
     m = cmpeq_bitmask(vec, t1) |
         cmpeq_bitmask(vec, t2) |
         signed_cmpgt_bitmask(t3, vec) |
         signed_cmpgt_bitmask(vec, t4);
-#elif PYYJSON_X86
+#elif SSRJSON_X86
     vector_a m;
     m = (vec == t1) | (vec == t2) | signed_cmpgt(t3, vec) | signed_cmpgt(vec, t4);
 #else
@@ -400,10 +400,10 @@ force_inline bool ascii_in_ucs2_encode_loop(u8 **dst_addr, const u16 **src_addr,
 force_inline void check_2bytes_in_ucs2_and_get_done_count(vector_a vec, bool *out_checked, usize *out_done_count) {
     vector_a t1 = broadcast(0x80);
     vector_a t2 = broadcast(0x7ff);
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 512
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 512
     u32 m;
     m = unsigned_cmpgt_bitmask(t1, vec) | unsigned_cmpgt_bitmask(vec, t2);
-#elif PYYJSON_X86
+#elif SSRJSON_X86
     vector_a m;
     m = signed_cmpgt(t1, vec) | signed_cmpgt(vec, t2);
 #else
@@ -429,7 +429,7 @@ force_inline bool _2bytes_in_ucs2_encode_loop(u8 **dst_addr, const u16 **src_add
     vec = *(const vector_u *)src;
 
     // write
-#if PYYJSON_X86
+#if SSRJSON_X86
 #    if COMPILE_SIMD_BITS == 512
     ucs2_encode_2bytes_utf8_avx512(dst, vec);
 #    elif COMPILE_SIMD_BITS == 256
@@ -467,13 +467,13 @@ force_inline void check_3bytes_in_ucs2_and_get_done_count(vector_a vec, bool *ou
     vector_a t2 = broadcast(0xd7ff);
     vector_a t3 = broadcast(0xe000);
 
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 512
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 512
     u32 m;
 
     m = unsigned_cmplt_bitmask(vec, t1) |
         (unsigned_cmpgt_bitmask(vec, t2) &
          unsigned_cmplt_bitmask(vec, t3));
-#elif PYYJSON_X86
+#elif SSRJSON_X86
     // see CHECK_ESCAPE_LT512_USE_SIGNED_SATURATED_MINUS
     vector_a m;
     // use 2 signed_cmpgt to do unsigned range check
@@ -496,10 +496,10 @@ force_inline void check_3bytes_in_ucs4_and_get_done_count(vector_a vec, bool *ou
     vector_a t3 = broadcast(0xe000);
     vector_a t4 = broadcast(0xffff);
 
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 512
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 512
     u32 m;
     m = unsigned_cmpgt_bitmask(t1, vec) | (unsigned_cmpgt_bitmask(vec, t2) & unsigned_cmpgt_bitmask(t3, vec)) | unsigned_cmpgt_bitmask(vec, t4);
-#elif PYYJSON_X86
+#elif SSRJSON_X86
     vector_a m;
     m = signed_cmpgt(t1, vec) | (signed_cmpgt(vec, t2) & signed_cmpgt(t3, vec)) | signed_cmpgt(vec, t4);
 #else
@@ -525,7 +525,7 @@ force_inline bool _3bytes_in_ucs2_encode_loop(u8 **dst_addr, const u16 **src_add
     vec = *(const vector_u *)src;
 
     // write
-#if PYYJSON_X86
+#if SSRJSON_X86
 #    if SUPPORT_SIMD_512BITS
     ucs2_encode_3bytes_utf8_avx512(dst, vec);
 #    elif SUPPORT_SIMD_256BITS
@@ -533,7 +533,7 @@ force_inline bool _3bytes_in_ucs2_encode_loop(u8 **dst_addr, const u16 **src_add
 #    elif __SSSE3__
     ucs2_encode_3bytes_utf8_ssse3(dst, vec);
 #    else
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 #    endif
 #else
     // TODO
@@ -638,7 +638,7 @@ force_inline void check_ascii_in_ucs4_and_get_done_countx4(unionvector_a_x4 vec,
     vector_a t2 = broadcast(_Slash);
     vector_a t3 = broadcast(ControlMax);
     vector_a t4 = broadcast(0x7f);
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 512
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 512
     struct {
         u32 x[4];
     } m;
@@ -660,7 +660,7 @@ force_inline void check_ascii_in_ucs4_and_get_done_countx4(unionvector_a_x4 vec,
              cmpeq_bitmask(vec.x[3], t2) |
              signed_cmpgt_bitmask(t3, vec.x[3]) |
              signed_cmpgt_bitmask(vec.x[3], t4);
-#elif PYYJSON_X86
+#elif SSRJSON_X86
     // see CHECK_ESCAPE_LT512_USE_SIGNED_SATURATED_MINUS
     unionvector_a_x4 m;
     vector_a r;
@@ -742,13 +742,13 @@ force_inline void check_ascii_in_ucs4_and_get_done_count(vector_a vec, bool *out
     vector_a t2 = broadcast(_Slash);
     vector_a t3 = broadcast(ControlMax);
     vector_a t4 = broadcast(0x7f);
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 512
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 512
     u32 m;
     m = cmpeq_bitmask(vec, t1) |
         cmpeq_bitmask(vec, t2) |
         signed_cmpgt_bitmask(t3, vec) |
         signed_cmpgt_bitmask(vec, t4);
-#elif PYYJSON_X86
+#elif SSRJSON_X86
     vector_a m;
     m = (vec == t1) | (vec == t2) | signed_cmpgt(t3, vec) | signed_cmpgt(vec, t4);
 #else
@@ -800,10 +800,10 @@ force_inline bool ascii_in_ucs4_encode_loop(u8 **dst_addr, const u32 **src_addr,
 force_inline void check_2bytes_in_ucs4_and_get_done_count(vector_a vec, bool *out_checked, usize *out_done_count) {
     vector_a t1 = broadcast(0x80);
     vector_a t2 = broadcast(0x7ff);
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 512
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 512
     u32 m;
     m = unsigned_cmpgt_bitmask(t1, vec) | unsigned_cmpgt_bitmask(vec, t2);
-#elif PYYJSON_X86
+#elif SSRJSON_X86
     vector_a m;
     m = signed_cmpgt(t1, vec) | signed_cmpgt(vec, t2);
 #else
@@ -829,7 +829,7 @@ force_inline bool _2bytes_in_ucs4_encode_loop(u8 **dst_addr, const u32 **src_add
     vec = *(const vector_u *)src;
 
     // write
-#if PYYJSON_X86
+#if SSRJSON_X86
 #    if COMPILE_SIMD_BITS == 512
     ucs4_encode_2bytes_utf8_avx512(dst, vec);
 #    elif COMPILE_SIMD_BITS == 256
@@ -874,7 +874,7 @@ force_inline bool _3bytes_in_ucs4_encode_loop(u8 **dst_addr, const u32 **src_add
     vec = *(const vector_u *)src;
 
     // write
-#if PYYJSON_X86
+#if SSRJSON_X86
 #    if SUPPORT_SIMD_512BITS
     ucs4_encode_3bytes_utf8_avx512(dst, vec);
 #    elif SUPPORT_SIMD_256BITS
@@ -882,7 +882,7 @@ force_inline bool _3bytes_in_ucs4_encode_loop(u8 **dst_addr, const u32 **src_add
 #    elif __SSSE3__
     ucs4_encode_3bytes_utf8_ssse3(dst, vec);
 #    else
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 #    endif
 #else
     // TODO
@@ -983,4 +983,4 @@ _IMPL_INLINE_SPECIFIER bool bytes_write_ucs4(u8 **writer_addr, const u32 *src, u
 #undef _IMPL_INLINE_SPECIFIER_UCS2
 #undef _IMPL_INLINE_SPECIFIER_UCS4
 
-#endif // PYYJSON_ENCODE_UTF8_H
+#endif // SSRJSON_ENCODE_UTF8_H

@@ -1,4 +1,4 @@
-#include "pyyjson.h"
+#include "ssrjson.h"
 
 force_inline bool initialize_cpython(void) {
     PyObject *sys_module = NULL, *path = NULL, *add_path = NULL;
@@ -66,11 +66,11 @@ fail:;
 #endif
 
 // returns a new reference
-force_inline PyObject *import_pyyjson(void) {
+force_inline PyObject *import_ssrjson(void) {
 #ifdef _WIN32
 #else
     if (!set_dlopen_flags()) return NULL;
 #endif
-    PyObject *pModule = PyImport_ImportModule("pyyjson");
+    PyObject *pModule = PyImport_ImportModule("ssrjson");
     return pModule;
 }

@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_READ_UCS_LEVEL
 #        include "simd/avx512vl_dq_bw/common.h"
 #        include "simd/mask_table.h"

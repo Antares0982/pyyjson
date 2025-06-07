@@ -1,4 +1,4 @@
-#undef PYYJSON_COMPILE_CONTEXT_RW
+#undef SSRJSON_COMPILE_CONTEXT_RW
 //
 #include "r_out.inl.h"
 #include "w_out.inl.h"

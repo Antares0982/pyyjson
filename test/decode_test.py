@@ -10,7 +10,7 @@ class TestDecode(unittest.TestCase):
         return check_obj_same(self, a, b)
 
     def test_fail(self):
-        import pyyjson
+        import ssrjson
 
         test_cases = {
             ValueError: [
@@ -26,10 +26,10 @@ class TestDecode(unittest.TestCase):
             for case in cases:
                 with self.subTest(msg=f"decoding_fail_test(case={case})"):
                     with self.assertRaises(err):
-                        pyyjson.loads(case)
+                        ssrjson.loads(case)
 
     # def test_object_hook(self):
-    #     import pyyjson
+    #     import ssrjson
     #     import json
 
     #     class A:
@@ -54,15 +54,15 @@ class TestDecode(unittest.TestCase):
     #     for case in test_cases:
     #         with self.subTest(msg=f'decoding_object_hook_test(case={case})'):
     #             result_json = json.loads(case, object_hook=d4)
-    #             result_pyyjson = pyyjson.loads(case, object_hook=d4)
-    #             self._check_obj_same(result_json, result_pyyjson)
+    #             result_ssrjson = ssrjson.loads(case, object_hook=d4)
+    #             self._check_obj_same(result_json, result_ssrjson)
 
     def test_decode(self):
         import collections
         import json
         import math
 
-        import pyyjson
+        import ssrjson
 
         test_cases_origin = [
             True,
@@ -112,8 +112,8 @@ class TestDecode(unittest.TestCase):
             # print(case)
             with self.subTest(msg=f"decoding_test(case={case})"):
                 re_json = json.loads(case)
-                re_pyyjson = pyyjson.loads(case)
-                self._check_obj_same(re_pyyjson, re_json)
+                re_ssrjson = ssrjson.loads(case)
+                self._check_obj_same(re_ssrjson, re_json)
 
 
 if __name__ == "__main__":

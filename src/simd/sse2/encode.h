@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_SSE2_ENCODE_H
-#define PYYJSON_SIMD_SSE2_ENCODE_H
+#ifndef SSRJSON_SIMD_SSE2_ENCODE_H
+#define SSRJSON_SIMD_SSE2_ENCODE_H
 
 #include "checker.h"
 #include "cvt.h"
@@ -44,4 +44,4 @@
 #undef COMPILE_WRITE_UCS_LEVEL
 
 
-#endif // PYYJSON_SIMD_SSE2_ENCODE_H
+#endif // SSRJSON_SIMD_SSE2_ENCODE_H

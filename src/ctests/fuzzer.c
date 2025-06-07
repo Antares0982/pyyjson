@@ -11,10 +11,10 @@ typedef struct TestResult {
     PyObject *encoded;
 } TestResult;
 
-PyObject *pyyjson_module = NULL;
+PyObject *ssrjson_module = NULL;
 PyObject *decode_func = NULL;
 PyObject *encode_func = NULL;
-PyObject *pyyjson_fuzz_module = NULL;
+PyObject *ssrjson_fuzz_module = NULL;
 PyObject *fuzz_bytes_input = NULL;
 PyObject *fuzz_str_input = NULL;
 
@@ -44,25 +44,25 @@ fail:;
 
 int LLVMFuzzerInitialize(int *argc, char ***argv) {
     initialize_cpython();
-    pyyjson_module = import_pyyjson();
-    if (!pyyjson_module) goto fail;
-    decode_func = PyObject_GetAttrString(pyyjson_module, "loads");
+    ssrjson_module = import_ssrjson();
+    if (!ssrjson_module) goto fail;
+    decode_func = PyObject_GetAttrString(ssrjson_module, "loads");
     if (!decode_func) goto fail;
-    encode_func = PyObject_GetAttrString(pyyjson_module, "dumps");
+    encode_func = PyObject_GetAttrString(ssrjson_module, "dumps");
     if (!encode_func) goto fail;
     if (!init_test_arg_settings()) goto fail;
-    pyyjson_fuzz_module = PyImport_ImportModule("pyyjson_fuzz");
-    if (!pyyjson_fuzz_module) goto fail;
-    fuzz_bytes_input = PyObject_GetAttrString(pyyjson_fuzz_module, "fuzz_bytes_input");
+    ssrjson_fuzz_module = PyImport_ImportModule("ssrjson_fuzz");
+    if (!ssrjson_fuzz_module) goto fail;
+    fuzz_bytes_input = PyObject_GetAttrString(ssrjson_fuzz_module, "fuzz_bytes_input");
     if (!fuzz_bytes_input) goto fail;
-    fuzz_str_input = PyObject_GetAttrString(pyyjson_fuzz_module, "fuzz_str_input");
+    fuzz_str_input = PyObject_GetAttrString(ssrjson_fuzz_module, "fuzz_str_input");
     if (!fuzz_str_input) goto fail;
     return 0;
 fail:;
-    Py_XDECREF(pyyjson_module);
+    Py_XDECREF(ssrjson_module);
     Py_XDECREF(decode_func);
     Py_XDECREF(encode_func);
-    Py_XDECREF(pyyjson_fuzz_module);
+    Py_XDECREF(ssrjson_fuzz_module);
     printf("%s\n", "Cannot initialize");
     __builtin_trap();
     return -1;

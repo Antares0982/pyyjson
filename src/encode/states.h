@@ -1,5 +1,5 @@
-#ifndef PYYJSON_ENCODE_STATES_H
-#define PYYJSON_ENCODE_STATES_H
+#ifndef SSRJSON_ENCODE_STATES_H
+#define SSRJSON_ENCODE_STATES_H
 
 #include "unicode/unicode.h"
 
@@ -64,4 +64,4 @@ force_inline void memorize_ucs2_to_ucs4(EncodeUnicodeWriter* writer_addr, Encode
 }
 
 
-#endif // PYYJSON_ENCODE_STATES_H
+#endif // SSRJSON_ENCODE_STATES_H

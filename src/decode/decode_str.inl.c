@@ -1,6 +1,6 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    include "decode/str/str.h"
-#    include "pyyjson.h"
+#    include "ssrjson.h"
 #    include "simd/cvt.h"
 #    include "simd/long_cvt.h"
 #    include "simd/mask_table.h"
@@ -30,16 +30,16 @@ force_inline bool check_and_reserve_str_buffer(Py_ssize_t len, _src_t **buffer_h
     if (len > ((Py_ssize_t)PY_SSIZE_T_MAX - TAIL_PADDING * 2) / 4) {
         return false;
     }
-    static_assert(((Py_ssize_t)PYYJSON_STRING_BUFFER_SIZE - TAIL_PADDING * 2) > 4, "((Py_ssize_t)PYYJSON_STRING_BUFFER_SIZE - 128) > 4");
+    static_assert(((Py_ssize_t)SSRJSON_STRING_BUFFER_SIZE - TAIL_PADDING * 2) > 4, "((Py_ssize_t)SSRJSON_STRING_BUFFER_SIZE - 128) > 4");
     Py_ssize_t new_buffer_size = 4 * len + 2 * TAIL_PADDING;
-    if (new_buffer_size > PYYJSON_STRING_BUFFER_SIZE) {
+    if (new_buffer_size > SSRJSON_STRING_BUFFER_SIZE) {
         // malloc new buffer
         u8 *new_buffer = (u8 *)malloc(new_buffer_size);
         if (!new_buffer) return false;
         *buffer_head_addr = (_src_t *)(new_buffer + TAIL_PADDING);
         *need_dealloc = true;
     } else {
-        *buffer_head_addr = (_src_t *)(pyyjson_string_buffer + TAIL_PADDING);
+        *buffer_head_addr = (_src_t *)(ssrjson_string_buffer + TAIL_PADDING);
         *need_dealloc = false;
     }
     return true;
@@ -192,16 +192,16 @@ force_inline bool should_read_pretty(const _src_t *buffer, const _src_t *end) {
 static force_noinline PyObject *decode(PyUnicodeObject *in_unicode) {
     // some checks
     assert(in_unicode);
-    PyASCIIObject *ascii_head = PYYJSON_CAST(PyASCIIObject *, in_unicode);
+    PyASCIIObject *ascii_head = SSRJSON_CAST(PyASCIIObject *, in_unicode);
     assert((ascii_head->state.ascii ? 0 : ascii_head->state.kind) == COMPILE_UCS_LEVEL);
     if (unlikely(!ascii_head->length)) {
         PyErr_Format(JSONDecodeError, "input data is empty");
         return NULL;
     }
 #if COMPILE_UCS_LEVEL > 0
-    const _src_t *buffer = PYYJSON_CAST(_src_t *, PYYJSON_CAST(PyCompactUnicodeObject *, in_unicode) + 1);
+    const _src_t *buffer = SSRJSON_CAST(_src_t *, SSRJSON_CAST(PyCompactUnicodeObject *, in_unicode) + 1);
 #else
-    const _src_t *buffer = PYYJSON_CAST(_src_t *, ascii_head + 1);
+    const _src_t *buffer = SSRJSON_CAST(_src_t *, ascii_head + 1);
 #endif
     assert(buffer);
     assert(ascii_head->length > 0);

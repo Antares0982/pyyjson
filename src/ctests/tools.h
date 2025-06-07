@@ -1,5 +1,5 @@
-#ifndef PYYJSON_CTESTS_TOOLS_H
-#define PYYJSON_CTESTS_TOOLS_H
+#ifndef SSRJSON_CTESTS_TOOLS_H
+#define SSRJSON_CTESTS_TOOLS_H
 
 #include "test.h"
 
@@ -16,4 +16,4 @@ int check_ucs4_3bytes(u32 *input, u8 *output, int count);
 int check_ucs4_2bytes(u32 *input, u8 *output, int count);
 int check_ucs4_ascii(u32 *input, u8 *output, int count);
 
-#endif // PYYJSON_CTESTS_TOOLS_H
+#endif // SSRJSON_CTESTS_TOOLS_H

@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_SSE2_CHECKMAX_H
-#define PYYJSON_SIMD_SSE2_CHECKMAX_H
+#ifndef SSRJSON_SIMD_SSE2_CHECKMAX_H
+#define SSRJSON_SIMD_SSE2_CHECKMAX_H
 
 #include "simd/simd_detect.h"
 #include "simd/vector_types.h"
@@ -25,4 +25,4 @@ force_inline bool checkmax_u8_128(vector_a_u8_128 y, u8 lower_bound_minus_1) {
     return testz_128(mask);
 }
 
-#endif // PYYJSON_SIMD_SSE2_CHECKMAX_H
+#endif // SSRJSON_SIMD_SSE2_CHECKMAX_H

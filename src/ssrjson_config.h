@@ -1,5 +1,5 @@
-#ifndef PYYJSON_CONFIG_H
-#define PYYJSON_CONFIG_H
+#ifndef SSRJSON_CONFIG_H
+#define SSRJSON_CONFIG_H
 
 #ifdef _DEBUG
 #    undef _DEBUG
@@ -26,88 +26,88 @@
 
 // feature checks
 #if INTPTR_MAX == INT64_MAX
-#    define PYYJSON_64BIT
+#    define SSRJSON_64BIT
 #elif INTPTR_MAX == INT32_MAX
-#    define PYYJSON_32BIT
+#    define SSRJSON_32BIT
 #else
 #    error "Unsupported platform"
 #endif
 
 /* String buffer size for decoding. Default cost: 512 * 1024 = 512kb (per thread). */
-#ifndef PYYJSON_STRING_BUFFER_SIZE
-#    define PYYJSON_STRING_BUFFER_SIZE (512 * 1024)
+#ifndef SSRJSON_STRING_BUFFER_SIZE
+#    define SSRJSON_STRING_BUFFER_SIZE (512 * 1024)
 #endif
 
-/* Buffer for key associative cache. Default cost: 2048 * sizeof(pyyjson_cache_type) = 16kb (per thread). */
-#ifndef PYYJSON_KEY_CACHE_SIZE
-#    define PYYJSON_KEY_CACHE_SIZE (1 << 11)
+/* Buffer for key associative cache. Default cost: 2048 * sizeof(ssrjson_cache_type) = 16kb (per thread). */
+#ifndef SSRJSON_KEY_CACHE_SIZE
+#    define SSRJSON_KEY_CACHE_SIZE (1 << 11)
 #endif
 
 // /* Stack buffer for PyObject*. Default cost: 8 * 1024 = 8kb (per thread). */
-// #ifndef PYYJSON_DECODE_OBJSTACK_BUFFER_SIZE
-// #define PYYJSON_DECODE_OBJSTACK_BUFFER_SIZE (1024)
+// #ifndef SSRJSON_DECODE_OBJSTACK_BUFFER_SIZE
+// #define SSRJSON_DECODE_OBJSTACK_BUFFER_SIZE (1024)
 // #endif
 
-#ifndef PYYJSON_READER_ESTIMATED_PRETTY_RATIO
-#    define PYYJSON_READER_ESTIMATED_PRETTY_RATIO 16
+#ifndef SSRJSON_READER_ESTIMATED_PRETTY_RATIO
+#    define SSRJSON_READER_ESTIMATED_PRETTY_RATIO 16
 #endif
 
 /*
  Init buffer size for decode object buffer.
- Cost: PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE * sizeof(void*) bytes per thread.
+ Cost: SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE * sizeof(void*) bytes per thread.
  */
-#ifndef PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE
-#    define PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE (1024)
+#ifndef SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE
+#    define SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE (1024)
 #endif
 
 /*
  Buffer size for decode container buffer.
- Cost: PYYJSON_DECODE_CONTAINER_BUFFER_INIT_SIZE * sizeof(Py_ssize_t) bytes per thread.
+ Cost: SSRJSON_DECODE_CONTAINER_BUFFER_INIT_SIZE * sizeof(Py_ssize_t) bytes per thread.
  */
-#ifndef PYYJSON_DECODE_MAX_RECURSION
-#    define PYYJSON_DECODE_MAX_RECURSION (1024)
+#ifndef SSRJSON_DECODE_MAX_RECURSION
+#    define SSRJSON_DECODE_MAX_RECURSION (1024)
 #endif
 
 /*
  Init buffer size for dst buffer. Must be multiple of 64.
- Cost: PYYJSON_ENCODE_DST_BUFFER_INIT_SIZE bytes per thread.
+ Cost: SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE bytes per thread.
  */
-#ifndef PYYJSON_ENCODE_DST_BUFFER_INIT_SIZE
-#    define PYYJSON_ENCODE_DST_BUFFER_INIT_SIZE (1024)
+#ifndef SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE
+#    define SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE (1024)
 #endif
 
 /*
  Max nested structures for encoding.
- Cost: PYYJSON_ENCODE_MAX_RECURSION * sizeof(void*) * 2 bytes per thread.
+ Cost: SSRJSON_ENCODE_MAX_RECURSION * sizeof(void*) * 2 bytes per thread.
  */
-#ifndef PYYJSON_ENCODE_MAX_RECURSION
-#    define PYYJSON_ENCODE_MAX_RECURSION (1024)
+#ifndef SSRJSON_ENCODE_MAX_RECURSION
+#    define SSRJSON_ENCODE_MAX_RECURSION (1024)
 #endif
 
 /*
  When a character needs escape when encoding,
- the following `PYYJSON_ENCODE_ESCAPE_ONCE_BYTES`
+ the following `SSRJSON_ENCODE_ESCAPE_ONCE_BYTES`
  bytes will be processed character by character without using SIMD.
  Adjust this value if the characters that need to be escaped
  are centralized in a certain range.
  */
-#ifndef PYYJSON_ENCODE_ESCAPE_ONCE_BYTES
-#    define PYYJSON_ENCODE_ESCAPE_ONCE_BYTES (16)
+#ifndef SSRJSON_ENCODE_ESCAPE_ONCE_BYTES
+#    define SSRJSON_ENCODE_ESCAPE_ONCE_BYTES (16)
 #endif
 
 /* Whether implementation of encoding ASCII/UCS1 string is inlined. */
-#ifndef PYYJSON_ENCODE_UCS1_IMPL_INLINE
-#    define PYYJSON_ENCODE_UCS1_IMPL_INLINE 1
+#ifndef SSRJSON_ENCODE_UCS1_IMPL_INLINE
+#    define SSRJSON_ENCODE_UCS1_IMPL_INLINE 1
 #endif
 
 /* Whether implementation of encoding UCS2 string is inlined. */
-#ifndef PYYJSON_ENCODE_UCS2_IMPL_INLINE
-#    define PYYJSON_ENCODE_UCS2_IMPL_INLINE 0
+#ifndef SSRJSON_ENCODE_UCS2_IMPL_INLINE
+#    define SSRJSON_ENCODE_UCS2_IMPL_INLINE 0
 #endif
 
 /* Whether implementation of encoding UCS4 string is inlined. */
-#ifndef PYYJSON_ENCODE_UCS4_IMPL_INLINE
-#    define PYYJSON_ENCODE_UCS4_IMPL_INLINE 0
+#ifndef SSRJSON_ENCODE_UCS4_IMPL_INLINE
+#    define SSRJSON_ENCODE_UCS4_IMPL_INLINE 0
 #endif
 
 /** Type define for primitive types. */

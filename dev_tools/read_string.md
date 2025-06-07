@@ -14,7 +14,7 @@ e--->f{return}
 a--->f
 ```
 
-pyyjson `read_bytes`
+ssrjson `read_bytes`
 
 ```mermaid
 graph TD

@@ -1,9 +1,9 @@
 #include "pythonlib.h"
-#include "pyyjson.h"
-#if PYYJSON_X86
-IMPL_MULTILIB_FUNCTION_INTERFACE(pyyjson_Encode)
-IMPL_MULTILIB_FUNCTION_INTERFACE(pyyjson_Decode)
-IMPL_MULTILIB_FUNCTION_INTERFACE(pyyjson_EncodeToBytes)
+#include "ssrjson.h"
+#if SSRJSON_X86
+IMPL_MULTILIB_FUNCTION_INTERFACE(ssrjson_Encode)
+IMPL_MULTILIB_FUNCTION_INTERFACE(ssrjson_Decode)
+IMPL_MULTILIB_FUNCTION_INTERFACE(ssrjson_EncodeToBytes)
 IMPL_MULTILIB_FUNCTION_INTERFACE(long_cvt_noinline_u16_u32)
 IMPL_MULTILIB_FUNCTION_INTERFACE(long_cvt_noinline_u8_u32)
 IMPL_MULTILIB_FUNCTION_INTERFACE(long_cvt_noinline_u8_u16)
@@ -20,7 +20,7 @@ typedef enum X86SIMDFeatureLevel {
 } X86SIMDFeatureLevel;
 
 #    define PLATFORM_SIMD_LEVEL X86SIMDFeatureLevel
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
 typedef enum AArchSIMDFeatureLevel {
     AArchSIMDFeatureLevelNEON = 0,
 } AArchSIMDFeatureLevel;
@@ -39,7 +39,7 @@ typedef enum AArchSIMDFeatureLevel {
 int CurrentSIMDFeatureLevel = -1;
 
 PLATFORM_SIMD_LEVEL get_simd_feature(void) {
-#if PYYJSON_X86
+#if SSRJSON_X86
     // https://www.intel.com/content/dam/develop/external/us/en/documents/319433-024-697869.pdf
 
     int max_leaf = get_cpuid_max();
@@ -72,7 +72,7 @@ PLATFORM_SIMD_LEVEL get_simd_feature(void) {
 
     //
     return X86SIMDFeatureLevelSSE2;
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
     return AArchSIMDFeatureLevelNEON;
 #endif
 }
@@ -80,14 +80,14 @@ PLATFORM_SIMD_LEVEL get_simd_feature(void) {
 force_inline void _update_simd_features(void) {
     if (unlikely(CurrentSIMDFeatureLevel == -1)) {
         PLATFORM_SIMD_LEVEL simd_feature = get_simd_feature();
-#if PYYJSON_X86
+#if SSRJSON_X86
         switch (simd_feature) {
             case X86SIMDFeatureLevelSSE2: {
                 // TODO
                 assert(false);
-                // SET_INTERFACE(pyyjson_Encode, sse2);
-                // SET_INTERFACE(pyyjson_Decode, sse2);
-                // SET_INTERFACE(pyyjson_EncodeToBytes, sse2);
+                // SET_INTERFACE(ssrjson_Encode, sse2);
+                // SET_INTERFACE(ssrjson_Decode, sse2);
+                // SET_INTERFACE(ssrjson_EncodeToBytes, sse2);
                 // SET_INTERFACE(long_cvt_noinline_u16_u32, sse2);
                 // SET_INTERFACE(long_cvt_noinline_u8_u32, sse2);
                 // SET_INTERFACE(long_cvt_noinline_u8_u16, sse2);
@@ -97,9 +97,9 @@ force_inline void _update_simd_features(void) {
                 break;
             }
             case X86SIMDFeatureLevelSSE4_2: {
-                SET_INTERFACE(pyyjson_Encode, sse4_2);
-                SET_INTERFACE(pyyjson_Decode, sse4_2);
-                SET_INTERFACE(pyyjson_EncodeToBytes, sse4_2);
+                SET_INTERFACE(ssrjson_Encode, sse4_2);
+                SET_INTERFACE(ssrjson_Decode, sse4_2);
+                SET_INTERFACE(ssrjson_EncodeToBytes, sse4_2);
                 SET_INTERFACE(long_cvt_noinline_u16_u32, sse4_2);
                 SET_INTERFACE(long_cvt_noinline_u8_u32, sse4_2);
                 SET_INTERFACE(long_cvt_noinline_u8_u16, sse4_2);
@@ -109,9 +109,9 @@ force_inline void _update_simd_features(void) {
                 break;
             }
             case X86SIMDFeatureLevelAVX2: {
-                SET_INTERFACE(pyyjson_Encode, avx2);
-                SET_INTERFACE(pyyjson_Decode, avx2);
-                SET_INTERFACE(pyyjson_EncodeToBytes, avx2);
+                SET_INTERFACE(ssrjson_Encode, avx2);
+                SET_INTERFACE(ssrjson_Decode, avx2);
+                SET_INTERFACE(ssrjson_EncodeToBytes, avx2);
                 SET_INTERFACE(long_cvt_noinline_u16_u32, avx2);
                 SET_INTERFACE(long_cvt_noinline_u8_u32, avx2);
                 SET_INTERFACE(long_cvt_noinline_u8_u16, avx2);
@@ -121,9 +121,9 @@ force_inline void _update_simd_features(void) {
                 break;
             }
             case X86SIMDFeatureLevelAVX512: {
-                SET_INTERFACE(pyyjson_Encode, avx512);
-                SET_INTERFACE(pyyjson_Decode, avx512);
-                SET_INTERFACE(pyyjson_EncodeToBytes, avx512);
+                SET_INTERFACE(ssrjson_Encode, avx512);
+                SET_INTERFACE(ssrjson_Decode, avx512);
+                SET_INTERFACE(ssrjson_EncodeToBytes, avx512);
                 SET_INTERFACE(long_cvt_noinline_u16_u32, avx512);
                 SET_INTERFACE(long_cvt_noinline_u8_u32, avx512);
                 SET_INTERFACE(long_cvt_noinline_u8_u16, avx512);
@@ -136,7 +136,7 @@ force_inline void _update_simd_features(void) {
                 assert(false);
             }
         }
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
 // TODO
 #endif
         // mark as ready
@@ -144,14 +144,14 @@ force_inline void _update_simd_features(void) {
     }
 }
 
-MAKE_FORWARD_PYFUNCTION_IMPL(pyyjson_Encode)
-MAKE_FORWARD_PYFUNCTION_IMPL(pyyjson_Decode)
-MAKE_FORWARD_PYFUNCTION_IMPL(pyyjson_EncodeToBytes)
+MAKE_FORWARD_PYFUNCTION_IMPL(ssrjson_Encode)
+MAKE_FORWARD_PYFUNCTION_IMPL(ssrjson_Decode)
+MAKE_FORWARD_PYFUNCTION_IMPL(ssrjson_EncodeToBytes)
 
-PyObject *pyyjson_print_current_features(PyObject *self, PyObject *args) {
+PyObject *ssrjson_print_current_features(PyObject *self, PyObject *args) {
     // TODO change to returning a dict with all build info
     _update_simd_features();
-#if PYYJSON_X86
+#if SSRJSON_X86
     switch (CurrentSIMDFeatureLevel) {
         case X86SIMDFeatureLevelSSE2: {
             printf("SIMD: SSE2\n");
@@ -174,17 +174,17 @@ PyObject *pyyjson_print_current_features(PyObject *self, PyObject *args) {
             break;
         }
     }
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
     printf("SIMD: NEON\n");
 #endif
     Py_RETURN_NONE;
 }
 
-PyObject *pyyjson_get_current_features(PyObject *self, PyObject *args) {
+PyObject *ssrjson_get_current_features(PyObject *self, PyObject *args) {
     PyObject *ret = PyDict_New();
     _update_simd_features();
     PyDict_SetItemString(ret, "MultiLib", PyBool_FromLong(true));
-#if PYYJSON_X86
+#if SSRJSON_X86
     switch (CurrentSIMDFeatureLevel) {
         // case X86SIMDFeatureLevelSSE2: {
         //     PyDict_SetItemString(ret, "SIMD", PyUnicode_FromString("SSE2"));
@@ -207,7 +207,7 @@ PyObject *pyyjson_get_current_features(PyObject *self, PyObject *args) {
             break;
         }
     }
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
     PyDict_SetItemString(ret, "SIMD", PyUnicode_FromString("NEON"));
 #endif
     return ret;

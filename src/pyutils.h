@@ -1,7 +1,7 @@
-#ifndef PYYJSON_PYUTILS_H
-#define PYYJSON_PYUTILS_H
+#ifndef SSRJSON_PYUTILS_H
+#define SSRJSON_PYUTILS_H
 
-#include "pyyjson.h"
+#include "ssrjson.h"
 
 #define ASCII_OFFSET sizeof(PyASCIIObject)
 #define UNICODE_OFFSET sizeof(PyCompactUnicodeObject)
@@ -22,11 +22,11 @@ extern int _PyDict_SetItem_KnownHash_LockHeld(PyObject *mp, PyObject *key, PyObj
 
 // Initialize a PyUnicode object with the given size and kind.
 force_inline void init_pyunicode(void *head, Py_ssize_t size, int kind) {
-    u8 *const u8head = PYYJSON_CAST(u8 *, head);
-    PyCompactUnicodeObject *unicode = PYYJSON_CAST(PyCompactUnicodeObject *, head);
-    PyASCIIObject *ascii = PYYJSON_CAST(PyASCIIObject *, head);
-    PyObject_Init(PYYJSON_CAST(PyObject *, head), &PyUnicode_Type);
-    void *data = PYYJSON_CAST(void *, u8head + (kind ? UNICODE_OFFSET : ASCII_OFFSET));
+    u8 *const u8head = SSRJSON_CAST(u8 *, head);
+    PyCompactUnicodeObject *unicode = SSRJSON_CAST(PyCompactUnicodeObject *, head);
+    PyASCIIObject *ascii = SSRJSON_CAST(PyASCIIObject *, head);
+    PyObject_Init(SSRJSON_CAST(PyObject *, head), &PyUnicode_Type);
+    void *data = SSRJSON_CAST(void *, u8head + (kind ? UNICODE_OFFSET : ASCII_OFFSET));
     //
     ascii->length = size;
     ascii->hash = -1;
@@ -57,7 +57,7 @@ force_inline void init_pyunicode(void *head, Py_ssize_t size, int kind) {
         is_sharing = sizeof(wchar_t) == 4;
 #endif
     } else {
-        PYYJSON_UNREACHABLE();
+        SSRJSON_UNREACHABLE();
     }
     if (kind) {
         unicode->utf8 = NULL;
@@ -114,4 +114,4 @@ PyObject *make_unicode_from_raw_ascii(void *raw_buffer, usize size, bool do_hash
 PyObject *make_unicode_down_ucs2_u8(void *raw_buffer, usize size, bool do_hash, bool is_ascii);
 PyObject *make_unicode_down_ucs4_u8(void *raw_buffer, usize size, bool do_hash, bool is_ascii);
 PyObject *make_unicode_down_ucs4_ucs2(void *raw_buffer, usize size, bool do_hash);
-#endif // PYYJSON_PYUTILS_H
+#endif // SSRJSON_PYUTILS_H

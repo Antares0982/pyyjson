@@ -4,7 +4,7 @@
 
 # import pytest
 
-# import pyyjson
+# import ssrjson
 
 # from util import read_fixture_str
 
@@ -36,18 +36,18 @@
 #         with pytest.raises(json.decoder.JSONDecodeError) as json_exc_info:
 #             json.loads(data)
 
-#         with pytest.raises(json.decoder.JSONDecodeError) as pyyjson_exc_info:
-#             pyyjson.loads(data)
+#         with pytest.raises(json.decoder.JSONDecodeError) as ssrjson_exc_info:
+#             ssrjson.loads(data)
 
 #         assert (
 #             self._get_error_infos(json_exc_info)
-#             == self._get_error_infos(pyyjson_exc_info)
+#             == self._get_error_infos(ssrjson_exc_info)
 #             == expected_err_infos
 #         )
 
 #     def test_empty(self):
-#         with pytest.raises(pyyjson.JSONDecodeError) as json_exc_info:
-#             pyyjson.loads("")
+#         with pytest.raises(ssrjson.JSONDecodeError) as json_exc_info:
+#             ssrjson.loads("")
 #         assert str(json_exc_info.value).startswith(
 #             "input data is empty"
 #         )
@@ -94,7 +94,7 @@
 #     #     }
 
 #     #     with pytest.raises(json.decoder.JSONDecodeError) as json_exc_info:
-#     #         pyyjson.loads(data)
+#     #         ssrjson.loads(data)
 
 #     #     assert self._get_error_infos(json_exc_info) == {
 #     #         "pos": 6,
@@ -138,9 +138,9 @@
 
 # class TestJsonEncodeError:
 #     def test_dumps_arg(self):
-#         with pytest.raises(pyyjson.JSONEncodeError) as exc_info:
-#             pyyjson.dumps()  # type: ignore
-#         assert exc_info.type == pyyjson.JSONEncodeError
+#         with pytest.raises(ssrjson.JSONEncodeError) as exc_info:
+#             ssrjson.dumps()  # type: ignore
+#         assert exc_info.type == ssrjson.JSONEncodeError
 #         assert (
 #             str(exc_info.value)
 #             == "dumps() missing 1 required positional argument: 'obj'"
@@ -148,45 +148,45 @@
 #         assert exc_info.value.__cause__ is None
 
 #     def test_dumps_chain_none(self):
-#         with pytest.raises(pyyjson.JSONEncodeError) as exc_info:
-#             pyyjson.dumps(Custom())
-#         assert exc_info.type == pyyjson.JSONEncodeError
+#         with pytest.raises(ssrjson.JSONEncodeError) as exc_info:
+#             ssrjson.dumps(Custom())
+#         assert exc_info.type == ssrjson.JSONEncodeError
 #         assert str(exc_info.value) == "Type is not JSON serializable: Custom"
 #         assert exc_info.value.__cause__ is None
 
 #     def test_dumps_chain_u64(self):
-#         with pytest.raises(pyyjson.JSONEncodeError) as exc_info:
-#             pyyjson.dumps([18446744073709551615, Custom()])
-#         assert exc_info.type == pyyjson.JSONEncodeError
+#         with pytest.raises(ssrjson.JSONEncodeError) as exc_info:
+#             ssrjson.dumps([18446744073709551615, Custom()])
+#         assert exc_info.type == ssrjson.JSONEncodeError
 #         assert exc_info.value.__cause__ is None
 
 #     def test_dumps_chain_default_typeerror(self):
-#         with pytest.raises(pyyjson.JSONEncodeError) as exc_info:
-#             pyyjson.dumps(Custom(), default=default_typeerror)
-#         assert exc_info.type == pyyjson.JSONEncodeError
+#         with pytest.raises(ssrjson.JSONEncodeError) as exc_info:
+#             ssrjson.dumps(Custom(), default=default_typeerror)
+#         assert exc_info.type == ssrjson.JSONEncodeError
 #         assert isinstance(exc_info.value.__cause__, TypeError)
 
 #     def test_dumps_chain_default_systemerror(self):
-#         with pytest.raises(pyyjson.JSONEncodeError) as exc_info:
-#             pyyjson.dumps(Custom(), default=default_systemerror)
-#         assert exc_info.type == pyyjson.JSONEncodeError
+#         with pytest.raises(ssrjson.JSONEncodeError) as exc_info:
+#             ssrjson.dumps(Custom(), default=default_systemerror)
+#         assert exc_info.type == ssrjson.JSONEncodeError
 #         assert isinstance(exc_info.value.__cause__, SystemError)
 
 #     def test_dumps_chain_default_importerror(self):
-#         with pytest.raises(pyyjson.JSONEncodeError) as exc_info:
-#             pyyjson.dumps(Custom(), default=default_importerror)
-#         assert exc_info.type == pyyjson.JSONEncodeError
+#         with pytest.raises(ssrjson.JSONEncodeError) as exc_info:
+#             ssrjson.dumps(Custom(), default=default_importerror)
+#         assert exc_info.type == ssrjson.JSONEncodeError
 #         assert isinstance(exc_info.value.__cause__, ImportError)
 
 #     def test_dumps_chain_default_customerror(self):
-#         with pytest.raises(pyyjson.JSONEncodeError) as exc_info:
-#             pyyjson.dumps(Custom(), default=default_customerror)
-#         assert exc_info.type == pyyjson.JSONEncodeError
+#         with pytest.raises(ssrjson.JSONEncodeError) as exc_info:
+#             ssrjson.dumps(Custom(), default=default_customerror)
+#         assert exc_info.type == ssrjson.JSONEncodeError
 #         assert isinstance(exc_info.value.__cause__, CustomException)
 #         assert str(exc_info.value.__cause__) == CUSTOM_ERROR_MESSAGE
 
 #     def test_dumps_normalize_exception(self):
-#         with pytest.raises(pyyjson.JSONEncodeError) as exc_info:
-#             pyyjson.dumps(10**60)
-#         assert exc_info.type == pyyjson.JSONEncodeError
+#         with pytest.raises(ssrjson.JSONEncodeError) as exc_info:
+#             ssrjson.dumps(10**60)
+#         assert exc_info.type == ssrjson.JSONEncodeError
 #         assert isinstance(exc_info.value.__cause__, OverflowError)

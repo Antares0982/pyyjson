@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_SSE2_COMMON_H
-#define PYYJSON_SIMD_SSE2_COMMON_H
+#ifndef SSRJSON_SIMD_SSE2_COMMON_H
+#define SSRJSON_SIMD_SSE2_COMMON_H
 
 #include "simd/simd_detect.h"
 #include "simd/vector_types.h"
@@ -227,12 +227,12 @@ force_inline SIMD_128 runtime_byte_rshift_128(SIMD_128 x, int imm8) {
             break;
         }
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         }
     }
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
     return x;
 #endif
 }
 
-#endif // PYYJSON_SIMD_SSE2_COMMON_H
+#endif // SSRJSON_SIMD_SSE2_COMMON_H

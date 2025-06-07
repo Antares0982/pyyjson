@@ -4,7 +4,7 @@
 
 # import pytest
 
-# import pyyjson
+# import ssrjson
 
 # try:
 #     from faker import Faker
@@ -46,5 +46,5 @@
 #             ]
 #             for _ in range(0, NUM_SHUFFLES):
 #                 random.shuffle(data)
-#                 output = pyyjson.dumps(data)
-#                 assert pyyjson.loads(output) == data
+#                 output = ssrjson.dumps(data)
+#                 assert ssrjson.loads(output) == data

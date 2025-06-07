@@ -2,7 +2,7 @@
 
 import pytest
 
-import pyyjson
+import ssrjson
 
 
 class TestCircular:
@@ -12,10 +12,10 @@ class TestCircular:
         """
         obj = {}  # type: ignore
         obj["obj"] = obj
-        with pytest.raises(pyyjson.JSONEncodeError):
-            pyyjson.dumps(obj)
-        with pytest.raises(pyyjson.JSONEncodeError):
-            pyyjson.dumps_to_bytes(obj)
+        with pytest.raises(ssrjson.JSONEncodeError):
+            ssrjson.dumps(obj)
+        with pytest.raises(ssrjson.JSONEncodeError):
+            ssrjson.dumps_to_bytes(obj)
 
     # def test_circular_dict_sort_keys(self):
     #     """
@@ -23,8 +23,8 @@ class TestCircular:
     #     """
     #     obj = {}  # type: ignore
     #     obj["obj"] = obj
-    #     with pytest.raises(pyyjson.JSONEncodeError):
-    #         pyyjson.dumps(obj, option=pyyjson.OPT_SORT_KEYS)
+    #     with pytest.raises(ssrjson.JSONEncodeError):
+    #         ssrjson.dumps(obj, option=ssrjson.OPT_SORT_KEYS)
 
     # def test_circular_dict_non_str_keys(self):
     #     """
@@ -32,8 +32,8 @@ class TestCircular:
     #     """
     #     obj = {}  # type: ignore
     #     obj["obj"] = obj
-    #     with pytest.raises(pyyjson.JSONEncodeError):
-    #         pyyjson.dumps(obj, option=pyyjson.OPT_NON_STR_KEYS)
+    #     with pytest.raises(ssrjson.JSONEncodeError):
+    #         ssrjson.dumps(obj, option=ssrjson.OPT_NON_STR_KEYS)
 
     def test_circular_list(self):
         """
@@ -41,10 +41,10 @@ class TestCircular:
         """
         obj = []  # type: ignore
         obj.append(obj)  # type: ignore
-        with pytest.raises(pyyjson.JSONEncodeError):
-            pyyjson.dumps(obj)
-        with pytest.raises(pyyjson.JSONEncodeError):
-            pyyjson.dumps_to_bytes(obj)
+        with pytest.raises(ssrjson.JSONEncodeError):
+            ssrjson.dumps(obj)
+        with pytest.raises(ssrjson.JSONEncodeError):
+            ssrjson.dumps_to_bytes(obj)
 
     def test_circular_nested(self):
         """
@@ -52,10 +52,10 @@ class TestCircular:
         """
         obj = {}  # type: ignore
         obj["list"] = [{"obj": obj}]
-        with pytest.raises(pyyjson.JSONEncodeError):
-            pyyjson.dumps(obj)
-        with pytest.raises(pyyjson.JSONEncodeError):
-            pyyjson.dumps_to_bytes(obj)
+        with pytest.raises(ssrjson.JSONEncodeError):
+            ssrjson.dumps(obj)
+        with pytest.raises(ssrjson.JSONEncodeError):
+            ssrjson.dumps_to_bytes(obj)
 
     # def test_circular_nested_sort_keys(self):
     #     """
@@ -63,8 +63,8 @@ class TestCircular:
     #     """
     #     obj = {}  # type: ignore
     #     obj["list"] = [{"obj": obj}]
-    #     with pytest.raises(pyyjson.JSONEncodeError):
-    #         pyyjson.dumps(obj, option=pyyjson.OPT_SORT_KEYS)
+    #     with pytest.raises(ssrjson.JSONEncodeError):
+    #         ssrjson.dumps(obj, option=ssrjson.OPT_SORT_KEYS)
 
     # def test_circular_nested_non_str_keys(self):
     #     """
@@ -72,5 +72,5 @@ class TestCircular:
     #     """
     #     obj = {}  # type: ignore
     #     obj["list"] = [{"obj": obj}]
-    #     with pytest.raises(pyyjson.JSONEncodeError):
-    #         pyyjson.dumps(obj, option=pyyjson.OPT_NON_STR_KEYS)
+    #     with pytest.raises(ssrjson.JSONEncodeError):
+    #         ssrjson.dumps(obj, option=ssrjson.OPT_NON_STR_KEYS)

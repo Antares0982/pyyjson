@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    include "encode/encode_shared.h"
 #    include "unicode/unicode.h"
 #endif

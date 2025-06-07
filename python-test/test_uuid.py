@@ -4,7 +4,7 @@
 
 # import pytest
 
-# import pyyjson
+# import ssrjson
 
 
 # class TestUUID:
@@ -45,24 +45,24 @@
 #         class AUUID(uuid.UUID):
 #             pass
 
-#         with pytest.raises(pyyjson.JSONEncodeError):
-#             pyyjson.dumps(AUUID("{12345678-1234-5678-1234-567812345678}"))
+#         with pytest.raises(ssrjson.JSONEncodeError):
+#             ssrjson.dumps(AUUID("{12345678-1234-5678-1234-567812345678}"))
 
 #     def test_serializes_withopt(self):
 #         """
 #         dumps() accepts deprecated OPT_SERIALIZE_UUID
 #         """
 #         assert (
-#             pyyjson.dumps(
+#             ssrjson.dumps(
 #                 uuid.UUID("7202d115-7ff3-4c81-a7c1-2a1f067b1ece"),
-#                 option=pyyjson.OPT_SERIALIZE_UUID,
+#                 option=ssrjson.OPT_SERIALIZE_UUID,
 #             )
 #             == b'"7202d115-7ff3-4c81-a7c1-2a1f067b1ece"'
 #         )
 
 #     def test_nil_uuid(self):
 #         assert (
-#             pyyjson.dumps(uuid.UUID("00000000-0000-0000-0000-000000000000"))
+#             ssrjson.dumps(uuid.UUID("00000000-0000-0000-0000-000000000000"))
 #             == b'"00000000-0000-0000-0000-000000000000"'
 #         )
 
@@ -82,14 +82,14 @@
 #             uuid.UUID(fields=(0x12345678, 0x1234, 0x5678, 0x12, 0x34, 0x567812345678)),
 #             uuid.UUID(int=0x12345678123456781234567812345678),
 #         ]
-#         result = pyyjson.dumps(uuids)
+#         result = ssrjson.dumps(uuids)
 #         canonical_uuids = ['"%s"' % str(u) for u in uuids]
 #         serialized = ("[%s]" % ",".join(canonical_uuids)).encode("utf8")
 #         assert result == serialized
 
 #     def test_serializes_correctly_with_leading_zeroes(self):
 #         instance = uuid.UUID(int=0x00345678123456781234567812345678)
-#         assert pyyjson.dumps(instance) == ('"%s"' % str(instance)).encode("utf8")
+#         assert ssrjson.dumps(instance) == ('"%s"' % str(instance)).encode("utf8")
 
 #     def test_all_uuid_creation_functions_create_serializable_uuids(self):
 #         uuids = (
@@ -99,4 +99,4 @@
 #             uuid.uuid5(uuid.NAMESPACE_DNS, "python.org"),
 #         )
 #         for val in uuids:
-#             assert pyyjson.dumps(val) == f'"{val}"'.encode("utf-8")
+#             assert ssrjson.dumps(val) == f'"{val}"'.encode("utf-8")

@@ -3,7 +3,7 @@
 #include "decode.h"
 
 
-#if PYYJSON_HAS_IEEE_754
+#if SSRJSON_HAS_IEEE_754
 /** Maximum exponent of exact pow10 */
 #    define U64_POW10_MAX_EXP 19
 

@@ -1,7 +1,7 @@
-#ifndef PYYJSON_DECODE_H
-#define PYYJSON_DECODE_H
+#ifndef SSRJSON_DECODE_H
+#define SSRJSON_DECODE_H
 #include "pyutils.h"
-#include "pyyjson.h"
+#include "ssrjson.h"
 #include "simd/memcmp.h"
 #include "simd/simd_impl.h"
 #include "xxhash.h"
@@ -29,7 +29,7 @@ typedef union {
     u64 union_value;
 } EscapeInfo;
 
-#define _DECODE_UNICODE_ERR PYYJSON_CAST(u32, -1)
+#define _DECODE_UNICODE_ERR SSRJSON_CAST(u32, -1)
 
 #define DECODE_LOOPSTATE_CONTINUE 0
 #define DECODE_LOOPSTATE_END 1
@@ -202,7 +202,7 @@ force_inline u32 byte_load_4(const void *src) {
  * These functions are used by JSON reader to read literals and comments.
  *============================================================================*/
 
-force_inline bool pyyjson_decode_nan(DecodeObjStackInfo *restrict decode_obj_stack_info, bool is_signed);
+force_inline bool ssrjson_decode_nan(DecodeObjStackInfo *restrict decode_obj_stack_info, bool is_signed);
 
 
 /*==============================================================================
@@ -223,7 +223,7 @@ extern const u64 pow10_sig_table[];
  to f64, with `to nearest` rounding mode.
  */
 force_inline f64 normalized_u64_to_f64(u64 val) {
-#if PYYJSON_U64_TO_F64_NO_IMPL
+#if SSRJSON_U64_TO_F64_NO_IMPL
     i64 sig = (i64)((val >> 1) | (val & 1));
     return ((f64)sig) * (f64)2.0;
 #else
@@ -251,37 +251,37 @@ force_inline void init_read_state(ReadStrState *state) {
  *============================================================================*/
 
 
-#define REHASHER(_x) (((size_t)(_x)) % (PYYJSON_KEY_CACHE_SIZE))
-typedef XXH64_hash_t pyyjson_hash_t;
-extern pyyjson_cache_type AssociativeKeyCache[PYYJSON_KEY_CACHE_SIZE];
+#define REHASHER(_x) (((size_t)(_x)) % (SSRJSON_KEY_CACHE_SIZE))
+typedef XXH64_hash_t ssrjson_hash_t;
+extern ssrjson_cache_type AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
 
-force_inline void add_key_cache(pyyjson_hash_t hash, PyObject *obj) {
+force_inline void add_key_cache(ssrjson_hash_t hash, PyObject *obj) {
     assert(PyUnicode_GET_LENGTH(obj) * PyUnicode_KIND(obj) <= 64);
     size_t index = REHASHER(hash);
-    // PYYJSON_TRACE_HASH(index);
-    pyyjson_cache_type old = AssociativeKeyCache[index];
+    // SSRJSON_TRACE_HASH(index);
+    ssrjson_cache_type old = AssociativeKeyCache[index];
     if (old) {
-        // PYYJSON_TRACE_HASH_CONFLICT(hash);
+        // SSRJSON_TRACE_HASH_CONFLICT(hash);
         Py_DECREF(old);
     }
     Py_INCREF(obj);
     AssociativeKeyCache[index] = obj;
 }
 
-force_inline PyObject *get_key_cache(const void *unicode_str, pyyjson_hash_t hash, size_t real_len, int kind, bool ascii) {
+force_inline PyObject *get_key_cache(const void *unicode_str, ssrjson_hash_t hash, size_t real_len, int kind, bool ascii) {
     assert(real_len <= 64);
-    pyyjson_cache_type cache = AssociativeKeyCache[REHASHER(hash)];
+    ssrjson_cache_type cache = AssociativeKeyCache[REHASHER(hash)];
     if (!cache) return NULL;
-    PyASCIIObject *cache_ascii = PYYJSON_CAST(PyASCIIObject *, cache);
+    PyASCIIObject *cache_ascii = SSRJSON_CAST(PyASCIIObject *, cache);
     Py_ssize_t cache_length = cache_ascii->length;
     Py_ssize_t cache_kind = cache_ascii->state.kind;
     bool cache_is_ascii = cache_ascii->state.ascii;
     Py_ssize_t cache_offset = cache_is_ascii ? sizeof(PyASCIIObject) : sizeof(PyCompactUnicodeObject);
-    if (likely(kind == cache_kind && ascii == cache_is_ascii && ((real_len == cache_length * cache_kind)) && (pyyjson_memcmp_neq_le64(PYYJSON_CAST(u8 *, unicode_str), PYYJSON_CAST(u8 *, cache) + cache_offset, real_len) == 0))) {
-        // PYYJSON_TRACE_CACHE_HIT();
+    if (likely(kind == cache_kind && ascii == cache_is_ascii && ((real_len == cache_length * cache_kind)) && (ssrjson_memcmp_neq_le64(SSRJSON_CAST(u8 *, unicode_str), SSRJSON_CAST(u8 *, cache) + cache_offset, real_len) == 0))) {
+        // SSRJSON_TRACE_CACHE_HIT();
         return cache;
     }
     return NULL;
 }
 
-#endif // PYYJSON_DECODE_H
+#endif // SSRJSON_DECODE_H

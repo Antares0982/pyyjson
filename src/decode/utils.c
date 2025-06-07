@@ -1,18 +1,18 @@
 #include "decode.h"
 #include <threads.h>
 
-bool _pyyjson_decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+bool _ssrjson_decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_stack_info) {
     // resize
-    if (likely(PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE == decode_obj_stack_info->result_stack_end - decode_obj_stack_info->result_stack)) {
-        void *new_buffer = malloc(sizeof(PyObject *) * (PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1));
+    if (likely(SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE == decode_obj_stack_info->result_stack_end - decode_obj_stack_info->result_stack)) {
+        void *new_buffer = malloc(sizeof(PyObject *) * (SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1));
         if (unlikely(!new_buffer)) {
             PyErr_NoMemory();
             return false;
         }
-        memcpy(new_buffer, decode_obj_stack_info->result_stack, sizeof(PyObject *) * PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE);
+        memcpy(new_buffer, decode_obj_stack_info->result_stack, sizeof(PyObject *) * SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE);
         decode_obj_stack_info->result_stack = (PyObject **)new_buffer;
-        decode_obj_stack_info->cur_write_result_addr = decode_obj_stack_info->result_stack + PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE;
-        decode_obj_stack_info->result_stack_end = decode_obj_stack_info->result_stack + (PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1);
+        decode_obj_stack_info->cur_write_result_addr = decode_obj_stack_info->result_stack + SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE;
+        decode_obj_stack_info->result_stack_end = decode_obj_stack_info->result_stack + (SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1);
     } else {
         Py_ssize_t old_capacity = decode_obj_stack_info->result_stack_end - decode_obj_stack_info->result_stack;
         if (unlikely((PY_SSIZE_T_MAX >> 1) < old_capacity)) {
@@ -32,6 +32,6 @@ bool _pyyjson_decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_st
     return true;
 }
 
-thread_local pyyjson_align(64) u8 pyyjson_string_buffer[PYYJSON_STRING_BUFFER_SIZE];
-pyyjson_cache_type AssociativeKeyCache[PYYJSON_KEY_CACHE_SIZE];
-pyyjson_align(64) u8 pyyjson_bytes_temp_buffer[PYYJSON_STRING_BUFFER_SIZE];
+thread_local ssrjson_align(64) u8 ssrjson_string_buffer[SSRJSON_STRING_BUFFER_SIZE];
+ssrjson_cache_type AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
+ssrjson_align(64) u8 ssrjson_bytes_temp_buffer[SSRJSON_STRING_BUFFER_SIZE];

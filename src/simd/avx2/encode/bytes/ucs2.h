@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX2_ENCODE_BYTES_UCS2_H
-#define PYYJSON_SIMD_AVX2_ENCODE_BYTES_UCS2_H
+#ifndef SSRJSON_SIMD_AVX2_ENCODE_BYTES_UCS2_H
+#define SSRJSON_SIMD_AVX2_ENCODE_BYTES_UCS2_H
 
 #include "simd/simd_detect.h"
 #include "simd/vector_types.h"
@@ -237,7 +237,7 @@ force_inline void ucs2_encode_3bytes_utf8_avx2_blendhigh(u8 *writer, vector_a y,
             break;
         }
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         }
     }
 }
@@ -284,10 +284,10 @@ restart:;
             goto _3bytes;
         }
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         }
     }
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 ascii:;
     {
         const vector_a m_not_ascii = (vec == broadcast(_Quote)) | (vec == broadcast(_Slash)) | signed_cmpgt(broadcast(ControlMax), vec) | signed_cmpgt(vec, broadcast(0x7f));
@@ -305,14 +305,14 @@ ascii:;
             writer += real_done_count;
             len = READ_BATCH_COUNT - done_count - 1;
             if (escape_unicode >= ControlMax && escape_unicode < 0x80 && escape_unicode != _Slash && escape_unicode != _Quote) {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             } else {
                 if (unlikely(!encode_one_ucs2(&writer, escape_unicode))) return false;
             }
             if (len) goto restart;
             goto finished;
         }
-        PYYJSON_UNREACHABLE();
+        SSRJSON_UNREACHABLE();
     }
 _2bytes:;
     {
@@ -331,14 +331,14 @@ _2bytes:;
             writer += real_done_count * 2;
             len = READ_BATCH_COUNT - done_count - 1;
             if (escape_unicode >= 0x80 && escape_unicode <= 0x7ff) {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             } else {
                 if (unlikely(!encode_one_ucs2(&writer, escape_unicode))) return false;
             }
             if (len) goto restart;
             goto finished;
         }
-        PYYJSON_UNREACHABLE();
+        SSRJSON_UNREACHABLE();
     }
 _3bytes:;
     {
@@ -358,14 +358,14 @@ _3bytes:;
             writer += real_done_count * 3;
             len = READ_BATCH_COUNT - done_count - 1;
             if (escape_unicode >= 0x800 && (escape_unicode <= 0xd7ff || escape_unicode >= 0xe000)) {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             } else {
                 if (unlikely(!encode_one_ucs2(&writer, escape_unicode))) return false;
             }
             if (len) goto restart;
             goto finished;
         }
-        PYYJSON_UNREACHABLE();
+        SSRJSON_UNREACHABLE();
     }
 finished:;
     *writer_addr = writer;
@@ -377,4 +377,4 @@ finished:;
 #undef COMPILE_WRITE_UCS_LEVEL
 #undef COMPILE_READ_UCS_LEVEL
 
-#endif // PYYJSON_SIMD_AVX2_ENCODE_BYTES_UCS2_H
+#endif // SSRJSON_SIMD_AVX2_ENCODE_BYTES_UCS2_H

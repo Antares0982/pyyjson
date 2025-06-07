@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX512VLDQBW_COMMON_H
-#define PYYJSON_SIMD_AVX512VLDQBW_COMMON_H
+#ifndef SSRJSON_SIMD_AVX512VLDQBW_COMMON_H
+#define SSRJSON_SIMD_AVX512VLDQBW_COMMON_H
 #if !defined(__AVX512VL__) || !__AVX512VL__ || !defined(__AVX512DQ__) || !__AVX512DQ__ || !defined(__AVX512BW__) || !__AVX512BW__
 #    error "AVX512VL, AVX512DQ and AVX512BW is required for this file"
 #endif
@@ -96,4 +96,4 @@ force_inline vector_a_u8_128 cvt_u32_to_u8_512(vector_a_u32_512 z) {
     return (x1 | x2) | (x3 | x4);
 }
 
-#endif // PYYJSON_SIMD_AVX512VLDQBW_COMMON_H
+#endif // SSRJSON_SIMD_AVX512VLDQBW_COMMON_H

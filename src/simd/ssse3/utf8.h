@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_SSSE3_UTF8_H
-#define PYYJSON_SIMD_SSSE3_UTF8_H
+#ifndef SSRJSON_SIMD_SSSE3_UTF8_H
+#define SSRJSON_SIMD_SSSE3_UTF8_H
 #if !defined(__SSSE3__) || !__SSSE3__
 #    error "SSSE3 is required for this file"
 #endif
@@ -17,4 +17,4 @@
 
 
 
-#endif // PYYJSON_SIMD_SSSE3_UTF8_H
+#endif // SSRJSON_SIMD_SSSE3_UTF8_H

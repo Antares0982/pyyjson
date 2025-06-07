@@ -4,20 +4,20 @@ import json
 import unittest
 
 # def test_encode_option(files):
-#     import pyyjson
+#     import ssrjson
 #     import tempfile
 #     for file in files:
 #         with open(file, "r", encoding="utf-8") as f:
 #             json_data = json.load(f)
 #         with tempfile.NamedTemporaryFile(mode="w+", encoding='ascii') as f:
-#             pyyjson.dump(json_data, f)
+#             ssrjson.dump(json_data, f)
 
 
 # def test_decode_option(files):
-#     import pyyjson
+#     import ssrjson
 #     for file in files:
 #         with open(file, "r", encoding="ascii") as f:
-#             pyyjson_data = pyyjson.load(f)
+#             ssrjson_data = ssrjson.load(f)
 
 
 class TestJsonFileIO(unittest.TestCase):
@@ -36,7 +36,7 @@ class TestJsonFileIO(unittest.TestCase):
                 self.datas.append(json.load(f))
 
     def test_json_load(self):
-        import pyyjson
+        import ssrjson
 
         class A:
             def __init__(self, a):
@@ -53,34 +53,34 @@ class TestJsonFileIO(unittest.TestCase):
         for file in self.file_path:
             # test parse keyword
             # with open(file, "r+", encoding="utf-8") as f:
-            #     pyyjson_data = pyyjson.load(object_hook=d4, fp=f)
+            #     ssrjson_data = ssrjson.load(object_hook=d4, fp=f)
             #     f.seek(0)
             #     json_data = json.load(f)
-            # self._check_obj_same(pyyjson_data, json_data)
+            # self._check_obj_same(ssrjson_data, json_data)
 
             with open(file, "r+", encoding="utf-8") as f:
-                pyyjson_data = pyyjson.loads(f.read())
+                ssrjson_data = ssrjson.loads(f.read())
                 f.seek(0)
                 json_data = json.loads(f.read())
-            self._check_obj_same(pyyjson_data, json_data)
+            self._check_obj_same(ssrjson_data, json_data)
 
     def test_json_dump(self):
-        import pyyjson
+        import ssrjson
         import tempfile
 
         for data in self.datas:
             # test parse keyword
             # with tempfile.NamedTemporaryFile(mode="w+", encoding='utf-8') as f:
-            #     pyyjson.dump(skipkeys=False, fp=f, obj=data)
+            #     ssrjson.dump(skipkeys=False, fp=f, obj=data)
             #     f.seek(0)
-            #     pyyjson_data = json.load(f)
+            #     ssrjson_data = json.load(f)
             # with tempfile.NamedTemporaryFile(mode="w+", encoding='utf-8') as f:
             #     json.dump(data, f)
             #     f.seek(0)
             #     json_data = json.load(f)
-            # self._check_obj_same(pyyjson_data, json_data)
+            # self._check_obj_same(ssrjson_data, json_data)
 
-            self._check_obj_same(json.loads(pyyjson.dumps(data)), data)
+            self._check_obj_same(json.loads(ssrjson.dumps(data)), data)
 
     # file contents may null
     # def test_wrong_encoding(self):

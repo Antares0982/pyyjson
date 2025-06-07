@@ -2,34 +2,34 @@
 
 import pytest
 
-import pyyjson
+import ssrjson
 
 from util import read_fixture_bytes
 
 
 class TestJSONTestSuiteParsing:
-    def _run_fail_json(self, filename, exc=pyyjson.JSONDecodeError):
+    def _run_fail_json(self, filename, exc=ssrjson.JSONDecodeError):
         data = read_fixture_bytes("json/test_parsing/" + filename)
         with pytest.raises(exc):
-            pyyjson.loads(data)
+            ssrjson.loads(data)
         with pytest.raises(exc):
-            pyyjson.loads(bytearray(data))
+            ssrjson.loads(bytearray(data))
         # with pytest.raises(exc):
-        #     pyyjson.loads(memoryview(data))
+        #     ssrjson.loads(memoryview(data))
         try:
             decoded = data.decode("utf-8")
         except UnicodeDecodeError:
             pass
         else:
             with pytest.raises(exc):
-                pyyjson.loads(decoded)
+                ssrjson.loads(decoded)
 
     def _run_pass_json(self, filename, match=""):
         data = read_fixture_bytes("json/test_parsing/" + filename)
-        pyyjson.loads(data)
-        # pyyjson.loads(bytearray(data))
-        # pyyjson.loads(memoryview(data))
-        pyyjson.loads(data.decode("utf-8"))
+        ssrjson.loads(data)
+        # ssrjson.loads(bytearray(data))
+        # ssrjson.loads(memoryview(data))
+        ssrjson.loads(data.decode("utf-8"))
 
     def test_y_array_arraysWithSpace(self):
         """
@@ -1935,7 +1935,7 @@ class TestJSONTestSuiteParsing:
         """
         try:
             self._run_pass_json("i_structure_500_nested_arrays.json")
-        except pyyjson.JSONDecodeError:
+        except ssrjson.JSONDecodeError:
             # fails on serde, passes on yyjson
             pass
 

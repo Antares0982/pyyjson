@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX2_ENCODE_UTF8_H
-#define PYYJSON_SIMD_AVX2_ENCODE_UTF8_H
+#ifndef SSRJSON_SIMD_AVX2_ENCODE_UTF8_H
+#define SSRJSON_SIMD_AVX2_ENCODE_UTF8_H
 
 #ifndef __AVX2__
 #    error "AVX2 is required for this file"
@@ -11,4 +11,4 @@
 #include "bytes/ucs2.h"
 #include "bytes/ucs4.h"
 
-#endif // PYYJSON_SIMD_AVX2_ENCODE_UTF8_H
+#endif // SSRJSON_SIMD_AVX2_ENCODE_UTF8_H

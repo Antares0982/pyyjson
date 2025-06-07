@@ -1,9 +1,9 @@
-#ifndef PYYJSON_COMPILE_CONTEXT_R
-#define PYYJSON_COMPILE_CONTEXT_R
+#ifndef SSRJSON_COMPILE_CONTEXT_R
+#define SSRJSON_COMPILE_CONTEXT_R
 
 // fake include and definition to deceive clangd
-#ifdef PYYJSON_CLANGD_DUMMY
-#    include "pyyjson.h"
+#ifdef SSRJSON_CLANGD_DUMMY
+#    include "ssrjson.h"
 #    ifndef COMPILE_READ_UCS_LEVEL
 #        define COMPILE_READ_UCS_LEVEL 1
 #    endif
@@ -36,19 +36,19 @@
 
 // Encode inline specifier.
 #if COMPILE_READ_UCS_LEVEL == 1
-#    if PYYJSON_ENCODE_UCS1_IMPL_INLINE
+#    if SSRJSON_ENCODE_UCS1_IMPL_INLINE
 #        define _IMPL_INLINE_SPECIFIER force_inline
 #    else
 #        define _IMPL_INLINE_SPECIFIER static force_noinline
 #    endif
 #elif COMPILE_READ_UCS_LEVEL == 2
-#    if PYYJSON_ENCODE_UCS2_IMPL_INLINE
+#    if SSRJSON_ENCODE_UCS2_IMPL_INLINE
 #        define _IMPL_INLINE_SPECIFIER force_inline
 #    else
 #        define _IMPL_INLINE_SPECIFIER static force_noinline
 #    endif
 #elif COMPILE_READ_UCS_LEVEL == 4
-#    if PYYJSON_ENCODE_UCS4_IMPL_INLINE
+#    if SSRJSON_ENCODE_UCS4_IMPL_INLINE
 #        define _IMPL_INLINE_SPECIFIER force_inline
 #    else
 #        define _IMPL_INLINE_SPECIFIER static force_noinline
@@ -56,21 +56,21 @@
 #endif
 
 // The source type.
-#define _src_t PYYJSON_SIMPLE_CONCAT2(u, READ_BIT_SIZE)
+#define _src_t SSRJSON_SIMPLE_CONCAT2(u, READ_BIT_SIZE)
 
 // Other type definitions.
-#define avx512_bitmask_t PYYJSON_SIMPLE_CONCAT2(u, AVX512BITMASK_SIZE)
+#define avx512_bitmask_t SSRJSON_SIMPLE_CONCAT2(u, AVX512BITMASK_SIZE)
 
 // Name creation macro.
-#define MAKE_R_NAME(_x_) PYYJSON_CONCAT2(_x_, _src_t)
+#define MAKE_R_NAME(_x_) SSRJSON_CONCAT2(_x_, _src_t)
 
 #ifdef COMPILE_UCS_LEVEL
 #    if COMPILE_UCS_LEVEL == 0
 #        define __UCS_NAME ascii
 #    else
-#        define __UCS_NAME PYYJSON_SIMPLE_CONCAT2(ucs, COMPILE_UCS_LEVEL)
+#        define __UCS_NAME SSRJSON_SIMPLE_CONCAT2(ucs, COMPILE_UCS_LEVEL)
 #    endif
-#    define MAKE_UCS_NAME(_x_) PYYJSON_CONCAT2(_x_, __UCS_NAME)
+#    define MAKE_UCS_NAME(_x_) SSRJSON_CONCAT2(_x_, __UCS_NAME)
 #endif
 /*
  * Names using R context.
@@ -109,4 +109,4 @@
 #    define decode_str_fast_trailing MAKE_UCS_NAME(decode_str_fast_trailing)
 #    define get_cache_key_hash_and_size MAKE_UCS_NAME(get_cache_key_hash_and_size)
 #endif
-#endif // PYYJSON_COMPILE_CONTEXT_R
+#endif // SSRJSON_COMPILE_CONTEXT_R

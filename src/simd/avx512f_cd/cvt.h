@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX512FCD_CVT_H
-#define PYYJSON_SIMD_AVX512FCD_CVT_H
+#ifndef SSRJSON_SIMD_AVX512FCD_CVT_H
+#define SSRJSON_SIMD_AVX512FCD_CVT_H
 
 #include "simd/simd_detect.h"
 #include "simd/vector_types.h"
@@ -50,4 +50,4 @@ force_inline void cvt_to_dst_u16_u8_512(u8 *dst, vector_a_u16_512 z) {
 
 // cvt_to_dst_u32_u8_512: AVX512VL+DQ+BW
 
-#endif // PYYJSON_SIMD_AVX512FCD_CVT_H
+#endif // SSRJSON_SIMD_AVX512FCD_CVT_H

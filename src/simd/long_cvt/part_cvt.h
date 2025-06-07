@@ -1,8 +1,8 @@
-#ifndef PYYJSON_SIMD_LONG_CVT_PART_CVT_H
-#define PYYJSON_SIMD_LONG_CVT_PART_CVT_H
+#ifndef SSRJSON_SIMD_LONG_CVT_PART_CVT_H
+#define SSRJSON_SIMD_LONG_CVT_PART_CVT_H
 
-#ifdef PYYJSON_CLANGD_DUMMY
-#    include "pyyjson.h"
+#ifdef SSRJSON_CLANGD_DUMMY
+#    include "ssrjson.h"
 #    include "simd/simd_impl.h"
 #    ifndef COMPILE_SIMD_BITS
 #        define COMPILE_SIMD_BITS 512
@@ -374,4 +374,4 @@ force_inline void __partial_cvt_32_u32_u32(u32 **dst_addr, const u32 **src_addr)
     __partial_cvt_16_u32_u32(dst_addr, src_addr);
     __partial_cvt_16_u32_u32(dst_addr, src_addr);
 }
-#endif // PYYJSON_SIMD_LONG_CVT_PART_CVT_H
+#endif // SSRJSON_SIMD_LONG_CVT_PART_CVT_H

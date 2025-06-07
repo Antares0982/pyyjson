@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_READ_UCS_LEVEL
 #        include "decode/decode.h"
 #        include "simd/union_vector.h"
@@ -24,7 +24,7 @@ force_inline void _decode_str_loop4_read_src_impl(
         anymask_t *out_check_mask_arr4,
         anymask_t *out_check_mask_total) {
     for (int i = 0; i < 4; ++i) {
-        out_vec->x[i] = *(PYYJSON_CAST(vector_u *, src) + i);
+        out_vec->x[i] = *(SSRJSON_CAST(vector_u *, src) + i);
     }
     for (int i = 0; i < 4; ++i) {
         out_check_mask_arr4[i] = get_escape_anymask(out_vec->x[i]);
@@ -36,7 +36,7 @@ force_inline void _decode_str_loop_read_src_impl(
         const _src_t *src,
         vector_a *out_vec,
         anymask_t *out_check_mask) {
-    *out_vec = *PYYJSON_CAST(vector_u *, src);
+    *out_vec = *SSRJSON_CAST(vector_u *, src);
     *out_check_mask = get_escape_anymask(*out_vec);
 }
 
@@ -47,19 +47,19 @@ force_inline void _decode_str_trailing_read_src_impl(
         anymask_t *out_check_mask) {
     usize trailing_len = src_end - src;
     assert(trailing_len < READ_BATCH_COUNT);
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 512
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 512
     usize maskz = len_to_maskz(src_end - src);
     *out_vec = maskz_loadu(maskz, src);
     *out_check_mask = maskz & get_escape_bitmask(*out_vec);
-#elif PYYJSON_X86 && COMPILE_SIMD_BITS == 256
+#elif SSRJSON_X86 && COMPILE_SIMD_BITS == 256
     vector_a vec = *(vector_u *)(src_end - READ_BATCH_COUNT);
     *out_vec = high_mask(vec, trailing_len);
     *out_check_mask = high_mask(get_escape_mask(vec), trailing_len);
-#elif PYYJSON_X86
+#elif SSRJSON_X86
     vector_a vec = *(vector_u *)(src_end - READ_BATCH_COUNT);
     *out_vec = runtime_byte_rshift_128(vec, (READ_BATCH_COUNT - trailing_len) * sizeof(_src_t));
     *out_check_mask = low_mask(get_escape_mask(*out_vec), trailing_len);
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
 // TODO
 #endif
 }
@@ -169,7 +169,7 @@ force_inline usize _decode_str_trailing_decoder_impl(
         vector_a *track_max,
         vector_a src_vec,
         EscapeInfo *escapeval_addr) {
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 256
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 256
 #    define BLEND 1
 #else
 #    define BLEND 0

@@ -3,7 +3,7 @@
 #define XXH_INLINE_ALL
 #include "decode.h"
 
-#include "pyyjson.h"
+#include "ssrjson.h"
 #include "simd/cvt.h"
 #include "simd/mask_table.h"
 #include "simd/memcpy.h"
@@ -12,9 +12,9 @@
 #include "tls.h"
 #include "str/ucs.h"
 
-extern thread_local u8 pyyjson_string_buffer[PYYJSON_STRING_BUFFER_SIZE];
+extern thread_local u8 ssrjson_string_buffer[SSRJSON_STRING_BUFFER_SIZE];
 
-static_assert((PYYJSON_STRING_BUFFER_SIZE % 64) == 0, "(PYYJSON_STRING_BUFFER_SIZE % 64) == 0");
+static_assert((SSRJSON_STRING_BUFFER_SIZE % 64) == 0, "(SSRJSON_STRING_BUFFER_SIZE % 64) == 0");
 
 // force_inline PyObject *read_bytes(const u8 **ptr, u8 *write_buffer, bool is_key);
 // force_inline PyObject *read_bytes_root_pretty(const u8 *dat, usize len);
@@ -42,38 +42,38 @@ force_inline bool ctn_grow_check(DecodeCtnStackInfo *decode_ctn_info) {
 }
 
 #if PY_MINOR_VERSION >= 12
-#    define PYYJSON_PY_DECREF_DEBUG() (_Py_DECREF_STAT_INC())
-#    define PYYJSON_PY_INCREF_DEBUG() (_Py_INCREF_STAT_INC())
+#    define SSRJSON_PY_DECREF_DEBUG() (_Py_DECREF_STAT_INC())
+#    define SSRJSON_PY_INCREF_DEBUG() (_Py_INCREF_STAT_INC())
 #else
 #    ifdef Py_REF_DEBUG
-#        define PYYJSON_PY_DECREF_DEBUG() (_Py_RefTotal--)
-#        define PYYJSON_PY_INCREF_DEBUG() (_Py_RefTotal++)
+#        define SSRJSON_PY_DECREF_DEBUG() (_Py_RefTotal--)
+#        define SSRJSON_PY_INCREF_DEBUG() (_Py_RefTotal++)
 #    else
-#        define PYYJSON_PY_DECREF_DEBUG()
-#        define PYYJSON_PY_INCREF_DEBUG()
+#        define SSRJSON_PY_DECREF_DEBUG()
+#        define SSRJSON_PY_INCREF_DEBUG()
 #    endif
 #endif
 
 
-#if PYYJSON_ENABLE_TRACE
+#if SSRJSON_ENABLE_TRACE
 Py_ssize_t max_str_len = 0;
-int __count_trace[PYYJSON_OP_BITCOUNT_MAX] = {0};
-int __hash_trace[PYYJSON_KEY_CACHE_SIZE] = {0};
+int __count_trace[SSRJSON_OP_BITCOUNT_MAX] = {0};
+int __hash_trace[SSRJSON_KEY_CACHE_SIZE] = {0};
 size_t __hash_hit_counter = 0;
 size_t __hash_add_key_call_count = 0;
 
-#    define PYYJSON_TRACE_STR_LEN(_len) max_str_len = max_str_len > _len ? max_str_len : _len
-#    define PYYJSON_TRACE_HASH(_hash) \
+#    define SSRJSON_TRACE_STR_LEN(_len) max_str_len = max_str_len > _len ? max_str_len : _len
+#    define SSRJSON_TRACE_HASH(_hash) \
         __hash_add_key_call_count++;  \
-        __hash_trace[_hash & (PYYJSON_KEY_CACHE_SIZE - 1)]++
-#    define PYYJSON_TRACE_CACHE_HIT() __hash_hit_counter++
-#    define PYYJSON_TRACE_HASH_CONFLICT(_hash) printf("hash conflict: %lld, index=%lld\n", (long long int)_hash, (long long int)(_hash & (PYYJSON_KEY_CACHE_SIZE - 1)))
-#else // PYYJSON_ENABLE_TRACE
-#    define PYYJSON_TRACE_STR_LEN(_len) (void)(0)
-#    define PYYJSON_TRACE_HASH(_hash) (void)(0)
-#    define PYYJSON_TRACE_CACHE_HIT() (void)(0)
-#    define PYYJSON_TRACE_HASH_CONFLICT(_hash) (void)(0)
-#endif // PYYJSON_ENABLE_TRACE
+        __hash_trace[_hash & (SSRJSON_KEY_CACHE_SIZE - 1)]++
+#    define SSRJSON_TRACE_CACHE_HIT() __hash_hit_counter++
+#    define SSRJSON_TRACE_HASH_CONFLICT(_hash) printf("hash conflict: %lld, index=%lld\n", (long long int)_hash, (long long int)(_hash & (SSRJSON_KEY_CACHE_SIZE - 1)))
+#else // SSRJSON_ENABLE_TRACE
+#    define SSRJSON_TRACE_STR_LEN(_len) (void)(0)
+#    define SSRJSON_TRACE_HASH(_hash) (void)(0)
+#    define SSRJSON_TRACE_CACHE_HIT() (void)(0)
+#    define SSRJSON_TRACE_HASH_CONFLICT(_hash) (void)(0)
+#endif // SSRJSON_ENABLE_TRACE
 
 force_inline void Py_DecRef_NoCheck(PyObject *op) {
     // Non-limited C API and limited C API for Python 3.9 and older access
@@ -83,7 +83,7 @@ force_inline void Py_DecRef_NoCheck(PyObject *op) {
         return;
     }
 #endif
-    PYYJSON_PY_DECREF_DEBUG();
+    SSRJSON_PY_DECREF_DEBUG();
     assert(op->ob_refcnt > 1);
     --op->ob_refcnt;
 }
@@ -104,13 +104,13 @@ force_inline void Py_Immortal_IncRef(PyObject *op) {
 #else          // PY_MINOR_VERSION >= 12
     op->ob_refcnt++;
 #endif         // PY_MINOR_VERSION >= 12
-    PYYJSON_PY_INCREF_DEBUG();
+    SSRJSON_PY_INCREF_DEBUG();
 }
 
 force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int type_flag, bool is_key) {
-    PYYJSON_TRACE_STR_LEN(len);
+    SSRJSON_TRACE_STR_LEN(len);
     PyObject *obj;
-    pyyjson_hash_t hash;
+    ssrjson_hash_t hash;
     size_t real_len;
     Py_ssize_t offset;
     Py_UCS4 max_char;
@@ -118,7 +118,7 @@ force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int ty
     bool ascii;
 
     switch (type_flag) {
-        case PYYJSON_STRING_TYPE_ASCII: {
+        case SSRJSON_STRING_TYPE_ASCII: {
             ascii = true;
             kind = 1;
             max_char = 0x7f;
@@ -126,7 +126,7 @@ force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int ty
             offset = sizeof(PyASCIIObject);
             break;
         }
-        case PYYJSON_STRING_TYPE_LATIN1: {
+        case SSRJSON_STRING_TYPE_LATIN1: {
             ascii = false;
             kind = 1;
             max_char = 0xff;
@@ -134,7 +134,7 @@ force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int ty
             offset = sizeof(PyCompactUnicodeObject);
             break;
         }
-        case PYYJSON_STRING_TYPE_UCS2: {
+        case SSRJSON_STRING_TYPE_UCS2: {
             ascii = false;
             kind = 2;
             max_char = 0xffff;
@@ -142,7 +142,7 @@ force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int ty
             offset = sizeof(PyCompactUnicodeObject);
             break;
         }
-        case PYYJSON_STRING_TYPE_UCS4: {
+        case SSRJSON_STRING_TYPE_UCS4: {
             ascii = false;
             kind = 4;
             max_char = 0x10ffff;
@@ -151,7 +151,7 @@ force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int ty
             break;
         }
         default:
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
     }
 
     bool should_cache = (is_key && real_len && likely(real_len <= 64));
@@ -167,13 +167,13 @@ force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int ty
 
     obj = PyUnicode_New(len, max_char);
     if (obj == NULL) return NULL;
-    pyyjson_memcpy(PYYJSON_CAST(u8 *, obj) + offset, unicode_str, real_len);
+    ssrjson_memcpy(SSRJSON_CAST(u8 *, obj) + offset, unicode_str, real_len);
     if (should_cache) {
         add_key_cache(hash, obj);
     }
 success:
     if (is_key) {
-        PyASCIIObject *ascii_obj = PYYJSON_CAST(PyASCIIObject *, obj);
+        PyASCIIObject *ascii_obj = SSRJSON_CAST(PyASCIIObject *, obj);
         if (len) {
             assert(ascii_obj->hash == -1);
             make_hash(ascii_obj, unicode_str, real_len);
@@ -194,7 +194,7 @@ force_inline bool init_decode_obj_stack_info(DecodeObjStackInfo *restrict decode
     }
     decode_obj_stack_info->result_stack = new_buffer;
     decode_obj_stack_info->cur_write_result_addr = new_buffer;
-    decode_obj_stack_info->result_stack_end = new_buffer + PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE;
+    decode_obj_stack_info->result_stack_end = new_buffer + SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE;
     return true;
 }
 
@@ -207,14 +207,14 @@ force_inline bool init_decode_ctn_stack_info(DecodeCtnStackInfo *restrict decode
     }
     decode_ctn_stack_info->ctn_start = new_buffer;
     decode_ctn_stack_info->ctn = new_buffer;
-    decode_ctn_stack_info->ctn_end = new_buffer + PYYJSON_DECODE_MAX_RECURSION;
+    decode_ctn_stack_info->ctn_end = new_buffer + SSRJSON_DECODE_MAX_RECURSION;
     return true;
 }
 
-#if PYYJSON_ENABLE_TRACE
-#    define PYYJSON_TRACE_OP(x)                                 \
+#if SSRJSON_ENABLE_TRACE
+#    define SSRJSON_TRACE_OP(x)                                 \
         do {                                                    \
-            for (int i = 0; i < PYYJSON_OP_BITCOUNT_MAX; i++) { \
+            for (int i = 0; i < SSRJSON_OP_BITCOUNT_MAX; i++) { \
                 if (x & (1 << i)) {                             \
                     __count_trace[i]++;                         \
                     break;                                      \
@@ -223,23 +223,23 @@ force_inline bool init_decode_ctn_stack_info(DecodeCtnStackInfo *restrict decode
             __op_counter++;                                     \
         } while (0)
 #else
-#    define PYYJSON_TRACE_OP(x) (void)0
+#    define SSRJSON_TRACE_OP(x) (void)0
 #endif
 
 
-bool _pyyjson_decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_stack_info);
+bool _ssrjson_decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_stack_info);
 
-force_inline bool pyyjson_push_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, PyObject *obj) {
-    static_assert(((Py_ssize_t)PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1) > 0, "(PYYJSON_DECODE_OBJSTACK_BUFFER_SIZE << 1) > 0");
+force_inline bool ssrjson_push_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, PyObject *obj) {
+    static_assert(((Py_ssize_t)SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1) > 0, "(SSRJSON_DECODE_OBJSTACK_BUFFER_SIZE << 1) > 0");
     if (unlikely(decode_obj_stack_info->cur_write_result_addr >= decode_obj_stack_info->result_stack_end)) {
-        bool c = _pyyjson_decode_obj_stack_resize(decode_obj_stack_info);
+        bool c = _ssrjson_decode_obj_stack_resize(decode_obj_stack_info);
         RETURN_ON_UNLIKELY_ERR(!c);
     }
     *decode_obj_stack_info->cur_write_result_addr++ = obj;
     return true;
 }
 
-force_inline bool pyyjson_decode_arr(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t arr_len) {
+force_inline bool ssrjson_decode_arr(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t arr_len) {
     assert(arr_len >= 0);
     PyObject *list = PyList_New(arr_len);
     RETURN_ON_UNLIKELY_ERR(!list);
@@ -251,10 +251,10 @@ force_inline bool pyyjson_decode_arr(DecodeObjStackInfo *restrict decode_obj_sta
         PyList_SET_ITEM(list, j, val); // this never fails
     }
     decode_obj_stack_info->cur_write_result_addr -= arr_len;
-    return pyyjson_push_obj(decode_obj_stack_info, list);
+    return ssrjson_push_obj(decode_obj_stack_info, list);
 }
 
-force_inline bool pyyjson_decode_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t dict_len) {
+force_inline bool ssrjson_decode_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t dict_len) {
     PyObject *dict = _PyDict_NewPresized(dict_len);
     RETURN_ON_UNLIKELY_ERR(!dict);
     PyObject **dict_val_start = decode_obj_stack_info->cur_write_result_addr - dict_len * 2;
@@ -281,32 +281,32 @@ force_inline bool pyyjson_decode_obj(DecodeObjStackInfo *restrict decode_obj_sta
         }
     }
     decode_obj_stack_info->cur_write_result_addr -= dict_len * 2;
-    return pyyjson_push_obj(decode_obj_stack_info, dict);
+    return ssrjson_push_obj(decode_obj_stack_info, dict);
 }
 
-force_inline bool pyyjson_decode_null(DecodeObjStackInfo *restrict decode_obj_stack_info) {
-    PYYJSON_TRACE_OP(PYYJSON_OP_CONSTANTS);
+force_inline bool ssrjson_decode_null(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+    SSRJSON_TRACE_OP(SSRJSON_OP_CONSTANTS);
     Py_Immortal_IncRef(Py_None);
-    return pyyjson_push_obj(decode_obj_stack_info, Py_None);
+    return ssrjson_push_obj(decode_obj_stack_info, Py_None);
 }
 
-force_inline bool pyyjson_decode_false(DecodeObjStackInfo *restrict decode_obj_stack_info) {
-    PYYJSON_TRACE_OP(PYYJSON_OP_CONSTANTS);
+force_inline bool ssrjson_decode_false(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+    SSRJSON_TRACE_OP(SSRJSON_OP_CONSTANTS);
     Py_Immortal_IncRef(Py_False);
-    return pyyjson_push_obj(decode_obj_stack_info, Py_False);
+    return ssrjson_push_obj(decode_obj_stack_info, Py_False);
 }
 
-force_inline bool pyyjson_decode_true(DecodeObjStackInfo *restrict decode_obj_stack_info) {
-    PYYJSON_TRACE_OP(PYYJSON_OP_CONSTANTS);
+force_inline bool ssrjson_decode_true(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+    SSRJSON_TRACE_OP(SSRJSON_OP_CONSTANTS);
     Py_Immortal_IncRef(Py_True);
-    return pyyjson_push_obj(decode_obj_stack_info, Py_True);
+    return ssrjson_push_obj(decode_obj_stack_info, Py_True);
 }
 
-force_inline bool pyyjson_decode_nan(DecodeObjStackInfo *restrict decode_obj_stack_info, bool is_signed) {
-    PYYJSON_TRACE_OP(PYYJSON_OP_NAN_INF);
+force_inline bool ssrjson_decode_nan(DecodeObjStackInfo *restrict decode_obj_stack_info, bool is_signed) {
+    SSRJSON_TRACE_OP(SSRJSON_OP_NAN_INF);
     PyObject *o = PyFloat_FromDouble(is_signed ? -fabs(Py_NAN) : fabs(Py_NAN));
     RETURN_ON_UNLIKELY_ERR(!o);
-    return pyyjson_push_obj(decode_obj_stack_info, o);
+    return ssrjson_push_obj(decode_obj_stack_info, o);
 }
 
 /** Character type table (generate with misc/make_tables.c) */
@@ -441,7 +441,7 @@ force_inline u32 read_b4_unicode(u32 uni) {
 
 static int invalid_arg_checked = 0;
 
-PyObject *SIMD_NAME_MODIFIER(pyyjson_Decode)(PyObject *self, PyObject *args, PyObject *kwargs) {
+PyObject *SIMD_NAME_MODIFIER(ssrjson_Decode)(PyObject *self, PyObject *args, PyObject *kwargs) {
     PyObject *obj;
     PyObject *ret;
     //
@@ -453,34 +453,34 @@ PyObject *SIMD_NAME_MODIFIER(pyyjson_Decode)(PyObject *self, PyObject *args, PyO
     }
 
     if (!invalid_arg_checked && (cls || object_hook || parse_float || parse_int || parse_constant || object_pairs_hook)) {
-        fprintf(stderr, "Warning: some options are not supported in this version of pyyjson\n");
+        fprintf(stderr, "Warning: some options are not supported in this version of ssrjson\n");
         invalid_arg_checked = 1;
     }
 
     if (PyUnicode_Check(obj)) {
-        PyASCIIObject *ascii_head = PYYJSON_CAST(PyASCIIObject *, obj);
-        PyUnicodeObject *in_unicode = PYYJSON_CAST(PyUnicodeObject *, obj);
+        PyASCIIObject *ascii_head = SSRJSON_CAST(PyASCIIObject *, obj);
+        PyUnicodeObject *in_unicode = SSRJSON_CAST(PyUnicodeObject *, obj);
         int kind = ascii_head->state.ascii ? 0 : ascii_head->state.kind;
         switch (kind) {
-            case PYYJSON_STRING_TYPE_ASCII: {
+            case SSRJSON_STRING_TYPE_ASCII: {
                 ret = decode_ascii(in_unicode);
                 break;
             }
-            case PYYJSON_STRING_TYPE_LATIN1: {
+            case SSRJSON_STRING_TYPE_LATIN1: {
                 ret = decode_ucs1(in_unicode);
                 break;
             }
-            case PYYJSON_STRING_TYPE_UCS2: {
+            case SSRJSON_STRING_TYPE_UCS2: {
                 ret = decode_ucs2(in_unicode);
                 break;
             }
-            case PYYJSON_STRING_TYPE_UCS4: {
+            case SSRJSON_STRING_TYPE_UCS4: {
                 ret = decode_ucs4(in_unicode);
                 break;
             }
             default: {
                 ret = NULL;
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             }
         }
         goto done;
@@ -493,14 +493,14 @@ PyObject *SIMD_NAME_MODIFIER(pyyjson_Decode)(PyObject *self, PyObject *args, PyO
             ret = NULL;
             goto done;
         }
-        ret = pyyjson_decode_bytes(buffer, length);
+        ret = ssrjson_decode_bytes(buffer, length);
         goto done;
     }
 
     if (PyByteArray_Check(obj)) {
         char *buffer = PyByteArray_AS_STRING(obj);
         Py_ssize_t length = PyByteArray_GET_SIZE(obj);
-        ret = pyyjson_decode_bytes(buffer, length);
+        ret = ssrjson_decode_bytes(buffer, length);
         goto done;
     }
 

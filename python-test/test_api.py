@@ -7,7 +7,7 @@ import re
 
 import pytest
 
-import pyyjson
+import ssrjson
 
 SIMPLE_TYPES = (1, 1.0, -1, None, "str", True, False)
 
@@ -23,43 +23,43 @@ class TestApi:
         """
         loads() handles trailing whitespace
         """
-        assert pyyjson.loads("{}\n\t ") == {}
+        assert ssrjson.loads("{}\n\t ") == {}
 
     def test_loads_trailing_invalid(self):
         """
         loads() handles trailing invalid
         """
-        pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, "{}\n\t a")
+        pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, "{}\n\t a")
 
     def test_simple_json(self):
         """
         dumps() equivalent to json on simple types
         """
         for obj in SIMPLE_TYPES:
-            assert pyyjson.dumps(obj) == json.dumps(obj)
-            assert pyyjson.dumps_to_bytes(obj) == json.dumps(obj).encode("utf-8")
+            assert ssrjson.dumps(obj) == json.dumps(obj)
+            assert ssrjson.dumps_to_bytes(obj) == json.dumps(obj).encode("utf-8")
 
     def test_simple_round_trip(self):
         """
         dumps(), loads() round trip on simple types
         """
         for obj in SIMPLE_TYPES:
-            assert pyyjson.loads(pyyjson.dumps(obj)) == obj
-            assert pyyjson.loads(pyyjson.dumps_to_bytes(obj)) == obj
+            assert ssrjson.loads(ssrjson.dumps(obj)) == obj
+            assert ssrjson.loads(ssrjson.dumps_to_bytes(obj)) == obj
 
     def test_loads_type(self):
         """
         loads() invalid type
         """
         for val in (1, 3.14, [], {}, None):
-            # pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, val)
-            pytest.raises(TypeError, pyyjson.loads, val)
+            # pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, val)
+            pytest.raises(TypeError, ssrjson.loads, val)
 
     def test_loads_recursion_partial(self):
         """
         loads() recursion limit partial
         """
-        pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, "[" * (1024 * 1024))
+        pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, "[" * (1024 * 1024))
 
     def test_loads_recursion_valid_limit_array(self):
         """
@@ -67,7 +67,7 @@ class TestApi:
         """
         n = LOADS_RECURSION_LIMIT + 1
         value = b"[" * n + b"]" * n
-        pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, value)
+        pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, value)
 
     def test_loads_recursion_valid_limit_object(self):
         """
@@ -75,7 +75,7 @@ class TestApi:
         """
         n = LOADS_RECURSION_LIMIT
         value = b'{"key":' * n + b'{"key":true}' + b"}" * n
-        pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, value)
+        pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, value)
 
     def test_loads_recursion_valid_limit_mixed(self):
         """
@@ -83,7 +83,7 @@ class TestApi:
         """
         n = LOADS_RECURSION_LIMIT
         value = b'[{"key":' * n + b'{"key":true}' + b"}" * n + b"]"
-        pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, value)
+        pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, value)
 
     def test_loads_recursion_valid_excessive_array(self):
         """
@@ -91,7 +91,7 @@ class TestApi:
         """
         n = 10000000
         value = b"[" * n + b"]" * n
-        pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, value)
+        pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, value)
 
     def test_loads_recursion_valid_limit_array_pretty(self):
         """
@@ -99,7 +99,7 @@ class TestApi:
         """
         n = LOADS_RECURSION_LIMIT + 1
         value = b"[\n  " * n + b"]" * n
-        pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, value)
+        pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, value)
 
     def test_loads_recursion_valid_limit_object_pretty(self):
         """
@@ -107,7 +107,7 @@ class TestApi:
         """
         n = LOADS_RECURSION_LIMIT
         value = b'{\n  "key":' * n + b'{"key":true}' + b"}" * n
-        pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, value)
+        pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, value)
 
     def test_loads_recursion_valid_limit_mixed_pretty(self):
         """
@@ -115,7 +115,7 @@ class TestApi:
         """
         n = LOADS_RECURSION_LIMIT
         value = b'[\n  {"key":' * n + b'{"key":true}' + b"}" * n + b"]"
-        pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, value)
+        pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, value)
 
     def test_loads_recursion_valid_excessive_array_pretty(self):
         """
@@ -123,52 +123,52 @@ class TestApi:
         """
         n = 10000000
         value = b"[\n  " * n + b"]" * n
-        pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, value)
+        pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, value)
 
     def test_valueerror(self):
         """
-        pyyjson.JSONDecodeError is a subclass of ValueError
+        ssrjson.JSONDecodeError is a subclass of ValueError
         """
-        pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, "{")
-        pytest.raises(ValueError, pyyjson.loads, "{")
+        pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, "{")
+        pytest.raises(ValueError, ssrjson.loads, "{")
 
     def test_default_positional(self):
         """
         dumps() positional arg
         """
         with pytest.raises(TypeError):
-            pyyjson.dumps(__obj={})  # type: ignore
+            ssrjson.dumps(__obj={})  # type: ignore
         with pytest.raises(TypeError):
-            pyyjson.dumps(zxc={})  # type: ignore
+            ssrjson.dumps(zxc={})  # type: ignore
         with pytest.raises(TypeError):
-            pyyjson.dumps_to_bytes(__obj={})  # type: ignore
+            ssrjson.dumps_to_bytes(__obj={})  # type: ignore
         with pytest.raises(TypeError):
-            pyyjson.dumps_to_bytes(zxc={})  # type: ignore
+            ssrjson.dumps_to_bytes(zxc={})  # type: ignore
 
     def test_default_unknown_kwarg(self):
         """
         dumps() unknown kwarg
         """
         with pytest.raises(TypeError):
-            pyyjson.dumps({}, zxc=default)  # type: ignore
+            ssrjson.dumps({}, zxc=default)  # type: ignore
 
     def test_default_empty_kwarg(self):
         """
         dumps() empty kwarg
         """
-        assert pyyjson.dumps(None, **{}) == "null"
-        assert pyyjson.dumps_to_bytes(None, **{}) == b"null"
+        assert ssrjson.dumps(None, **{}) == "null"
+        assert ssrjson.dumps_to_bytes(None, **{}) == b"null"
 
     def test_dumps_signature(self):
         """
         dumps() valid __text_signature__
         """
         assert (
-            str(inspect.signature(pyyjson.dumps))
+            str(inspect.signature(ssrjson.dumps))
             == "(obj, indent=None)"
         )
         assert (
-            str(inspect.signature(pyyjson.dumps_to_bytes))
+            str(inspect.signature(ssrjson.dumps_to_bytes))
             == "(obj, indent=None)"
         )
 
@@ -176,19 +176,19 @@ class TestApi:
         """
         loads() valid __text_signature__
         """
-        assert str(inspect.signature(pyyjson.loads)) == "(s)"
+        assert str(inspect.signature(ssrjson.loads)) == "(s)"
 
     def test_dumps_module_str(self):
         """
-        pyyjson.dumps.__module__ is a str
+        ssrjson.dumps.__module__ is a str
         """
-        assert pyyjson.dumps.__module__ == "pyyjson"
+        assert ssrjson.dumps.__module__ == "ssrjson"
 
     def test_loads_module_str(self):
         """
-        pyyjson.loads.__module__ is a str
+        ssrjson.loads.__module__ is a str
         """
-        assert pyyjson.loads.__module__ == "pyyjson"
+        assert ssrjson.loads.__module__ == "ssrjson"
 
     def test_bytes_buffer(self):
         """
@@ -197,13 +197,13 @@ class TestApi:
         a = "a" * 900
         b = "b" * 4096
         c = "c" * 4096 * 4096
-        assert pyyjson.dumps([a, b, c]) == f'["{a}","{b}","{c}"]'
-        assert pyyjson.dumps_to_bytes([a, b, c]) == f'["{a}","{b}","{c}"]'.encode("utf-8")
+        assert ssrjson.dumps([a, b, c]) == f'["{a}","{b}","{c}"]'
+        assert ssrjson.dumps_to_bytes([a, b, c]) == f'["{a}","{b}","{c}"]'.encode("utf-8")
 
     def test_bytes_null_terminated(self):
         """
         dumps() PyBytesObject buffer is null-terminated
         """
         # would raise ValueError: invalid literal for int() with base 10: b'1596728892'
-        int(pyyjson.dumps(1596728892))
-        int(pyyjson.dumps_to_bytes(1596728892))
+        int(ssrjson.dumps(1596728892))
+        int(ssrjson.dumps_to_bytes(1596728892))

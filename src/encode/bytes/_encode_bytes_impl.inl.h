@@ -1,8 +1,8 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    include "encode/encode_impl_wrap.h"
 #    include "encode/encode_shared.h"
 #    include "encode_utf8.h"
-#    include "pyyjson.h"
+#    include "ssrjson.h"
 #    include "tls.h"
 #    include "unicode/unicode.h"
 //
@@ -28,23 +28,23 @@ force_inline bool bytes_buffer_append_key(PyObject *key, EncodeUnicodeWriter *wr
     write_unicode_indent(&writer_addr->writer_u8, cur_nested_depth);
     *writer_addr->writer_u8++ = '"';
     if (is_ascii) {
-        bytes_write_ascii(&writer_addr->writer_u8, PYYJSON_CAST(const u8 *, PYYJSON_CAST(PyASCIIObject *, key) + 1), len);
+        bytes_write_ascii(&writer_addr->writer_u8, SSRJSON_CAST(const u8 *, SSRJSON_CAST(PyASCIIObject *, key) + 1), len);
     } else {
         switch (read_kind_val) {
             case 1: {
-                bytes_write_ucs1(&writer_addr->writer_u8, PYYJSON_CAST(const u8 *, PYYJSON_CAST(PyCompactUnicodeObject *, key) + 1), len);
+                bytes_write_ucs1(&writer_addr->writer_u8, SSRJSON_CAST(const u8 *, SSRJSON_CAST(PyCompactUnicodeObject *, key) + 1), len);
                 break;
             }
             case 2: {
-                if (unlikely(!bytes_write_ucs2(&writer_addr->writer_u8, PYYJSON_CAST(const u16 *, PYYJSON_CAST(PyCompactUnicodeObject *, key) + 1), len))) return false;
+                if (unlikely(!bytes_write_ucs2(&writer_addr->writer_u8, SSRJSON_CAST(const u16 *, SSRJSON_CAST(PyCompactUnicodeObject *, key) + 1), len))) return false;
                 break;
             }
             case 4: {
-                if (unlikely(!bytes_write_ucs4(&writer_addr->writer_u8, PYYJSON_CAST(const u32 *, PYYJSON_CAST(PyCompactUnicodeObject *, key) + 1), len))) return false;
+                if (unlikely(!bytes_write_ucs4(&writer_addr->writer_u8, SSRJSON_CAST(const u32 *, SSRJSON_CAST(PyCompactUnicodeObject *, key) + 1), len))) return false;
                 break;
             }
             default: {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             }
         }
     }
@@ -71,23 +71,23 @@ force_inline bool bytes_buffer_append_str(PyObject *str, EncodeUnicodeWriter *wr
     }
     *writer_addr->writer_u8++ = '"';
     if (is_ascii) {
-        bytes_write_ascii(&writer_addr->writer_u8, PYYJSON_CAST(const u8 *, PYYJSON_CAST(PyASCIIObject *, str) + 1), len);
+        bytes_write_ascii(&writer_addr->writer_u8, SSRJSON_CAST(const u8 *, SSRJSON_CAST(PyASCIIObject *, str) + 1), len);
     } else {
         switch (read_kind_val) {
             case 1: {
-                bytes_write_ucs1(&writer_addr->writer_u8, PYYJSON_CAST(const u8 *, PYYJSON_CAST(PyCompactUnicodeObject *, str) + 1), len);
+                bytes_write_ucs1(&writer_addr->writer_u8, SSRJSON_CAST(const u8 *, SSRJSON_CAST(PyCompactUnicodeObject *, str) + 1), len);
                 break;
             }
             case 2: {
-                if (unlikely(!bytes_write_ucs2(&writer_addr->writer_u8, PYYJSON_CAST(const u16 *, PYYJSON_CAST(PyCompactUnicodeObject *, str) + 1), len))) return false;
+                if (unlikely(!bytes_write_ucs2(&writer_addr->writer_u8, SSRJSON_CAST(const u16 *, SSRJSON_CAST(PyCompactUnicodeObject *, str) + 1), len))) return false;
                 break;
             }
             case 4: {
-                if (unlikely(!bytes_write_ucs4(&writer_addr->writer_u8, PYYJSON_CAST(const u32 *, PYYJSON_CAST(PyCompactUnicodeObject *, str) + 1), len))) return false;
+                if (unlikely(!bytes_write_ucs4(&writer_addr->writer_u8, SSRJSON_CAST(const u32 *, SSRJSON_CAST(PyCompactUnicodeObject *, str) + 1), len))) return false;
                 break;
             }
             default: {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             }
         }
     }
@@ -108,7 +108,7 @@ force_inline EncodeValJumpFlag encode_bytes_process_val(
         bool is_in_obj) {
 #define CTN_SIZE_GROW()                                                         \
     do {                                                                        \
-        if (unlikely(*cur_nested_depth_addr == PYYJSON_ENCODE_MAX_RECURSION)) { \
+        if (unlikely(*cur_nested_depth_addr == SSRJSON_ENCODE_MAX_RECURSION)) { \
             PyErr_SetString(JSONEncodeError, "Too many nested structures");     \
             return JumpFlag_Fail;                                               \
         }                                                                       \
@@ -209,7 +209,7 @@ force_inline EncodeValJumpFlag encode_bytes_process_val(
 }
 
 static force_noinline PyObject *
-pyyjson_dumps_to_bytes_obj(PyObject *in_obj) {
+ssrjson_dumps_to_bytes_obj(PyObject *in_obj) {
 #define GOTO_FAIL_ON_UNLIKELY_ERR(_condition) \
     do {                                      \
         if (unlikely(_condition)) {           \
@@ -284,7 +284,7 @@ pyyjson_dumps_to_bytes_obj(PyObject *in_obj) {
         goto arr_val_begin;
     }
 
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 
 
 dict_pair_begin:;
@@ -316,7 +316,7 @@ dict_pair_begin:;
                 goto fail;
             }
             default: {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             }
         }
         goto dict_pair_begin;
@@ -348,7 +348,7 @@ dict_pair_begin:;
         }
     }
 
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 
 arr_val_begin:;
     assert(cur_list_size != 0);
@@ -381,7 +381,7 @@ arr_val_begin:;
                 goto fail;
             }
             default: {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             }
         }
         //
@@ -413,7 +413,7 @@ arr_val_begin:;
             goto arr_val_begin;
         }
     }
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 
 success:;
     assert(cur_nested_depth == 0);

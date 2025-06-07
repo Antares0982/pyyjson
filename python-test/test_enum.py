@@ -5,7 +5,7 @@
 
 # import pytest
 
-# import pyyjson
+# import ssrjson
 
 
 # class StrEnum(str, enum.Enum):
@@ -69,40 +69,40 @@
 #                 B = "b"
 
 #     def test_arbitrary_enum(self):
-#         assert pyyjson.dumps(UnspecifiedEnum.A) == b'"a"'
-#         assert pyyjson.dumps(UnspecifiedEnum.B) == b"1"
-#         assert pyyjson.dumps(UnspecifiedEnum.C) == b"1.1"
-#         assert pyyjson.dumps(UnspecifiedEnum.D) == b'{"d":1}'
+#         assert ssrjson.dumps(UnspecifiedEnum.A) == b'"a"'
+#         assert ssrjson.dumps(UnspecifiedEnum.B) == b"1"
+#         assert ssrjson.dumps(UnspecifiedEnum.C) == b"1.1"
+#         assert ssrjson.dumps(UnspecifiedEnum.D) == b'{"d":1}'
 
 #     def test_custom_enum(self):
-#         assert pyyjson.dumps(UnspecifiedEnum.E, default=default) == b'"c"'
+#         assert ssrjson.dumps(UnspecifiedEnum.E, default=default) == b'"c"'
 
 #     def test_enum_options(self):
 #         assert (
-#             pyyjson.dumps(UnspecifiedEnum.F, option=pyyjson.OPT_NAIVE_UTC)
+#             ssrjson.dumps(UnspecifiedEnum.F, option=ssrjson.OPT_NAIVE_UTC)
 #             == b'"1970-01-01T00:00:00+00:00"'
 #         )
 
 #     def test_int_enum(self):
-#         assert pyyjson.dumps(IntEnum.ONE) == b"1"
+#         assert ssrjson.dumps(IntEnum.ONE) == b"1"
 
 #     def test_intenum_enum(self):
-#         assert pyyjson.dumps(IntEnumEnum.ONE) == b"1"
+#         assert ssrjson.dumps(IntEnumEnum.ONE) == b"1"
 
 #     def test_intflag_enum(self):
-#         assert pyyjson.dumps(IntFlagEnum.ONE) == b"1"
+#         assert ssrjson.dumps(IntFlagEnum.ONE) == b"1"
 
 #     def test_flag_enum(self):
-#         assert pyyjson.dumps(FlagEnum.ONE) == b"1"
+#         assert ssrjson.dumps(FlagEnum.ONE) == b"1"
 
 #     def test_auto_enum(self):
-#         assert pyyjson.dumps(AutoEnum.A) == b'"a"'
+#         assert ssrjson.dumps(AutoEnum.A) == b'"a"'
 
 #     def test_float_enum(self):
-#         assert pyyjson.dumps(FloatEnum.ONE) == b"1.1"
+#         assert ssrjson.dumps(FloatEnum.ONE) == b"1.1"
 
 #     def test_str_enum(self):
-#         assert pyyjson.dumps(StrEnum.AAA) == b'"aaa"'
+#         assert ssrjson.dumps(StrEnum.AAA) == b'"aaa"'
 
 #     def test_bool_enum(self):
 #         with pytest.raises(TypeError):
@@ -112,9 +112,9 @@
 
 #     def test_non_str_keys_enum(self):
 #         assert (
-#             pyyjson.dumps({StrEnum.AAA: 1}, option=pyyjson.OPT_NON_STR_KEYS)
+#             ssrjson.dumps({StrEnum.AAA: 1}, option=ssrjson.OPT_NON_STR_KEYS)
 #             == b'{"aaa":1}'
 #         )
 #         assert (
-#             pyyjson.dumps({IntEnum.ONE: 1}, option=pyyjson.OPT_NON_STR_KEYS) == b'{"1":1}'
+#             ssrjson.dumps({IntEnum.ONE: 1}, option=ssrjson.OPT_NON_STR_KEYS) == b'{"1":1}'
 #         )

@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX_COMMON_H
-#define PYYJSON_SIMD_AVX_COMMON_H
+#ifndef SSRJSON_SIMD_AVX_COMMON_H
+#define SSRJSON_SIMD_AVX_COMMON_H
 
 #if !defined(__AVX__) || !__AVX__
 #    error "AVX is required for this file"
@@ -28,4 +28,4 @@ force_inline vector_a_u32_256 broadcast_u32_256(u32 v) {
 }
 
 
-#endif // PYYJSON_SIMD_AVX_COMMON_H
+#endif // SSRJSON_SIMD_AVX_COMMON_H

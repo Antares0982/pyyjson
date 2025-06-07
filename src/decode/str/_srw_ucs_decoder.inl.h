@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_UCS_LEVEL
 #        include "decoder_impl_wrap.h"
 #        include "simd/simd_impl.h"
@@ -51,7 +51,7 @@ force_inline int decode_str_copy_trailing(_dst_t **dst_addr, const _src_t **src_
     anymask_t check_mask;
     //
     _decode_str_trailing_read_src_impl(*src_addr, src_end, &vec, &check_mask);
-#if PYYJSON_X86 && COMPILE_SIMD_BITS == 256
+#if SSRJSON_X86 && COMPILE_SIMD_BITS == 256
     // write with blend
     usize trailing_count = src_end - *src_addr;
     cvt_to_dst_blendhigh((*dst_addr) + trailing_count - READ_BATCH_COUNT, vec, trailing_count);
@@ -88,7 +88,7 @@ force_inline int decode_str_copy_trailing(_dst_t **dst_addr, const _src_t **src_
 //     u32 escape_val;
 //     usize escape_len;
 //     escape_val = escape_info.escape_val;
-//     *max_escapeval_addr = PYYJSON_MAX(*max_escapeval_addr, escape_val);
+//     *max_escapeval_addr = SSRJSON_MAX(*max_escapeval_addr, escape_val);
 //     assert(escape_val != _DECODE_UNICODE_ERR);
 // #if COMPILE_WRITE_UCS_LEVEL <= 1
 //     if (escape_val < 0x100) {
@@ -101,10 +101,10 @@ force_inline int decode_str_copy_trailing(_dst_t **dst_addr, const _src_t **src_
 //             if (escape_val < 0x10000) {
 //         // R: ucs1,ucs2 W: ucs1,ucs2
 // #    if COMPILE_WRITE_UCS_LEVEL == 1
-//         usize u8size = (*u8writer_addr) - PYYJSON_CAST(u8 *, temp_buffer);
+//         usize u8size = (*u8writer_addr) - SSRJSON_CAST(u8 *, temp_buffer);
 //         *u8size_addr = u8size;
 //         *u8writer_addr = NULL;
-//         *u16writer_addr = PYYJSON_CAST(u16 *, temp_buffer) + u8size;
+//         *u16writer_addr = SSRJSON_CAST(u16 *, temp_buffer) + u8size;
 // #    endif
 //         *(*u16writer_addr)++ = (u16)escape_val;
 //         return 2;
@@ -114,23 +114,23 @@ force_inline int decode_str_copy_trailing(_dst_t **dst_addr, const _src_t **src_
 //         // R: ucs1,ucs2,ucs4 W: ucs1,ucs2,ucs4
 // #if COMPILE_WRITE_UCS_LEVEL == 1
 //         // R,W: ucs1
-//         usize u8size = (*u8writer_addr) - PYYJSON_CAST(u8 *, temp_buffer);
+//         usize u8size = (*u8writer_addr) - SSRJSON_CAST(u8 *, temp_buffer);
 //         *u8size_addr = u8size;
 //         *u8writer_addr = NULL;
-//         *u32writer_addr = PYYJSON_CAST(u32 *, temp_buffer) + u8size;
+//         *u32writer_addr = SSRJSON_CAST(u32 *, temp_buffer) + u8size;
 // #elif COMPILE_WRITE_UCS_LEVEL == 2
 // #    if COMPILE_READ_UCS_LEVEL == 1
 //         // R: ucs1 W: ucs2
-//         usize totalsize = (*u16writer_addr) - PYYJSON_CAST(u16 *, temp_buffer);
+//         usize totalsize = (*u16writer_addr) - SSRJSON_CAST(u16 *, temp_buffer);
 //         *u16size_addr = totalsize - *u8size_addr;
 //         *u16writer_addr = NULL;
-//         *u32writer_addr = PYYJSON_CAST(u32 *, temp_buffer) + totalsize;
+//         *u32writer_addr = SSRJSON_CAST(u32 *, temp_buffer) + totalsize;
 // #    else
 //         // R: ucs2 W: ucs2
-//         usize u16size = (*u16writer_addr) - PYYJSON_CAST(u16 *, temp_buffer);
+//         usize u16size = (*u16writer_addr) - SSRJSON_CAST(u16 *, temp_buffer);
 //         *u16size_addr = u16size;
 //         *u16writer_addr = NULL;
-//         *u32writer_addr = PYYJSON_CAST(u32 *, temp_buffer) + u16size;
+//         *u32writer_addr = SSRJSON_CAST(u32 *, temp_buffer) + u16size;
 // #    endif
 // #endif
 //         *(*u32writer_addr)++ = escape_val;

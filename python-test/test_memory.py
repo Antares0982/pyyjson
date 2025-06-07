@@ -8,7 +8,7 @@ import sys
 from typing import List
 
 import pytest
-import pyyjson
+import ssrjson
 
 try:
     import pytz
@@ -152,11 +152,11 @@ class TestMemory:
         """
         proc = psutil.Process()
         gc.collect()
-        val = pyyjson.loads(FIXTURE)
+        val = ssrjson.loads(FIXTURE)
         assert val
         mem = proc.memory_info().rss
         for _ in range(10000):
-            val = pyyjson.loads(FIXTURE)
+            val = ssrjson.loads(FIXTURE)
             assert val
         gc.collect()
         leak = proc.memory_info().rss - mem
@@ -170,11 +170,11 @@ class TestMemory:
     #     proc = psutil.Process()
     #     gc.collect()
     #     fixture = FIXTURE.encode("utf-8")
-    #     val = pyyjson.loads(fixture)
+    #     val = ssrjson.loads(fixture)
     #     assert val
     #     mem = proc.memory_info().rss
     #     for _ in range(10000):
-    #         val = pyyjson.loads(memoryview(fixture))
+    #         val = ssrjson.loads(memoryview(fixture))
     #         assert val
     #     gc.collect()
     #     assert proc.memory_info().rss - mem <= + MAX_INCREASE
@@ -187,12 +187,12 @@ class TestMemory:
         """
         proc = psutil.Process()
         gc.collect()
-        fixture = pyyjson.loads(FIXTURE)
-        val = pyyjson.dumps(fixture)
+        fixture = ssrjson.loads(FIXTURE)
+        val = ssrjson.dumps(fixture)
         assert val
         mem = proc.memory_info().rss
         for _ in range(10000):
-            val = pyyjson.dumps(fixture)
+            val = ssrjson.dumps(fixture)
             assert val
         gc.collect()
         assert proc.memory_info().rss - mem <= MAX_INCREASE
@@ -205,12 +205,12 @@ class TestMemory:
         """
         proc = psutil.Process()
         gc.collect()
-        fixture = pyyjson.loads(FIXTURE)
-        val = pyyjson.dumps_to_bytes(fixture)
+        fixture = ssrjson.loads(FIXTURE)
+        val = ssrjson.dumps_to_bytes(fixture)
         assert val
         mem = proc.memory_info().rss
         for _ in range(10000):
-            val = pyyjson.dumps_to_bytes(fixture)
+            val = ssrjson.dumps_to_bytes(fixture)
             assert val
         gc.collect()
         assert proc.memory_info().rss - mem <= MAX_INCREASE
@@ -228,8 +228,8 @@ class TestMemory:
         i = 0
         for _ in range(n):
             try:
-                pyyjson.loads("")
-            except pyyjson.JSONDecodeError:
+                ssrjson.loads("")
+            except ssrjson.JSONDecodeError:
                 i += 1
         assert n == i
         assert proc.memory_info().rss - mem <= MAX_INCREASE
@@ -249,8 +249,8 @@ class TestMemory:
         i = 0
         for _ in range(n):
             try:
-                pyyjson.dumps(data)
-            except pyyjson.JSONEncodeError:
+                ssrjson.dumps(data)
+            except ssrjson.JSONEncodeError:
                 i += 1
         assert n == i
         assert proc.memory_info().rss - mem <= MAX_INCREASE
@@ -270,8 +270,8 @@ class TestMemory:
         i = 0
         for _ in range(n):
             try:
-                pyyjson.dumps_to_bytes(data)
-            except pyyjson.JSONEncodeError:
+                ssrjson.dumps_to_bytes(data)
+            except ssrjson.JSONEncodeError:
                 i += 1
         assert n == i
         assert proc.memory_info().rss - mem <= MAX_INCREASE
@@ -284,7 +284,7 @@ class TestMemory:
     #     """
     #     proc = psutil.Process()
     #     gc.collect()
-    #     fixture = pyyjson.loads(FIXTURE)
+    #     fixture = ssrjson.loads(FIXTURE)
 
     #     class Custom:
     #         def __init__(self, name):
@@ -293,11 +293,11 @@ class TestMemory:
     #         def __str__(self):
     #             return f"{self.__class__.__name__}({self.name})"
 
-    #     fixture["custom"] = Custom("pyyjson")
-    #     val = pyyjson.dumps(fixture, default=default)
+    #     fixture["custom"] = Custom("ssrjson")
+    #     val = ssrjson.dumps(fixture, default=default)
     #     mem = proc.memory_info().rss
     #     for _ in range(10000):
-    #         val = pyyjson.dumps(fixture, default=default)
+    #         val = ssrjson.dumps(fixture, default=default)
     #         assert val
     #     gc.collect()
     #     assert proc.memory_info().rss - mem <= MAX_INCREASE
@@ -312,12 +312,12 @@ class TestMemory:
         gc.collect()
         fixture = {f"key_{idx}": "value" for idx in range(1024)}
         assert len(fixture) == 1024
-        val = pyyjson.dumps(fixture)
-        loaded = pyyjson.loads(val)
+        val = ssrjson.dumps(fixture)
+        loaded = ssrjson.loads(val)
         assert loaded
         mem = proc.memory_info().rss
         for _ in range(100):
-            loaded = pyyjson.loads(val)
+            loaded = ssrjson.loads(val)
             assert loaded
         gc.collect()
         assert proc.memory_info().rss - mem <= MAX_INCREASE

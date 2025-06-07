@@ -1,6 +1,6 @@
-#ifndef PYYJSON_SIMD_VECTOR_TYPES_H
-#define PYYJSON_SIMD_VECTOR_TYPES_H
-#include "pyyjson.h"
+#ifndef SSRJSON_SIMD_VECTOR_TYPES_H
+#define SSRJSON_SIMD_VECTOR_TYPES_H
+#include "ssrjson.h"
 
 /* Common SIMD vector types. */
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -94,7 +94,7 @@ typedef __declspec(align(4)) struct {
     u32 v[16];
 } vector_u_u32_512;
 
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
 // smaller than 128
 typedef u8 vector_a_u8_32 __attribute__((__vector_size__(4), __aligned__(4)));
 typedef u8 vector_u_u8_32 __attribute__((__vector_size__(4), __aligned__(1)));
@@ -189,4 +189,4 @@ typedef u32 vector_a_u32_2048 __attribute__((__vector_size__(256), __aligned__(2
 typedef u32 vector_u_u32_2048 __attribute__((__vector_size__(256), __aligned__(4)));
 #endif
 
-#endif // PYYJSON_SIMD_VECTOR_TYPES_H
+#endif // SSRJSON_SIMD_VECTOR_TYPES_H

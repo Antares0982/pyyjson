@@ -1,10 +1,10 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    include "simd/sse2/checker.h"
 #    include "simd/sse2/common.h"
 #    ifndef COMPILE_READ_UCS_LEVEL
 #        define COMPILE_READ_UCS_LEVEL 1
 #    endif
-#    ifndef PYYJSON_SIMD_SSE2_DECODE_H
+#    ifndef SSRJSON_SIMD_SSE2_DECODE_H
 #        include "_r_decode_tools.inl.h"
 #    endif
 #endif

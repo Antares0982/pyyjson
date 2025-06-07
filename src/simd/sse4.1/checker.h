@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_SSE4_CHECKER_H
-#define PYYJSON_SIMD_SSE4_CHECKER_H
+#ifndef SSRJSON_SIMD_SSE4_CHECKER_H
+#define SSRJSON_SIMD_SSE4_CHECKER_H
 
 #include "common.h"
 #include "simd/simd_detect.h"
@@ -20,4 +20,4 @@
 #include "checker/_sr_escape.inl.h"
 #undef COMPILE_READ_UCS_LEVEL
 
-#endif // PYYJSON_SIMD_SSE4_CHECKER_H
+#endif // SSRJSON_SIMD_SSE4_CHECKER_H

@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_SSE2_UTF8_H
-#define PYYJSON_SIMD_SSE2_UTF8_H
+#ifndef SSRJSON_SIMD_SSE2_UTF8_H
+#define SSRJSON_SIMD_SSE2_UTF8_H
 #include "simd/simd_detect.h"
 #include "simd/vector_types.h"
 //
@@ -10,4 +10,4 @@
 
 
 
-#endif // PYYJSON_SIMD_SSE2_UTF8_H
+#endif // SSRJSON_SIMD_SSE2_UTF8_H

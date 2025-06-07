@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX2_CHECKMAX_H
-#define PYYJSON_SIMD_AVX2_CHECKMAX_H
+#ifndef SSRJSON_SIMD_AVX2_CHECKMAX_H
+#define SSRJSON_SIMD_AVX2_CHECKMAX_H
 
 #if !defined(__AVX2__) || !__AVX2__
 #    error "AVX2 is required for this file"
@@ -29,4 +29,4 @@ force_inline bool checkmax_u8_256(vector_a_u8_256 y, u8 lower_bound_minus_1) {
     return testz_256(mask);
 }
 
-#endif // PYYJSON_SIMD_AVX2_CHECKMAX_H
+#endif // SSRJSON_SIMD_AVX2_CHECKMAX_H

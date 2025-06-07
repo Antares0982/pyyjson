@@ -1,6 +1,6 @@
 # # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-# import pyyjson
+# import ssrjson
 
 # try:
 #     from typing import TypedDict  # type: ignore
@@ -19,4 +19,4 @@
 #             b: int
 
 #         obj = TypedDict1(a="a", b=1)
-#         assert pyyjson.dumps(obj) == b'{"a":"a","b":1}'
+#         assert ssrjson.dumps(obj) == b'{"a":"a","b":1}'

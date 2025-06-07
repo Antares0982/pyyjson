@@ -1,11 +1,11 @@
-import pyyjson
+import ssrjson
 
 
 class C:
     c: "C"
 
     def __del__(self):
-        pyyjson.loads('"' + "a" * 10000 + '"')
+        ssrjson.loads('"' + "a" * 10000 + '"')
 
 
 def test_reentrant():
@@ -13,4 +13,4 @@ def test_reentrant():
     c.c = c
     del c
 
-    pyyjson.loads("[" + "[]," * 1000 + "[]]")
+    ssrjson.loads("[" + "[]," * 1000 + "[]]")

@@ -1,20 +1,20 @@
-#ifndef PYYJSON_COMPILE_CONTEXT_SIRW
-#define PYYJSON_COMPILE_CONTEXT_SIRW
+#ifndef SSRJSON_COMPILE_CONTEXT_SIRW
+#define SSRJSON_COMPILE_CONTEXT_SIRW
 #include "iw_in.inl.h"
 #include "srw_in.inl.h"
 
 // Name creation macros.
-#define MAKE_SIRW_NAME(_x_) PYYJSON_CONCAT5(_x_, _src_t, _dst_t, __INDENT_NAME, COMPILE_SIMD_BITS)
+#define MAKE_SIRW_NAME(_x_) SSRJSON_CONCAT5(_x_, _src_t, _dst_t, __INDENT_NAME, COMPILE_SIMD_BITS)
 
 #define unicode_buffer_append_key_internal MAKE_SIRW_NAME(_unicode_buffer_append_key_internal)
 #define unicode_buffer_append_str_internal MAKE_SIRW_NAME(_unicode_buffer_append_str_internal)
 //
-#define STR_WRITER_IMPL(r_t, w_t) PYYJSON_CONCAT5(_unicode_buffer_append_str_internal, r_t, w_t, __INDENT_NAME, COMPILE_SIMD_BITS)
-#define KEY_WRITER_IMPL(r_t, w_t) PYYJSON_CONCAT5(_unicode_buffer_append_key_internal, r_t, w_t, __INDENT_NAME, COMPILE_SIMD_BITS)
+#define STR_WRITER_IMPL(r_t, w_t) SSRJSON_CONCAT5(_unicode_buffer_append_str_internal, r_t, w_t, __INDENT_NAME, COMPILE_SIMD_BITS)
+#define KEY_WRITER_IMPL(r_t, w_t) SSRJSON_CONCAT5(_unicode_buffer_append_key_internal, r_t, w_t, __INDENT_NAME, COMPILE_SIMD_BITS)
 
 #ifdef COMPILE_UCS_LEVEL
 // Name creation macros.
-#define MAKE_IU_NAME(_x_) PYYJSON_CONCAT3(_x_, __UCS_NAME, __INDENT_NAME)
+#define MAKE_IU_NAME(_x_) SSRJSON_CONCAT3(_x_, __UCS_NAME, __INDENT_NAME)
 //
 #define prepare_unicode_write MAKE_IU_NAME(_prepare_unicode_write)
 #define unicode_buffer_append_key MAKE_IU_NAME(_unicode_buffer_append_key)
@@ -41,4 +41,4 @@
 #define unicode_buffer_append_obj_end MAKE_IU_NAME(_unicode_buffer_append_obj_end)
 #endif
 
-#endif // PYYJSON_COMPILE_CONTEXT_SIRW
+#endif // SSRJSON_COMPILE_CONTEXT_SIRW

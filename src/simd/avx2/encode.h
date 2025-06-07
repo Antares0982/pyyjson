@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX2_ENCODE_H
-#define PYYJSON_SIMD_AVX2_ENCODE_H
+#ifndef SSRJSON_SIMD_AVX2_ENCODE_H
+#define SSRJSON_SIMD_AVX2_ENCODE_H
 
 #include "encode/utf8.h"
 #include "trailing.h"
@@ -41,4 +41,4 @@
 #undef COMPILE_WRITE_UCS_LEVEL
 
 
-#endif // PYYJSON_SIMD_AVX2_ENCODE_H
+#endif // SSRJSON_SIMD_AVX2_ENCODE_H

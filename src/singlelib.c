@@ -1,9 +1,9 @@
-#include "pyyjson.h"
+#include "ssrjson.h"
 
-PyObject *pyyjson_print_current_features(PyObject *self, PyObject *args) {
+PyObject *ssrjson_print_current_features(PyObject *self, PyObject *args) {
     // TODO change to returning a dict with all build info
 
-#if PYYJSON_X86
+#if SSRJSON_X86
 #    if COMPILE_SIMD_BITS == 512
     printf("SIMD: AVX512; MultiLib: False\n");
 #    elif COMPILE_SIMD_BITS == 256
@@ -13,16 +13,16 @@ PyObject *pyyjson_print_current_features(PyObject *self, PyObject *args) {
 #    else
     printf("SIMD: SSE2; MultiLib: False\n");
 #    endif
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
     printf("SIMD: NEON; MultiLib: False\n");
 #endif
     Py_RETURN_NONE;
 }
 
-PyObject *pyyjson_get_current_features(PyObject *self, PyObject *args) {
+PyObject *ssrjson_get_current_features(PyObject *self, PyObject *args) {
     PyObject *ret = PyDict_New();
 
-#if PYYJSON_X86
+#if SSRJSON_X86
     PyDict_SetItemString(ret, "MultiLib", PyBool_FromLong(false));
 
 #    if COMPILE_SIMD_BITS == 512
@@ -34,7 +34,7 @@ PyObject *pyyjson_get_current_features(PyObject *self, PyObject *args) {
 #    else
     PyDict_SetItemString(ret, "SIMD", PyUnicode_FromString("SSE2"));
 #    endif
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
     PyDict_SetItemString(ret, "SIMD", PyUnicode_FromString("NEON"));
 #endif
     return ret;

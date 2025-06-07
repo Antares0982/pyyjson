@@ -1,4 +1,4 @@
-#undef PYYJSON_COMPILE_CONTEXT_IW
+#undef SSRJSON_COMPILE_CONTEXT_IW
 //
 #include "w_out.inl.h"
 //
@@ -12,4 +12,4 @@
 #undef bytes_buffer_append_key
 #undef bytes_buffer_append_str
 #undef encode_bytes_process_val
-#undef pyyjson_dumps_to_bytes_obj
+#undef ssrjson_dumps_to_bytes_obj

@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS2_H
-#define PYYJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS2_H
+#ifndef SSRJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS2_H
+#define SSRJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS2_H
 
 #include "simd/simd_detect.h"
 #include "simd/vector_types.h"
@@ -238,10 +238,10 @@ restart:;
             goto _3bytes;
         }
         default: {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         }
     }
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 ascii:;
     {
         avx512_bitmask_t m_not_ascii = cmpeq_bitmask(vec, broadcast(_Quote)) | cmpeq_bitmask(vec, broadcast(_Slash)) | unsigned_cmpgt_bitmask(broadcast(ControlMax), vec) | unsigned_cmpgt_bitmask(vec, broadcast(0x7f));
@@ -258,7 +258,7 @@ ascii:;
             len -= done_count + 1;
             writer += done_count;
             if (escape_unicode >= ControlMax && escape_unicode < 0x80 && escape_unicode != _Slash && escape_unicode != _Quote) {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             } else {
                 if (unlikely(!encode_one_ucs2(&writer, escape_unicode))) return false;
             }
@@ -291,7 +291,7 @@ _2bytes:;
             len -= done_count + 1;
             writer += done_count * 2;
             if (escape_unicode >= 0x80 && escape_unicode <= 0x7ff) {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             } else {
                 if (unlikely(!encode_one_ucs2(&writer, escape_unicode))) return false;
             }
@@ -325,7 +325,7 @@ _3bytes:;
             len -= done_count + 1;
             writer += done_count * 3;
             if (escape_unicode >= 0x800 && (escape_unicode <= 0xd7ff || escape_unicode >= 0xe000)) {
-                PYYJSON_UNREACHABLE();
+                SSRJSON_UNREACHABLE();
             } else {
                 if (unlikely(!encode_one_ucs2(&writer, escape_unicode))) return false;
             }
@@ -352,4 +352,4 @@ finished:;
 #undef COMPILE_WRITE_UCS_LEVEL
 #undef COMPILE_READ_UCS_LEVEL
 
-#endif // PYYJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS2_H
+#endif // SSRJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS2_H

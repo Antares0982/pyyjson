@@ -111,8 +111,8 @@ def run_test(args):
             configure_cmd += ["-DASAN_ENABLED=ON"]
         subprocess.run(configure_cmd, check=True, env=new_env)
         subprocess.run(["cmake", "--build", "build", "--config", build_type], check=True, env=new_env)
-        target_file = f"build/{build_type}/pyyjson.dll"
-        os.rename(target_file, "build/pyyjson.pyd")
+        target_file = f"build/{build_type}/ssrjson.dll"
+        os.rename(target_file, "build/ssrjson.pyd")
         if args.asan:
             os.rename(f"build/{build_type}/clang_rt.asan_dynamic-x86_64.dll", "build/clang_rt.asan_dynamic-x86_64.dll")
         if args.build_only:

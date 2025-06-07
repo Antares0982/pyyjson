@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS1_H
-#define PYYJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS1_H
+#ifndef SSRJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS1_H
+#define SSRJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS1_H
 
 #include "simd/simd_detect.h"
 #include "simd/vector_types.h"
@@ -41,7 +41,7 @@ restart:;
         src += done_count + 1;
         len -= done_count + 1;
         if (escape_unicode >= ControlMax && escape_unicode < 0x80 && escape_unicode != _Slash && escape_unicode != _Quote) {
-            PYYJSON_UNREACHABLE();
+            SSRJSON_UNREACHABLE();
         } else {
             encode_one_special_ucs1(&writer, escape_unicode);
         }
@@ -60,4 +60,4 @@ restart:;
 #undef COMPILE_WRITE_UCS_LEVEL
 #undef COMPILE_READ_UCS_LEVEL
 
-#endif // PYYJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS1_H
+#endif // SSRJSON_SIMD_AVX512VLDQBW_ENCODE_BYTES_UCS1_H

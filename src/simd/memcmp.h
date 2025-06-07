@@ -1,5 +1,5 @@
-#ifndef PYYJSON_MEMCMP_H
-#define PYYJSON_MEMCMP_H
+#ifndef SSRJSON_MEMCMP_H
+#define SSRJSON_MEMCMP_H
 
 #include "simd_impl.h"
 
@@ -15,7 +15,7 @@ force_inline bool __memcmp_neq_short(u8 **x_addr, u8 **y_addr, usize *size_addr,
 
 /* Compare memory blocks smaller than (or equal to) 64 bytes.
  * Return non-zero if not equal (be compatible with memcmp().) */
-force_inline int pyyjson_memcmp_neq_le64(u8 *x, u8 *y, usize size) {
+force_inline int ssrjson_memcmp_neq_le64(u8 *x, u8 *y, usize size) {
     assert(size <= 64);
 #if COMPILE_SIMD_BITS == 512
     if (size == 64) {
@@ -39,4 +39,4 @@ force_inline int pyyjson_memcmp_neq_le64(u8 *x, u8 *y, usize size) {
     return 0;
 }
 
-#endif // PYYJSON_MEMCMP_H
+#endif // SSRJSON_MEMCMP_H

@@ -1,5 +1,5 @@
-#ifndef PYYJSON_DECODE_STR_H
-#define PYYJSON_DECODE_STR_H
+#ifndef SSRJSON_DECODE_STR_H
+#define SSRJSON_DECODE_STR_H
 
 #include "common.h"
 #include "decode/decode.h"
@@ -65,7 +65,7 @@
 #undef COMPILE_UCS_LEVEL
 #undef COMPILE_SIMD_BITS
 
-#ifdef PYYJSON_SIMD_AVX2_CHECKMAX_H
+#ifdef SSRJSON_SIMD_AVX2_CHECKMAX_H
 #    define COMPILE_SIMD_BITS 256
 #    define COMPILE_UCS_LEVEL 0
 #    include "_sr_checkmax.inl.h"
@@ -85,7 +85,7 @@
 #    undef COMPILE_SIMD_BITS
 #endif
 
-#ifdef PYYJSON_SIMD_AVX512FCD_CHECKMAX_H
+#ifdef SSRJSON_SIMD_AVX512FCD_CHECKMAX_H
 #    define COMPILE_SIMD_BITS 512
 #    define COMPILE_UCS_LEVEL 0
 #    include "_sr_checkmax.inl.h"
@@ -105,4 +105,4 @@
 #    undef COMPILE_SIMD_BITS
 #endif
 
-#endif // PYYJSON_DECODE_STR_H
+#endif // SSRJSON_DECODE_STR_H

@@ -1,10 +1,10 @@
-#ifndef PYYJSON_SIMD_DETECT_H
-#define PYYJSON_SIMD_DETECT_H
+#ifndef SSRJSON_SIMD_DETECT_H
+#define SSRJSON_SIMD_DETECT_H
 
 #include <Python.h>
-#if PYYJSON_DETECT_SIMD
+#if SSRJSON_DETECT_SIMD
 
-#    if PYYJSON_X86
+#    if SSRJSON_X86
 #        if __AVX512F__ && __AVX512CD__ && __AVX512BW__ && __AVX512VL__ && __AVX512DQ__
 #            define SIMD_FEATURE_NAME avx512
 #            define SUPPORT_SIMD_512BITS 1
@@ -36,11 +36,11 @@
 #            define SIMD_256_IU __m256i_u
 #        endif
 #        define SIMD_512 __m512i
-// x86: PYYJSON_HAS_BLENDV
+// x86: SSRJSON_HAS_BLENDV
 #        if __SSE4_1__
-#            define PYYJSON_HAS_BLENDV 1
+#            define SSRJSON_HAS_BLENDV 1
 #        else
-#            define PYYJSON_HAS_BLENDV 0
+#            define SSRJSON_HAS_BLENDV 0
 #        endif
 // x86: WRITE_SUPPORT_MASK_WRITE
 #        if __AVX512F__ && __AVX512CD__ && __AVX512BW__ && __AVX512VL__ && __AVX512DQ__
@@ -48,9 +48,9 @@
 #        else
 #            define WRITE_SUPPORT_MASK_WRITE 0
 #        endif
-#    elif PYYJSON_AARCH
+#    elif SSRJSON_AARCH
 #        define SIMD_FEATURE_NAME neon
-#        define PYYJSON_HAS_BLENDV 0
+#        define SSRJSON_HAS_BLENDV 0
 // #        define COMPILE_SIMD_BITS 128
 #        define WRITE_SUPPORT_MASK_WRITE 0
 // aarch64 TODO
@@ -65,20 +65,20 @@
 #    ifndef SIMD_FEATURE_NAME
 #        error "SIMD_FEATURE_NAME is not defined"
 #    endif
-#    define SIMD_NAME_MODIFIER(x) PYYJSON_CONCAT2(x, SIMD_FEATURE_NAME)
+#    define SIMD_NAME_MODIFIER(x) SSRJSON_CONCAT2(x, SIMD_FEATURE_NAME)
 #else
 #    define SIMD_NAME_MODIFIER(x) x
 #endif
 
-#if PYYJSON_X86
+#if SSRJSON_X86
 #    include <immintrin.h>
 #    if defined(_MSC_VER)
 #        include <intrin.h>
 #    endif
-#elif PYYJSON_AARCH
+#elif SSRJSON_AARCH
 #    include <arm_neon.h>
 static_assert(__LITTLE_ENDIAN__, "currently only little endian is supported");
 #endif
 
 
-#endif // PYYJSON_SIMD_DETECT_H
+#endif // SSRJSON_SIMD_DETECT_H

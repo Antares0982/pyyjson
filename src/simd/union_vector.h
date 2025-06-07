@@ -1,5 +1,5 @@
-#ifndef PYYJSON_UNION_VECTOR_H
-#define PYYJSON_UNION_VECTOR_H
+#ifndef SSRJSON_UNION_VECTOR_H
+#define SSRJSON_UNION_VECTOR_H
 #include "vector_types.h"
 
 typedef union {
@@ -101,4 +101,4 @@ typedef union {
     vector_a_u32_2048 z;
 } unionvector_a_u32_512_x4;
 
-#endif // PYYJSON_UNION_VECTOR_H
+#endif // SSRJSON_UNION_VECTOR_H

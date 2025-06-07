@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_SIMD_BITS
 #        include "decode.h"
 #        define DECODE_READ_PRETTY 1
@@ -74,7 +74,7 @@ arr_val_begin:
         // if (*cur == ' ')
         fast_skip_spaces(&cur, end);
     }
-    // #if PYYJSON_IS_REAL_GCC
+    // #if SSRJSON_IS_REAL_GCC
     //     while (true) REPEAT_CALL_16({
     //         if (byte_match_2((void *)cur, "  ")) cur += 2;
     //         else
@@ -99,7 +99,7 @@ arr_val_begin:
     }
     if (*cur <= U8MAX && char_is_number(*cur)) {
         PyObject *number_obj = READ_NUMBER(&cur, end);
-        if (likely(number_obj && pyyjson_push_obj(decode_obj_stack_info, number_obj))) {
+        if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
@@ -113,32 +113,32 @@ arr_val_begin:
 #else
                 decode_str(&cur, end, string_buffer_head, false);
 #endif
-        if (likely(str_obj && pyyjson_push_obj(decode_obj_stack_info, str_obj))) {
+        if (likely(str_obj && ssrjson_push_obj(decode_obj_stack_info, str_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
         goto fail_string;
     }
     if (*cur == 't') {
-        if (likely(_read_true(&cur, end) && pyyjson_decode_true(decode_obj_stack_info))) {
+        if (likely(_read_true(&cur, end) && ssrjson_decode_true(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
         goto fail_literal_true;
     }
     if (*cur == 'f') {
-        if (likely(_read_false(&cur, end) && pyyjson_decode_false(decode_obj_stack_info))) {
+        if (likely(_read_false(&cur, end) && ssrjson_decode_false(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
         goto fail_literal_false;
     }
     if (*cur == 'n') {
-        if (likely(_read_null(&cur, end) && pyyjson_decode_null(decode_obj_stack_info))) {
+        if (likely(_read_null(&cur, end) && ssrjson_decode_null(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
-        if (likely(_read_nan(&cur, end) && pyyjson_decode_nan(decode_obj_stack_info, false))) {
+        if (likely(_read_nan(&cur, end) && ssrjson_decode_nan(decode_obj_stack_info, false))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
@@ -163,7 +163,7 @@ arr_val_begin:
     }
     if ((*cur == 'i' || *cur == 'I' || *cur == 'N')) {
         PyObject *number_obj = read_inf_or_nan(false, &cur, end);
-        if (likely(number_obj && pyyjson_push_obj(decode_obj_stack_info, number_obj))) {
+        if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
@@ -206,7 +206,7 @@ arr_val_end:;
 
 arr_end:
     assert(decode_ctn_is_arr(decode_ctn_info->ctn));
-    if (!pyyjson_decode_arr(decode_obj_stack_info, get_decode_ctn_len(decode_ctn_info->ctn))) goto failed_cleanup;
+    if (!ssrjson_decode_arr(decode_obj_stack_info, get_decode_ctn_len(decode_ctn_info->ctn))) goto failed_cleanup;
     /* pop parent as current container */
     if (unlikely(decode_ctn_info->ctn-- == decode_ctn_info->ctn_start)) {
         goto doc_end;
@@ -233,7 +233,7 @@ obj_key_begin:
         // if (*cur == ' ')
         fast_skip_spaces(&cur, end);
     }
-    // #if PYYJSON_IS_REAL_GCC
+    // #if SSRJSON_IS_REAL_GCC
     //     while (true) REPEAT_CALL_16({
     //         if (byte_match_2((void *)cur, "  ")) cur += 2;
     //         else
@@ -251,7 +251,7 @@ obj_key_begin:
     if (likely(*cur == '"')) {
         cur++;
         PyObject *str_obj = decode_str(&cur, end, string_buffer_head, true);
-        if (likely(str_obj && pyyjson_push_obj(decode_obj_stack_info, str_obj))) {
+        if (likely(str_obj && ssrjson_push_obj(decode_obj_stack_info, str_obj))) {
             goto obj_key_end;
         }
         goto fail_string;
@@ -301,7 +301,7 @@ obj_val_begin:
 #else
                 decode_str(&cur, end, string_buffer_head, false);
 #endif
-        if (likely(str_obj && pyyjson_push_obj(decode_obj_stack_info, str_obj))) {
+        if (likely(str_obj && ssrjson_push_obj(decode_obj_stack_info, str_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
@@ -309,7 +309,7 @@ obj_val_begin:
     }
     if (char_is_number(*cur)) {
         PyObject *number_obj = READ_NUMBER(&cur, end);
-        if (likely(number_obj && pyyjson_push_obj(decode_obj_stack_info, number_obj))) {
+        if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
@@ -324,25 +324,25 @@ obj_val_begin:
         goto arr_begin;
     }
     if (*cur == 't') {
-        if (likely(_read_true(&cur, end) && pyyjson_decode_true(decode_obj_stack_info))) {
+        if (likely(_read_true(&cur, end) && ssrjson_decode_true(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
         goto fail_literal_true;
     }
     if (*cur == 'f') {
-        if (likely(_read_false(&cur, end) && pyyjson_decode_false(decode_obj_stack_info))) {
+        if (likely(_read_false(&cur, end) && ssrjson_decode_false(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
         goto fail_literal_false;
     }
     if (*cur == 'n') {
-        if (likely(_read_null(&cur, end) && pyyjson_decode_null(decode_obj_stack_info))) {
+        if (likely(_read_null(&cur, end) && ssrjson_decode_null(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
-        if (likely(_read_nan(&cur, end) && pyyjson_decode_nan(decode_obj_stack_info, false))) {
+        if (likely(_read_nan(&cur, end) && ssrjson_decode_nan(decode_obj_stack_info, false))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
@@ -365,7 +365,7 @@ obj_val_begin:
     }
     if ((*cur == 'i' || *cur == 'I' || *cur == 'N')) {
         PyObject *number_obj = read_inf_or_nan(false, &cur, end);
-        if (likely(number_obj && pyyjson_push_obj(decode_obj_stack_info, number_obj))) {
+        if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
@@ -408,7 +408,7 @@ obj_val_end:;
 
 obj_end:
     assert(!decode_ctn_is_arr(decode_ctn_info->ctn));
-    if (unlikely(!pyyjson_decode_obj(decode_obj_stack_info, get_decode_ctn_len(decode_ctn_info->ctn)))) goto failed_cleanup;
+    if (unlikely(!ssrjson_decode_obj(decode_obj_stack_info, get_decode_ctn_len(decode_ctn_info->ctn)))) goto failed_cleanup;
     /* pop container */
     /* point to the next value */
     if (unlikely(decode_ctn_info->ctn-- == decode_ctn_info->ctn_start)) {
@@ -443,7 +443,7 @@ success:;
         free((void *)((u8 *)string_buffer_head - TAIL_PADDING));
     }
     // free obj stack buffer if allocated dynamically
-    if (unlikely(decode_obj_stack_info->result_stack_end - decode_obj_stack_info->result_stack > PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE)) {
+    if (unlikely(decode_obj_stack_info->result_stack_end - decode_obj_stack_info->result_stack > SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE)) {
         free(decode_obj_stack_info->result_stack);
     }
 
@@ -512,7 +512,7 @@ failed_cleanup:
         free((void *)((u8 *)string_buffer_head - TAIL_PADDING));
     }
     // free obj stack buffer if allocated dynamically
-    if (unlikely(decode_obj_stack_info->result_stack_end - decode_obj_stack_info->result_stack > PYYJSON_DECODE_OBJ_BUFFER_INIT_SIZE)) {
+    if (unlikely(decode_obj_stack_info->result_stack_end - decode_obj_stack_info->result_stack > SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE)) {
         free(decode_obj_stack_info->result_stack);
     }
     return NULL;

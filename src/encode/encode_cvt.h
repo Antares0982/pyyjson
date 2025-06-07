@@ -1,7 +1,7 @@
-#ifndef PYYJSON_ENCODE_CVT_H
-#define PYYJSON_ENCODE_CVT_H
+#ifndef SSRJSON_ENCODE_CVT_H
+#define SSRJSON_ENCODE_CVT_H
 
-#include "pyyjson.h"
+#include "ssrjson.h"
 #include "simd/cvt.h"
 #include "simd/simd_detect.h"
 #include "unicode/unicode.h"
@@ -43,4 +43,4 @@ force_inline void ascii_elevate1(EncodeUnicodeBufferInfo *unicode_buffer_info, E
     memmove(GET_VEC_COMPACT_START(unicode_buffer_info), GET_VEC_ASCII_START(unicode_buffer_info), unicode_info->ascii_size);
 }
 
-#endif // PYYJSON_ENCODE_CVT_H
+#endif // SSRJSON_ENCODE_CVT_H

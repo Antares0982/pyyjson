@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_CONTEXT_ENCODE
 #        define COMPILE_CONTEXT_ENCODE
 #    endif
@@ -25,7 +25,7 @@ extern u8 *dragonbox_to_chars_n(double value, u8 *buffer);
 force_inline void _ELEVATE_FROM_U8_NUM_BUFFER(_dst_t **writer_addr, const u8 *buffer, Py_ssize_t len) {
     _dst_t *writer = *writer_addr;
 #if COMPILE_WRITE_UCS_LEVEL == 1
-    PYYJSON_UNREACHABLE();
+    SSRJSON_UNREACHABLE();
 #elif COMPILE_WRITE_UCS_LEVEL == 2
     __partial_cvt_32_u8_u16(&writer, &buffer);
 #else  // COMPILE_WRITE_UCS_LEVEL == 4

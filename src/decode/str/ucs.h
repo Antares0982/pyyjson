@@ -1,5 +1,5 @@
-#ifndef PYYJSON_DECODE_STR_UCS_H
-#define PYYJSON_DECODE_STR_UCS_H
+#ifndef SSRJSON_DECODE_STR_UCS_H
+#define SSRJSON_DECODE_STR_UCS_H
 
 #include "cache_key.h"
 #include "copy_to_new.h"
@@ -19,4 +19,4 @@
 #undef COMPILE_UCS_LEVEL
 #undef COMPILE_SIMD_BITS
 
-#endif // PYYJSON_DECODE_STR_UCS_H
+#endif // SSRJSON_DECODE_STR_UCS_H

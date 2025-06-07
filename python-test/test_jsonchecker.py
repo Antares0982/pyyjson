@@ -5,7 +5,7 @@ Tests files from http://json.org/JSON_checker/
 
 import pytest
 
-import pyyjson
+import ssrjson
 
 from util import read_fixture_str
 
@@ -13,14 +13,14 @@ PATTERN_1 = '["JSON Test Pattern pass1",{"object with 1 member":["array with 1 e
 
 
 class TestJsonChecker:
-    def _run_fail_json(self, filename, exc=pyyjson.JSONDecodeError):
+    def _run_fail_json(self, filename, exc=ssrjson.JSONDecodeError):
         data = read_fixture_str("json/test_checker/" + filename)
-        pytest.raises(exc, pyyjson.loads, data)
+        pytest.raises(exc, ssrjson.loads, data)
 
     def _run_pass_json(self, filename, match=""):
         data = read_fixture_str("json/test_checker/" + filename)
-        assert pyyjson.dumps(pyyjson.loads(data)) == match
-        assert pyyjson.dumps_to_bytes(pyyjson.loads(data)) == match.encode("utf-8")
+        assert ssrjson.dumps(ssrjson.loads(data)) == match
+        assert ssrjson.dumps_to_bytes(ssrjson.loads(data)) == match.encode("utf-8")
 
     def test_fail01(self):
         """
@@ -35,7 +35,7 @@ class TestJsonChecker:
         """
         fail02.json
         """
-        self._run_fail_json("fail02.json", pyyjson.JSONDecodeError)  # EOF
+        self._run_fail_json("fail02.json", ssrjson.JSONDecodeError)  # EOF
 
     def test_fail03(self):
         """
@@ -217,7 +217,7 @@ class TestJsonChecker:
         """
         fail32.json
         """
-        self._run_fail_json("fail32.json", pyyjson.JSONDecodeError)  # EOF
+        self._run_fail_json("fail32.json", ssrjson.JSONDecodeError)  # EOF
 
     def test_fail33(self):
         """

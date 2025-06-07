@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-import pyyjson
+import ssrjson
 
 from util import read_fixture_str
 
@@ -8,8 +8,8 @@ from util import read_fixture_str
 class TestJsonChecker:
     def _run_roundtrip_json(self, filename):
         data = read_fixture_str("json/test_roundtrip/" + filename)
-        assert pyyjson.dumps(pyyjson.loads(data)) == data
-        assert pyyjson.dumps_to_bytes(pyyjson.loads(data)) == data.encode("utf-8")
+        assert ssrjson.dumps(ssrjson.loads(data)) == data
+        assert ssrjson.dumps_to_bytes(ssrjson.loads(data)) == data.encode("utf-8")
 
     def test_roundtrip001(self):
         """

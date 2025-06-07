@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_READ_UCS_LEVEL
 #        include "decode/decode.h"
 #        include "simd/simd_impl.h"
@@ -70,7 +70,7 @@ force_inline bool read_to_hex(const _src_t *cur, u16 *val) {
 /** Read 'true' literal, '*cur' should be 't'. */
 force_inline bool _read_true(const _src_t **restrict ptr, const _src_t *restrict end) {
     _src_t *cur = (_src_t *)*ptr;
-    pyyjson_align(sizeof(_src_t) * 4) static const _src_t t[4] = {'t', 'r', 'u', 'e'};
+    ssrjson_align(sizeof(_src_t) * 4) static const _src_t t[4] = {'t', 'r', 'u', 'e'};
     if (likely(end >= cur + 4 && memcmp(cur, t, 4 * sizeof(_src_t)) == 0)) {
         *ptr = cur + 4;
         return true;
@@ -82,7 +82,7 @@ force_inline bool _read_true(const _src_t **restrict ptr, const _src_t *restrict
 force_inline bool _read_false(const _src_t **restrict ptr, const _src_t *restrict end) {
     // the first 'f' is already checked
     _src_t *cur = (_src_t *)*ptr;
-    pyyjson_align(sizeof(_src_t) * 4) static const _src_t t[4] = {'a', 'l', 's', 'e'};
+    ssrjson_align(sizeof(_src_t) * 4) static const _src_t t[4] = {'a', 'l', 's', 'e'};
     if (likely(end >= cur + 4 && memcmp(cur + 1, t, 4 * sizeof(_src_t)) == 0)) {
         *ptr = cur + 5;
         return true;
@@ -93,7 +93,7 @@ force_inline bool _read_false(const _src_t **restrict ptr, const _src_t *restric
 /** Read 'null' literal, '*cur' should be 'n'. */
 force_inline bool _read_null(const _src_t **restrict ptr, const _src_t *restrict end) {
     _src_t *cur = (_src_t *)*ptr;
-    pyyjson_align(sizeof(_src_t) * 4) static const _src_t t[4] = {'n', 'u', 'l', 'l'};
+    ssrjson_align(sizeof(_src_t) * 4) static const _src_t t[4] = {'n', 'u', 'l', 'l'};
     if (likely(end >= cur + 4 && memcmp(cur, t, 4 * sizeof(_src_t)) == 0)) {
         *ptr = cur + 4;
         return true;
@@ -103,18 +103,18 @@ force_inline bool _read_null(const _src_t **restrict ptr, const _src_t *restrict
 
 /** Read 'Infinity' literal (ignoring case). */
 force_inline bool _read_inf(const _src_t **ptr, const _src_t *end) {
-#define read_inf_vector PYYJSON_CONCAT4(vector, a, _src_t, READ_BIT_SIZEx8)
-#define read_inf_vector_u PYYJSON_CONCAT4(vector, u, _src_t, READ_BIT_SIZEx8)
+#define read_inf_vector SSRJSON_CONCAT4(vector, a, _src_t, READ_BIT_SIZEx8)
+#define read_inf_vector_u SSRJSON_CONCAT4(vector, u, _src_t, READ_BIT_SIZEx8)
     if (unlikely(end < *ptr + 8)) {
         return false;
     }
     read_inf_vector _mask = {~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20,
                              ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20};
     read_inf_vector _template = {'I', 'N', 'F', 'I', 'N', 'I', 'T', 'Y'};
-    // pyyjson_align(sizeof(_src_t) * 8) static const _src_t _mask[8] = {
+    // ssrjson_align(sizeof(_src_t) * 8) static const _src_t _mask[8] = {
     //         ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20,
     //         ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20};
-    // pyyjson_align(sizeof(_src_t) * 8) static const _src_t _template[8] = {
+    // ssrjson_align(sizeof(_src_t) * 8) static const _src_t _template[8] = {
     //         'I', 'N', 'F', 'I', 'N', 'I', 'T', 'Y'};
     read_inf_vector data;
     data = *(read_inf_vector_u *)(*ptr);
@@ -132,16 +132,16 @@ force_inline bool _read_inf(const _src_t **ptr, const _src_t *end) {
 
 /** Read 'NaN' literal (ignoring case). */
 force_inline bool _read_nan(const _src_t **restrict ptr, const _src_t *restrict end) {
-#define read_nan_vector PYYJSON_CONCAT4(vector, a, _src_t, READ_BIT_SIZEx4)
-#define read_nan_vector_u PYYJSON_CONCAT4(vector, u, _src_t, READ_BIT_SIZEx4)
+#define read_nan_vector SSRJSON_CONCAT4(vector, a, _src_t, READ_BIT_SIZEx4)
+#define read_nan_vector_u SSRJSON_CONCAT4(vector, u, _src_t, READ_BIT_SIZEx4)
     if (unlikely(end < *ptr + 3)) {
         return false;
     }
     // it is safe to load *end, so here we load `4 * sizeof(_src_t)` bytes
     read_nan_vector _mask = {~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, 0};
-    // pyyjson_align(sizeof(_src_t) * 4) static const _src_t _mask[4] = {~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, 0};
+    // ssrjson_align(sizeof(_src_t) * 4) static const _src_t _mask[4] = {~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, 0};
     read_nan_vector _template = {'N', 'A', 'N', 0};
-    // pyyjson_align(sizeof(_src_t) * 4) static const _src_t _template[4] = {'N', 'A', 'N', 0};
+    // ssrjson_align(sizeof(_src_t) * 4) static const _src_t _template[4] = {'N', 'A', 'N', 0};
     read_nan_vector data = *(read_nan_vector_u *)(*ptr);
     // memcpy(&data, *ptr, sizeof(data));
     data = data & _mask;

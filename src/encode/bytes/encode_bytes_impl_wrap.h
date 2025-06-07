@@ -4,7 +4,7 @@
 #include "encode/encode_impl_wrap.h"
 #include "encode/encode_shared.h"
 #include "encode_utf8.h"
-#include "pyyjson.h"
+#include "ssrjson.h"
 #include "tls.h"
 #include "unicode/unicode.h"
 

@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    include "simd/sse2/checker.h"
 #    include "simd/sse2/common.h"
 #    include "simd/sse2/cvt.h"

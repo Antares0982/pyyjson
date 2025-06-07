@@ -1,11 +1,11 @@
-#ifndef PYYJSON_COMPILE_CONTEXT_SRW
-#define PYYJSON_COMPILE_CONTEXT_SRW
+#ifndef SSRJSON_COMPILE_CONTEXT_SRW
+#define SSRJSON_COMPILE_CONTEXT_SRW
 #include "rw_in.inl.h"
 #include "sr_in.inl.h"
 #include "sw_in.inl.h"
 
 // Name creation macros.
-#define MAKE_SRW_NAME(_x_) PYYJSON_CONCAT4(_x_, _src_t, _dst_t, COMPILE_SIMD_BITS)
+#define MAKE_SRW_NAME(_x_) SSRJSON_CONCAT4(_x_, _src_t, _dst_t, COMPILE_SIMD_BITS)
 
 #define trailing_copy_with_cvt MAKE_SRW_NAME(trailing_copy_with_cvt)
 #define encode_trailing_copy_with_cvt MAKE_SRW_NAME(encode_trailing_copy_with_cvt)
@@ -16,4 +16,4 @@
 #define encode_unicode_impl MAKE_SRW_NAME(encode_unicode_impl)
 #define long_cvt MAKE_SRW_NAME(long_cvt)
 #define long_back_cvt MAKE_SRW_NAME(long_back_cvt)
-#endif // PYYJSON_COMPILE_CONTEXT_SRW
+#endif // SSRJSON_COMPILE_CONTEXT_SRW

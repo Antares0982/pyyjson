@@ -1,8 +1,8 @@
-#ifndef PYYJSON_SIMD_AVX512FCD_FULL_H
-#define PYYJSON_SIMD_AVX512FCD_FULL_H
+#ifndef SSRJSON_SIMD_AVX512FCD_FULL_H
+#define SSRJSON_SIMD_AVX512FCD_FULL_H
 
 #include "checkmax.h"
 #include "common.h"
 #include "cvt.h"
 
-#endif // PYYJSON_SIMD_AVX512FCD_FULL_H
+#endif // SSRJSON_SIMD_AVX512FCD_FULL_H

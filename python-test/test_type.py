@@ -11,23 +11,23 @@ try:
 except ImportError:
     xxhash = None
 
-import pyyjson
+import ssrjson
 
 
 class TestType:
     def test_fragment(self):
         """
-        pyyjson.JSONDecodeError on fragments
+        ssrjson.JSONDecodeError on fragments
         """
         for val in ("n", "{", "[", "t"):
-            pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, val)
+            pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, val)
 
     def test_invalid(self):
         """
-        pyyjson.JSONDecodeError on invalid
+        ssrjson.JSONDecodeError on invalid
         """
         for val in ('{"age", 44}', "[31337,]", "[,31337]", "[]]", "[,]"):
-            pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, val)
+            pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, val)
 
     def test_str(self):
         """
@@ -37,24 +37,24 @@ class TestType:
             ("blah", '"blah"'),
             ("東京", b'"\xe6\x9d\xb1\xe4\xba\xac"'.decode("utf-8")),
         ):
-            assert pyyjson.dumps(obj) == ref
-            assert pyyjson.dumps_to_bytes(obj) == ref.encode("utf-8")
-            assert pyyjson.loads(ref) == obj
+            assert ssrjson.dumps(obj) == ref
+            assert ssrjson.dumps_to_bytes(obj) == ref.encode("utf-8")
+            assert ssrjson.loads(ref) == obj
 
     def test_str_latin1(self):
         """
         str latin1
         """
-        assert pyyjson.loads(pyyjson.dumps("üýþÿ")) == "üýþÿ"
-        assert pyyjson.loads(pyyjson.dumps_to_bytes("üýþÿ")) == "üýþÿ"
+        assert ssrjson.loads(ssrjson.dumps("üýþÿ")) == "üýþÿ"
+        assert ssrjson.loads(ssrjson.dumps_to_bytes("üýþÿ")) == "üýþÿ"
 
     def test_str_long(self):
         """
         str long
         """
         for obj in ("aaaa" * 1024, "üýþÿ" * 1024, "好" * 1024, "�" * 1024):
-            assert pyyjson.loads(pyyjson.dumps(obj)) == obj
-            assert pyyjson.loads(pyyjson.dumps_to_bytes(obj)) == obj
+            assert ssrjson.loads(ssrjson.dumps(obj)) == obj
+            assert ssrjson.loads(ssrjson.dumps_to_bytes(obj)) == obj
 
     def test_str_other(self):
         """
@@ -65,8 +65,8 @@ class TestType:
             '{"a":"aa","aaüý":"üýüý","üý":"aüý好üý","aaa":"aü好ü好aaaüý好好üý好好aa","üý好好üý":"üýüýüýüý","aaaa":"aaaaaaa"}',  # range 0-65535
             '{"a":"aa","aaüý":"üýüý","üý":"aüý好üý","aaa":"aü好🐈ü🐈a好a🐈ü好a🐈好üaaaüý好好🐈🐈üý🐈🐈aa好好aa🐈🐈üý好好aa🐈🐈好好üýaa","üý好好üý":"üýüý好好好üýüý","üýüýüý":"üýüý","aaaa":"aaaaaaa"}',  # range 0-1114110
         ):
-            obj = pyyjson.loads(s)
-            assert pyyjson.loads(pyyjson.dumps(obj)) == obj
+            obj = ssrjson.loads(s)
+            assert ssrjson.loads(ssrjson.dumps(obj)) == obj
             d = dict()
             for k, v in obj.items():
                 k2 = ""
@@ -76,7 +76,7 @@ class TestType:
                 for c in v:
                     v2 += c * 64
                 d[k2] = v2
-            assert pyyjson.loads(pyyjson.dumps(d)) == d
+            assert ssrjson.loads(ssrjson.dumps(d)) == d
 
     def test_str_other_escape(self):
         """
@@ -148,7 +148,7 @@ class TestType:
             for _ in range(10):
                 while True:
                     var, ref = get_variant(s)
-                    dumped = pyyjson.dumps(pyyjson.loads(var))
+                    dumped = ssrjson.dumps(ssrjson.loads(var))
                     a = sorted(split_kv(dumped))
                     b = sorted(split_kv(ref))
                     if len(a) == len(b):
@@ -157,243 +157,243 @@ class TestType:
 
     def test_str_2mib(self):
         ref = '🐈🐈🐈🐈🐈"üýa0s9999🐈🐈🐈🐈🐈9\0999\\9999' * 1 * 1
-        assert pyyjson.loads(pyyjson.dumps(ref)) == ref
-        assert pyyjson.loads(pyyjson.dumps_to_bytes(ref)) == ref
+        assert ssrjson.loads(ssrjson.dumps(ref)) == ref
+        assert ssrjson.loads(ssrjson.dumps_to_bytes(ref)) == ref
 
     def test_str_very_long(self):
         """
         str long enough to trigger overflow in bytecount
         """
         for obj in ("aaaa" * 20000, "üýþÿ" * 20000, "好" * 20000, "�" * 20000):
-            assert pyyjson.loads(pyyjson.dumps(obj)) == obj
-            assert pyyjson.loads(pyyjson.dumps_to_bytes(obj)) == obj
+            assert ssrjson.loads(ssrjson.dumps(obj)) == obj
+            assert ssrjson.loads(ssrjson.dumps_to_bytes(obj)) == obj
 
     def test_str_replacement(self):
         """
         str roundtrip �
         """
-        assert pyyjson.dumps("�") == b'"\xef\xbf\xbd"'.decode("utf-8")
-        assert pyyjson.dumps_to_bytes("�") == b'"\xef\xbf\xbd"'
-        assert pyyjson.loads(b'"\xef\xbf\xbd"') == "�"
+        assert ssrjson.dumps("�") == b'"\xef\xbf\xbd"'.decode("utf-8")
+        assert ssrjson.dumps_to_bytes("�") == b'"\xef\xbf\xbd"'
+        assert ssrjson.loads(b'"\xef\xbf\xbd"') == "�"
 
     def test_str_trailing_4_byte(self):
         ref = "うぞ〜😏🙌"
-        assert pyyjson.loads(pyyjson.dumps(ref)) == ref
-        assert pyyjson.loads(pyyjson.dumps_to_bytes(ref)) == ref
+        assert ssrjson.loads(ssrjson.dumps(ref)) == ref
+        assert ssrjson.loads(ssrjson.dumps_to_bytes(ref)) == ref
 
     def test_str_ascii_control(self):
         """
         worst case format_escaped_str_with_escapes() allocation
         """
         ref = "\x01\x1f" * 1024 * 16
-        assert pyyjson.loads(pyyjson.dumps(ref)) == ref
-        assert pyyjson.loads(pyyjson.dumps(ref, indent=2)) == ref
-        assert pyyjson.loads(pyyjson.dumps_to_bytes(ref)) == ref
-        assert pyyjson.loads(pyyjson.dumps_to_bytes(ref, indent=2)) == ref
+        assert ssrjson.loads(ssrjson.dumps(ref)) == ref
+        assert ssrjson.loads(ssrjson.dumps(ref, indent=2)) == ref
+        assert ssrjson.loads(ssrjson.dumps_to_bytes(ref)) == ref
+        assert ssrjson.loads(ssrjson.dumps_to_bytes(ref, indent=2)) == ref
 
     def test_str_escape_quote_0(self):
-        assert pyyjson.dumps('"aaaaaaabb') == '"\\"aaaaaaabb"'
-        assert pyyjson.dumps_to_bytes('"aaaaaaabb') == b'"\\"aaaaaaabb"'
+        assert ssrjson.dumps('"aaaaaaabb') == '"\\"aaaaaaabb"'
+        assert ssrjson.dumps_to_bytes('"aaaaaaabb') == b'"\\"aaaaaaabb"'
 
     def test_str_escape_quote_1(self):
-        assert pyyjson.dumps('a"aaaaaabb') == '"a\\"aaaaaabb"'
-        assert pyyjson.dumps_to_bytes('a"aaaaaabb') == b'"a\\"aaaaaabb"'
+        assert ssrjson.dumps('a"aaaaaabb') == '"a\\"aaaaaabb"'
+        assert ssrjson.dumps_to_bytes('a"aaaaaabb') == b'"a\\"aaaaaabb"'
 
     def test_str_escape_quote_2(self):
-        assert pyyjson.dumps('aa"aaaaabb') == '"aa\\"aaaaabb"'
-        assert pyyjson.dumps_to_bytes('aa"aaaaabb') == b'"aa\\"aaaaabb"'
+        assert ssrjson.dumps('aa"aaaaabb') == '"aa\\"aaaaabb"'
+        assert ssrjson.dumps_to_bytes('aa"aaaaabb') == b'"aa\\"aaaaabb"'
 
     def test_str_escape_quote_3(self):
-        assert pyyjson.dumps('aaa"aaaabb') == '"aaa\\"aaaabb"'
-        assert pyyjson.dumps_to_bytes('aaa"aaaabb') == b'"aaa\\"aaaabb"'
+        assert ssrjson.dumps('aaa"aaaabb') == '"aaa\\"aaaabb"'
+        assert ssrjson.dumps_to_bytes('aaa"aaaabb') == b'"aaa\\"aaaabb"'
 
     def test_str_escape_quote_4(self):
-        assert pyyjson.dumps('aaaa"aaabb') == '"aaaa\\"aaabb"'
-        assert pyyjson.dumps_to_bytes('aaaa"aaabb') == b'"aaaa\\"aaabb"'
+        assert ssrjson.dumps('aaaa"aaabb') == '"aaaa\\"aaabb"'
+        assert ssrjson.dumps_to_bytes('aaaa"aaabb') == b'"aaaa\\"aaabb"'
 
     def test_str_escape_quote_5(self):
-        assert pyyjson.dumps('aaaaa"aabb') == '"aaaaa\\"aabb"'
-        assert pyyjson.dumps_to_bytes('aaaaa"aabb') == b'"aaaaa\\"aabb"'
+        assert ssrjson.dumps('aaaaa"aabb') == '"aaaaa\\"aabb"'
+        assert ssrjson.dumps_to_bytes('aaaaa"aabb') == b'"aaaaa\\"aabb"'
 
     def test_str_escape_quote_6(self):
-        assert pyyjson.dumps('aaaaaa"abb') == '"aaaaaa\\"abb"'
-        assert pyyjson.dumps_to_bytes('aaaaaa"abb') == b'"aaaaaa\\"abb"'
+        assert ssrjson.dumps('aaaaaa"abb') == '"aaaaaa\\"abb"'
+        assert ssrjson.dumps_to_bytes('aaaaaa"abb') == b'"aaaaaa\\"abb"'
 
     def test_str_escape_quote_7(self):
-        assert pyyjson.dumps('aaaaaaa"bb') == '"aaaaaaa\\"bb"'
-        assert pyyjson.dumps_to_bytes('aaaaaaa"bb') == b'"aaaaaaa\\"bb"'
+        assert ssrjson.dumps('aaaaaaa"bb') == '"aaaaaaa\\"bb"'
+        assert ssrjson.dumps_to_bytes('aaaaaaa"bb') == b'"aaaaaaa\\"bb"'
 
     def test_str_escape_quote_8(self):
-        assert pyyjson.dumps('aaaaaaaab"') == '"aaaaaaaab\\""'
-        assert pyyjson.dumps_to_bytes('aaaaaaaab"') == b'"aaaaaaaab\\""'
+        assert ssrjson.dumps('aaaaaaaab"') == '"aaaaaaaab\\""'
+        assert ssrjson.dumps_to_bytes('aaaaaaaab"') == b'"aaaaaaaab\\""'
 
     def test_str_escape_quote_multi(self):
         assert (
-            pyyjson.dumps('aa"aaaaabbbbbbbbbbbbbbbbbbbb"bb')
+            ssrjson.dumps('aa"aaaaabbbbbbbbbbbbbbbbbbbb"bb')
             == '"aa\\"aaaaabbbbbbbbbbbbbbbbbbbb\\"bb"'
         )
         assert (
-            pyyjson.dumps_to_bytes('aa"aaaaabbbbbbbbbbbbbbbbbbbb"bb')
+            ssrjson.dumps_to_bytes('aa"aaaaabbbbbbbbbbbbbbbbbbbb"bb')
             == b'"aa\\"aaaaabbbbbbbbbbbbbbbbbbbb\\"bb"'
         )
 
     def test_str_escape_backslash_0(self):
-        assert pyyjson.dumps("\\aaaaaaabb") == '"\\\\aaaaaaabb"'
-        assert pyyjson.dumps_to_bytes("\\aaaaaaabb") == b'"\\\\aaaaaaabb"'
+        assert ssrjson.dumps("\\aaaaaaabb") == '"\\\\aaaaaaabb"'
+        assert ssrjson.dumps_to_bytes("\\aaaaaaabb") == b'"\\\\aaaaaaabb"'
 
     def test_str_escape_backslash_1(self):
-        assert pyyjson.dumps("a\\aaaaaabb") == '"a\\\\aaaaaabb"'
-        assert pyyjson.dumps_to_bytes("a\\aaaaaabb") == b'"a\\\\aaaaaabb"'
+        assert ssrjson.dumps("a\\aaaaaabb") == '"a\\\\aaaaaabb"'
+        assert ssrjson.dumps_to_bytes("a\\aaaaaabb") == b'"a\\\\aaaaaabb"'
 
     def test_str_escape_backslash_2(self):
-        assert pyyjson.dumps("aa\\aaaaabb") == '"aa\\\\aaaaabb"'
-        assert pyyjson.dumps_to_bytes("aa\\aaaaabb") == b'"aa\\\\aaaaabb"'
+        assert ssrjson.dumps("aa\\aaaaabb") == '"aa\\\\aaaaabb"'
+        assert ssrjson.dumps_to_bytes("aa\\aaaaabb") == b'"aa\\\\aaaaabb"'
 
     def test_str_escape_backslash_3(self):
-        assert pyyjson.dumps("aaa\\aaaabb") == '"aaa\\\\aaaabb"'
-        assert pyyjson.dumps_to_bytes("aaa\\aaaabb") == b'"aaa\\\\aaaabb"'
+        assert ssrjson.dumps("aaa\\aaaabb") == '"aaa\\\\aaaabb"'
+        assert ssrjson.dumps_to_bytes("aaa\\aaaabb") == b'"aaa\\\\aaaabb"'
 
     def test_str_escape_backslash_4(self):
-        assert pyyjson.dumps("aaaa\\aaabb") == '"aaaa\\\\aaabb"'
-        assert pyyjson.dumps_to_bytes("aaaa\\aaabb") == b'"aaaa\\\\aaabb"'
+        assert ssrjson.dumps("aaaa\\aaabb") == '"aaaa\\\\aaabb"'
+        assert ssrjson.dumps_to_bytes("aaaa\\aaabb") == b'"aaaa\\\\aaabb"'
 
     def test_str_escape_backslash_5(self):
-        assert pyyjson.dumps("aaaaa\\aabb") == '"aaaaa\\\\aabb"'
-        assert pyyjson.dumps_to_bytes("aaaaa\\aabb") == b'"aaaaa\\\\aabb"'
+        assert ssrjson.dumps("aaaaa\\aabb") == '"aaaaa\\\\aabb"'
+        assert ssrjson.dumps_to_bytes("aaaaa\\aabb") == b'"aaaaa\\\\aabb"'
 
     def test_str_escape_backslash_6(self):
-        assert pyyjson.dumps("aaaaaa\\abb") == '"aaaaaa\\\\abb"'
-        assert pyyjson.dumps_to_bytes("aaaaaa\\abb") == b'"aaaaaa\\\\abb"'
+        assert ssrjson.dumps("aaaaaa\\abb") == '"aaaaaa\\\\abb"'
+        assert ssrjson.dumps_to_bytes("aaaaaa\\abb") == b'"aaaaaa\\\\abb"'
 
     def test_str_escape_backslash_7(self):
-        assert pyyjson.dumps("aaaaaaa\\bb") == '"aaaaaaa\\\\bb"'
-        assert pyyjson.dumps_to_bytes("aaaaaaa\\bb") == b'"aaaaaaa\\\\bb"'
+        assert ssrjson.dumps("aaaaaaa\\bb") == '"aaaaaaa\\\\bb"'
+        assert ssrjson.dumps_to_bytes("aaaaaaa\\bb") == b'"aaaaaaa\\\\bb"'
 
     def test_str_escape_backslash_8(self):
-        assert pyyjson.dumps("aaaaaaaab\\") == '"aaaaaaaab\\\\"'
-        assert pyyjson.dumps_to_bytes("aaaaaaaab\\") == b'"aaaaaaaab\\\\"'
+        assert ssrjson.dumps("aaaaaaaab\\") == '"aaaaaaaab\\\\"'
+        assert ssrjson.dumps_to_bytes("aaaaaaaab\\") == b'"aaaaaaaab\\\\"'
 
     def test_str_escape_backslash_multi(self):
         assert (
-            pyyjson.dumps("aa\\aaaaabbbbbbbbbbbbbbbbbbbb\\bb")
+            ssrjson.dumps("aa\\aaaaabbbbbbbbbbbbbbbbbbbb\\bb")
             == '"aa\\\\aaaaabbbbbbbbbbbbbbbbbbbb\\\\bb"'
         )
         assert (
-            pyyjson.dumps_to_bytes("aa\\aaaaabbbbbbbbbbbbbbbbbbbb\\bb")
+            ssrjson.dumps_to_bytes("aa\\aaaaabbbbbbbbbbbbbbbbbbbb\\bb")
             == b'"aa\\\\aaaaabbbbbbbbbbbbbbbbbbbb\\\\bb"'
         )
 
     def test_str_escape_x32_0(self):
-        assert pyyjson.dumps("\taaaaaaabb") == '"\\taaaaaaabb"'
-        assert pyyjson.dumps_to_bytes("\taaaaaaabb") == b'"\\taaaaaaabb"'
+        assert ssrjson.dumps("\taaaaaaabb") == '"\\taaaaaaabb"'
+        assert ssrjson.dumps_to_bytes("\taaaaaaabb") == b'"\\taaaaaaabb"'
 
     def test_str_escape_x32_1(self):
-        assert pyyjson.dumps("a\taaaaaabb") == '"a\\taaaaaabb"'
-        assert pyyjson.dumps_to_bytes("a\taaaaaabb") == b'"a\\taaaaaabb"'
+        assert ssrjson.dumps("a\taaaaaabb") == '"a\\taaaaaabb"'
+        assert ssrjson.dumps_to_bytes("a\taaaaaabb") == b'"a\\taaaaaabb"'
 
     def test_str_escape_x32_2(self):
-        assert pyyjson.dumps("aa\taaaaabb") == '"aa\\taaaaabb"'
-        assert pyyjson.dumps_to_bytes("aa\taaaaabb") == b'"aa\\taaaaabb"'
+        assert ssrjson.dumps("aa\taaaaabb") == '"aa\\taaaaabb"'
+        assert ssrjson.dumps_to_bytes("aa\taaaaabb") == b'"aa\\taaaaabb"'
 
     def test_str_escape_x32_3(self):
-        assert pyyjson.dumps("aaa\taaaabb") == '"aaa\\taaaabb"'
-        assert pyyjson.dumps_to_bytes("aaa\taaaabb") == b'"aaa\\taaaabb"'
+        assert ssrjson.dumps("aaa\taaaabb") == '"aaa\\taaaabb"'
+        assert ssrjson.dumps_to_bytes("aaa\taaaabb") == b'"aaa\\taaaabb"'
 
     def test_str_escape_x32_4(self):
-        assert pyyjson.dumps("aaaa\taaabb") == '"aaaa\\taaabb"'
-        assert pyyjson.dumps_to_bytes("aaaa\taaabb") == b'"aaaa\\taaabb"'
+        assert ssrjson.dumps("aaaa\taaabb") == '"aaaa\\taaabb"'
+        assert ssrjson.dumps_to_bytes("aaaa\taaabb") == b'"aaaa\\taaabb"'
 
     def test_str_escape_x32_5(self):
-        assert pyyjson.dumps("aaaaa\taabb") == '"aaaaa\\taabb"'
-        assert pyyjson.dumps_to_bytes("aaaaa\taabb") == b'"aaaaa\\taabb"'
+        assert ssrjson.dumps("aaaaa\taabb") == '"aaaaa\\taabb"'
+        assert ssrjson.dumps_to_bytes("aaaaa\taabb") == b'"aaaaa\\taabb"'
 
     def test_str_escape_x32_6(self):
-        assert pyyjson.dumps("aaaaaa\tabb") == '"aaaaaa\\tabb"'
-        assert pyyjson.dumps_to_bytes("aaaaaa\tabb") == b'"aaaaaa\\tabb"'
+        assert ssrjson.dumps("aaaaaa\tabb") == '"aaaaaa\\tabb"'
+        assert ssrjson.dumps_to_bytes("aaaaaa\tabb") == b'"aaaaaa\\tabb"'
 
     def test_str_escape_x32_7(self):
-        assert pyyjson.dumps("aaaaaaa\tbb") == '"aaaaaaa\\tbb"'
-        assert pyyjson.dumps_to_bytes("aaaaaaa\tbb") == b'"aaaaaaa\\tbb"'
+        assert ssrjson.dumps("aaaaaaa\tbb") == '"aaaaaaa\\tbb"'
+        assert ssrjson.dumps_to_bytes("aaaaaaa\tbb") == b'"aaaaaaa\\tbb"'
 
     def test_str_escape_x32_8(self):
-        assert pyyjson.dumps("aaaaaaaab\t") == '"aaaaaaaab\\t"'
-        assert pyyjson.dumps_to_bytes("aaaaaaaab\t") == b'"aaaaaaaab\\t"'
+        assert ssrjson.dumps("aaaaaaaab\t") == '"aaaaaaaab\\t"'
+        assert ssrjson.dumps_to_bytes("aaaaaaaab\t") == b'"aaaaaaaab\\t"'
 
     def test_str_escape_x32_multi(self):
         assert (
-            pyyjson.dumps("aa\taaaaabbbbbbbbbbbbbbbbbbbb\tbb")
+            ssrjson.dumps("aa\taaaaabbbbbbbbbbbbbbbbbbbb\tbb")
             == '"aa\\taaaaabbbbbbbbbbbbbbbbbbbb\\tbb"'
         )
         assert (
-            pyyjson.dumps_to_bytes("aa\taaaaabbbbbbbbbbbbbbbbbbbb\tbb")
+            ssrjson.dumps_to_bytes("aa\taaaaabbbbbbbbbbbbbbbbbbbb\tbb")
             == b'"aa\\taaaaabbbbbbbbbbbbbbbbbbbb\\tbb"'
         )
 
     def test_str_emoji(self):
         ref = "®️"
-        assert pyyjson.loads(pyyjson.dumps(ref)) == ref
-        assert pyyjson.loads(pyyjson.dumps_to_bytes(ref)) == ref
+        assert ssrjson.loads(ssrjson.dumps(ref)) == ref
+        assert ssrjson.loads(ssrjson.dumps_to_bytes(ref)) == ref
 
     def test_str_emoji_escape(self):
         ref = '/"®️/"'
-        assert pyyjson.loads(pyyjson.dumps(ref)) == ref
-        assert pyyjson.loads(pyyjson.dumps_to_bytes(ref)) == ref
+        assert ssrjson.loads(ssrjson.dumps(ref)) == ref
+        assert ssrjson.loads(ssrjson.dumps_to_bytes(ref)) == ref
 
     def test_very_long_list(self):
-        pyyjson.dumps([[]] * 1024 * 16)
-        pyyjson.dumps_to_bytes([[]] * 1024 * 16)
+        ssrjson.dumps([[]] * 1024 * 16)
+        ssrjson.dumps_to_bytes([[]] * 1024 * 16)
 
     def test_very_long_list_pretty(self):
-        pyyjson.dumps([[]] * 1024 * 16, indent=2)
-        pyyjson.dumps_to_bytes([[]] * 1024 * 16, indent=2)
+        ssrjson.dumps([[]] * 1024 * 16, indent=2)
+        ssrjson.dumps_to_bytes([[]] * 1024 * 16, indent=2)
 
     def test_very_long_dict(self):
-        pyyjson.dumps([{}] * 1024 * 16)
-        pyyjson.dumps_to_bytes([{}] * 1024 * 16)
+        ssrjson.dumps([{}] * 1024 * 16)
+        ssrjson.dumps_to_bytes([{}] * 1024 * 16)
 
     def test_very_long_dict_pretty(self):
-        pyyjson.dumps([{}] * 1024 * 16, indent=2)
-        pyyjson.dumps_to_bytes([{}] * 1024 * 16, indent=2)
+        ssrjson.dumps([{}] * 1024 * 16, indent=2)
+        ssrjson.dumps_to_bytes([{}] * 1024 * 16, indent=2)
 
     def test_very_long_str_empty(self):
-        pyyjson.dumps([""] * 1024 * 16)
-        pyyjson.dumps_to_bytes([""] * 1024 * 16)
+        ssrjson.dumps([""] * 1024 * 16)
+        ssrjson.dumps_to_bytes([""] * 1024 * 16)
 
     def test_very_long_str_empty_pretty(self):
-        pyyjson.dumps([""] * 1024 * 16, indent=2)
-        pyyjson.dumps_to_bytes([""] * 1024 * 16, indent=2)
+        ssrjson.dumps([""] * 1024 * 16, indent=2)
+        ssrjson.dumps_to_bytes([""] * 1024 * 16, indent=2)
 
     def test_very_long_str_not_empty(self):
-        pyyjson.dumps(["a"] * 1024 * 16)
-        pyyjson.dumps_to_bytes(["a"] * 1024 * 16)
+        ssrjson.dumps(["a"] * 1024 * 16)
+        ssrjson.dumps_to_bytes(["a"] * 1024 * 16)
 
     def test_very_long_str_not_empty_pretty(self):
-        pyyjson.dumps(["a"] * 1024 * 16, indent=2)
-        pyyjson.dumps_to_bytes(["a"] * 1024 * 16, indent=2)
+        ssrjson.dumps(["a"] * 1024 * 16, indent=2)
+        ssrjson.dumps_to_bytes(["a"] * 1024 * 16, indent=2)
 
     def test_very_long_bool(self):
-        pyyjson.dumps([True] * 1024 * 16)
-        pyyjson.dumps_to_bytes([True] * 1024 * 16)
+        ssrjson.dumps([True] * 1024 * 16)
+        ssrjson.dumps_to_bytes([True] * 1024 * 16)
 
     def test_very_long_bool_pretty(self):
-        pyyjson.dumps([True] * 1024 * 16, indent=2)
-        pyyjson.dumps_to_bytes([True] * 1024 * 16, indent=2)
+        ssrjson.dumps([True] * 1024 * 16, indent=2)
+        ssrjson.dumps_to_bytes([True] * 1024 * 16, indent=2)
 
     def test_very_long_int(self):
-        pyyjson.dumps([(2**64) - 1] * 1024 * 16)
-        pyyjson.dumps_to_bytes([(2**64) - 1] * 1024 * 16)
+        ssrjson.dumps([(2**64) - 1] * 1024 * 16)
+        ssrjson.dumps_to_bytes([(2**64) - 1] * 1024 * 16)
 
     def test_very_long_int_pretty(self):
-        pyyjson.dumps([(2**64) - 1] * 1024 * 16, indent=2)
-        pyyjson.dumps_to_bytes([(2**64) - 1] * 1024 * 16, indent=2)
+        ssrjson.dumps([(2**64) - 1] * 1024 * 16, indent=2)
+        ssrjson.dumps_to_bytes([(2**64) - 1] * 1024 * 16, indent=2)
 
     def test_very_long_float(self):
-        pyyjson.dumps([sys.float_info.max] * 1024 * 16)
-        pyyjson.dumps_to_bytes([sys.float_info.max] * 1024 * 16)
+        ssrjson.dumps([sys.float_info.max] * 1024 * 16)
+        ssrjson.dumps_to_bytes([sys.float_info.max] * 1024 * 16)
 
     def test_very_long_float_pretty(self):
-        pyyjson.dumps([sys.float_info.max] * 1024 * 16, indent=2)
-        pyyjson.dumps_to_bytes([sys.float_info.max] * 1024 * 16, indent=2)
+        ssrjson.dumps([sys.float_info.max] * 1024 * 16, indent=2)
+        ssrjson.dumps_to_bytes([sys.float_info.max] * 1024 * 16, indent=2)
 
     def test_str_surrogates_loads(self):
         """
@@ -404,14 +404,14 @@ class TestType:
         json.loads('"\ud800"')
         json.loads('"\ud83d\ude80"')
         json.loads('"\udcff"')
-        pyyjson.loads('"\ud800"')
-        pyyjson.loads('"\ud83d\ude80"')
-        pyyjson.loads('"\udcff"')
-        # pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, '"\ud800"')
-        # pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, '"\ud83d\ude80"')
-        # pytest.raises(pyyjson.JSONDecodeError, pyyjson.loads, '"\udcff"')
+        ssrjson.loads('"\ud800"')
+        ssrjson.loads('"\ud83d\ude80"')
+        ssrjson.loads('"\udcff"')
+        # pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, '"\ud800"')
+        # pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, '"\ud83d\ude80"')
+        # pytest.raises(ssrjson.JSONDecodeError, ssrjson.loads, '"\udcff"')
         pytest.raises(
-            pyyjson.JSONDecodeError, pyyjson.loads, b'"\xed\xa0\xbd\xed\xba\x80"'
+            ssrjson.JSONDecodeError, ssrjson.loads, b'"\xed\xa0\xbd\xed\xba\x80"'
         )  # \ud83d\ude80
 
     def test_str_surrogates_dumps(self):
@@ -424,30 +424,30 @@ class TestType:
         json.dumps("\ud83d\ude80")
         json.dumps("\udcff")
         json.dumps({"\ud83d\ude80": None})
-        pyyjson.dumps("\ud800")
-        pyyjson.dumps("\ud83d\ude80")
-        pyyjson.dumps("\udcff")
-        pyyjson.dumps({"\ud83d\ude80": None})
-        pytest.raises(pyyjson.JSONEncodeError, pyyjson.dumps_to_bytes, "\ud800")
-        pytest.raises(pyyjson.JSONEncodeError, pyyjson.dumps_to_bytes, "\ud83d\ude80")
-        pytest.raises(pyyjson.JSONEncodeError, pyyjson.dumps_to_bytes, "\udcff")
+        ssrjson.dumps("\ud800")
+        ssrjson.dumps("\ud83d\ude80")
+        ssrjson.dumps("\udcff")
+        ssrjson.dumps({"\ud83d\ude80": None})
+        pytest.raises(ssrjson.JSONEncodeError, ssrjson.dumps_to_bytes, "\ud800")
+        pytest.raises(ssrjson.JSONEncodeError, ssrjson.dumps_to_bytes, "\ud83d\ude80")
+        pytest.raises(ssrjson.JSONEncodeError, ssrjson.dumps_to_bytes, "\udcff")
         pytest.raises(
-            pyyjson.JSONEncodeError, pyyjson.dumps_to_bytes, {"\ud83d\ude80": None}
+            ssrjson.JSONEncodeError, ssrjson.dumps_to_bytes, {"\ud83d\ude80": None}
         )
 
     def test_bytes_dumps(self):
         """
         bytes dumps not supported
         """
-        with pytest.raises(pyyjson.JSONEncodeError):
-            pyyjson.dumps([b"a"])
-            pyyjson.dumps_to_bytes([b"a"])
+        with pytest.raises(ssrjson.JSONEncodeError):
+            ssrjson.dumps([b"a"])
+            ssrjson.dumps_to_bytes([b"a"])
 
     def test_bytes_loads(self):
         """
         bytes loads
         """
-        assert pyyjson.loads(b"[]") == []
+        assert ssrjson.loads(b"[]") == []
 
     def test_bytearray_loads(self):
         """
@@ -455,7 +455,7 @@ class TestType:
         """
         arr = bytearray()
         arr.extend(b"[]")
-        assert pyyjson.loads(arr) == []
+        assert ssrjson.loads(arr) == []
 
     # def test_memoryview_loads(self):
     #     """
@@ -463,23 +463,23 @@ class TestType:
     #     """
     #     arr = bytearray()
     #     arr.extend(b"[]")
-    #     assert pyyjson.loads(memoryview(arr)) == []
+    #     assert ssrjson.loads(memoryview(arr)) == []
 
     # def test_bytesio_loads(self):
     #     """
     #     memoryview loads
     #     """
     #     arr = io.BytesIO(b"[]")
-    #     assert pyyjson.loads(arr.getbuffer()) == []
+    #     assert ssrjson.loads(arr.getbuffer()) == []
 
     def test_bool(self):
         """
         bool
         """
         for obj, ref in ((True, "true"), (False, "false")):
-            assert pyyjson.dumps(obj) == ref
-            assert pyyjson.dumps_to_bytes(obj) == ref.encode("utf-8")
-            assert pyyjson.loads(ref) == obj
+            assert ssrjson.dumps(obj) == ref
+            assert ssrjson.dumps_to_bytes(obj) == ref.encode("utf-8")
+            assert ssrjson.loads(ref) == obj
 
     def test_bool_true_array(self):
         """
@@ -487,9 +487,9 @@ class TestType:
         """
         obj = [True] * 256
         ref = "[" + ("true," * 255) + "true]"
-        assert pyyjson.dumps(obj) == ref
-        assert pyyjson.dumps_to_bytes(obj) == ref.encode("utf-8")
-        assert pyyjson.loads(ref) == obj
+        assert ssrjson.dumps(obj) == ref
+        assert ssrjson.dumps_to_bytes(obj) == ref.encode("utf-8")
+        assert ssrjson.loads(ref) == obj
 
     def test_bool_false_array(self):
         """
@@ -497,9 +497,9 @@ class TestType:
         """
         obj = [False] * 256
         ref = "[" + ("false," * 255) + "false]"
-        assert pyyjson.dumps(obj) == ref
-        assert pyyjson.dumps_to_bytes(obj) == ref.encode("utf-8")
-        assert pyyjson.loads(ref) == obj
+        assert ssrjson.dumps(obj) == ref
+        assert ssrjson.dumps_to_bytes(obj) == ref.encode("utf-8")
+        assert ssrjson.loads(ref) == obj
 
     def test_none(self):
         """
@@ -507,9 +507,9 @@ class TestType:
         """
         obj = None
         ref = "null"
-        assert pyyjson.dumps(obj) == ref
-        assert pyyjson.dumps_to_bytes(obj) == ref.encode("utf-8")
-        assert pyyjson.loads(ref) == obj
+        assert ssrjson.dumps(obj) == ref
+        assert ssrjson.dumps_to_bytes(obj) == ref.encode("utf-8")
+        assert ssrjson.loads(ref) == obj
 
     def test_int(self):
         """
@@ -517,9 +517,9 @@ class TestType:
         """
         obj = [-5000, -1000, -10, -5, -2, -1, 0, 1, 2, 5, 10, 1000, 50000]
         ref = "[-5000,-1000,-10,-5,-2,-1,0,1,2,5,10,1000,50000]"
-        assert pyyjson.dumps(obj) == ref
-        assert pyyjson.dumps_to_bytes(obj) == ref.encode("utf-8")
-        assert pyyjson.loads(ref) == obj
+        assert ssrjson.dumps(obj) == ref
+        assert ssrjson.dumps_to_bytes(obj) == ref.encode("utf-8")
+        assert ssrjson.loads(ref) == obj
 
     def test_null_array(self):
         """
@@ -527,16 +527,16 @@ class TestType:
         """
         obj = [None] * 256
         ref = "[" + ("null," * 255) + "null]"
-        assert pyyjson.dumps(obj) == ref
-        assert pyyjson.dumps_to_bytes(obj) == ref.encode("utf-8")
-        assert pyyjson.loads(ref) == obj
+        assert ssrjson.dumps(obj) == ref
+        assert ssrjson.dumps_to_bytes(obj) == ref.encode("utf-8")
+        assert ssrjson.loads(ref) == obj
 
     def test_nan_dumps(self):
         """
         NaN serializes to null
         """
-        assert pyyjson.dumps(float("NaN")) == "NaN"
-        assert pyyjson.dumps_to_bytes(float("NaN")) == b"NaN"
+        assert ssrjson.dumps(float("NaN")) == "NaN"
+        assert ssrjson.dumps_to_bytes(float("NaN")) == b"NaN"
 
     def test_nan_loads(self):
         """
@@ -549,15 +549,15 @@ class TestType:
             assert len(obj) == 1
             assert math.isnan(obj[0])
 
-        is_nan_list(pyyjson.loads("[NaN]"))
-        is_nan_list(pyyjson.loads("[nan]"))
+        is_nan_list(ssrjson.loads("[NaN]"))
+        is_nan_list(ssrjson.loads("[nan]"))
 
     def test_infinity_dumps(self):
         """
         Infinity serializes to null
         """
-        assert pyyjson.dumps(float("Infinity")) == "Infinity"
-        assert pyyjson.dumps_to_bytes(float("Infinity")) == b"Infinity"
+        assert ssrjson.dumps(float("Infinity")) == "Infinity"
+        assert ssrjson.dumps_to_bytes(float("Infinity")) == b"Infinity"
 
     def test_infinity_loads(self):
         """
@@ -570,157 +570,157 @@ class TestType:
             assert len(obj) == 1
             assert math.isinf(obj[0])
 
-        is_inf_list(pyyjson.loads("[infinity]"))
-        is_inf_list(pyyjson.loads("[Infinity]"))
-        is_inf_list(pyyjson.loads("[-Infinity]"))
-        is_inf_list(pyyjson.loads("[-infinity]"))
+        is_inf_list(ssrjson.loads("[infinity]"))
+        is_inf_list(ssrjson.loads("[Infinity]"))
+        is_inf_list(ssrjson.loads("[-Infinity]"))
+        is_inf_list(ssrjson.loads("[-infinity]"))
 
     def test_int_53(self):
         """
         int 53-bit
         """
         for val in (9007199254740991, -9007199254740991):
-            assert pyyjson.loads(str(val)) == val
-            assert pyyjson.dumps(val) == str(val)
-            assert pyyjson.dumps_to_bytes(val) == str(val).encode("utf-8")
+            assert ssrjson.loads(str(val)) == val
+            assert ssrjson.dumps(val) == str(val)
+            assert ssrjson.dumps_to_bytes(val) == str(val).encode("utf-8")
 
     def test_int_53_exc(self):
         """
         int 53-bit exception on 64-bit
         """
         for val in (9007199254740992, -9007199254740992):
-            assert pyyjson.dumps(val) == str(val)
-            assert pyyjson.dumps_to_bytes(val) == str(val).encode("utf-8")
-            # with pytest.raises(pyyjson.JSONEncodeError):
-            #     pyyjson.dumps(val)
+            assert ssrjson.dumps(val) == str(val)
+            assert ssrjson.dumps_to_bytes(val) == str(val).encode("utf-8")
+            # with pytest.raises(ssrjson.JSONEncodeError):
+            #     ssrjson.dumps(val)
 
     def test_int_53_exc_usize(self):
         """
         int 53-bit exception on 64-bit usize
         """
         for val in (9223372036854775808, 18446744073709551615):
-            assert pyyjson.dumps(val) == str(val)
-            assert pyyjson.dumps_to_bytes(val) == str(val).encode("utf-8")
-            # with pytest.raises(pyyjson.JSONEncodeError):
-            #     pyyjson.dumps(val)
+            assert ssrjson.dumps(val) == str(val)
+            assert ssrjson.dumps_to_bytes(val) == str(val).encode("utf-8")
+            # with pytest.raises(ssrjson.JSONEncodeError):
+            #     ssrjson.dumps(val)
 
     def test_int_64(self):
         """
         int 64-bit
         """
         for val in (9223372036854775807, -9223372036854775807):
-            assert pyyjson.loads(str(val)) == val
-            assert pyyjson.dumps(val) == str(val)
-            assert pyyjson.dumps_to_bytes(val) == str(val).encode("utf-8")
+            assert ssrjson.loads(str(val)) == val
+            assert ssrjson.dumps(val) == str(val)
+            assert ssrjson.dumps_to_bytes(val) == str(val).encode("utf-8")
 
     def test_uint_64(self):
         """
         uint 64-bit
         """
         for val in (0, 9223372036854775808, 18446744073709551615):
-            assert pyyjson.loads(str(val)) == val
-            assert pyyjson.dumps(val) == str(val)
-            assert pyyjson.dumps_to_bytes(val) == str(val).encode("utf-8")
+            assert ssrjson.loads(str(val)) == val
+            assert ssrjson.dumps(val) == str(val)
+            assert ssrjson.dumps_to_bytes(val) == str(val).encode("utf-8")
 
     def test_int_128(self):
         """
         int 128-bit
         """
         for val in (18446744073709551616, -9223372036854775809):
-            pytest.raises(pyyjson.JSONEncodeError, pyyjson.dumps, val)
-            pytest.raises(pyyjson.JSONEncodeError, pyyjson.dumps_to_bytes, val)
+            pytest.raises(ssrjson.JSONEncodeError, ssrjson.dumps, val)
+            pytest.raises(ssrjson.JSONEncodeError, ssrjson.dumps_to_bytes, val)
 
     def test_float(self):
         """
         float
         """
-        assert -1.1234567893 == pyyjson.loads("-1.1234567893")
-        assert -1.234567893 == pyyjson.loads("-1.234567893")
-        assert -1.34567893 == pyyjson.loads("-1.34567893")
-        assert -1.4567893 == pyyjson.loads("-1.4567893")
-        assert -1.567893 == pyyjson.loads("-1.567893")
-        assert -1.67893 == pyyjson.loads("-1.67893")
-        assert -1.7893 == pyyjson.loads("-1.7893")
-        assert -1.893 == pyyjson.loads("-1.893")
-        assert -1.3 == pyyjson.loads("-1.3")
+        assert -1.1234567893 == ssrjson.loads("-1.1234567893")
+        assert -1.234567893 == ssrjson.loads("-1.234567893")
+        assert -1.34567893 == ssrjson.loads("-1.34567893")
+        assert -1.4567893 == ssrjson.loads("-1.4567893")
+        assert -1.567893 == ssrjson.loads("-1.567893")
+        assert -1.67893 == ssrjson.loads("-1.67893")
+        assert -1.7893 == ssrjson.loads("-1.7893")
+        assert -1.893 == ssrjson.loads("-1.893")
+        assert -1.3 == ssrjson.loads("-1.3")
 
-        assert 1.1234567893 == pyyjson.loads("1.1234567893")
-        assert 1.234567893 == pyyjson.loads("1.234567893")
-        assert 1.34567893 == pyyjson.loads("1.34567893")
-        assert 1.4567893 == pyyjson.loads("1.4567893")
-        assert 1.567893 == pyyjson.loads("1.567893")
-        assert 1.67893 == pyyjson.loads("1.67893")
-        assert 1.7893 == pyyjson.loads("1.7893")
-        assert 1.893 == pyyjson.loads("1.893")
-        assert 1.3 == pyyjson.loads("1.3")
+        assert 1.1234567893 == ssrjson.loads("1.1234567893")
+        assert 1.234567893 == ssrjson.loads("1.234567893")
+        assert 1.34567893 == ssrjson.loads("1.34567893")
+        assert 1.4567893 == ssrjson.loads("1.4567893")
+        assert 1.567893 == ssrjson.loads("1.567893")
+        assert 1.67893 == ssrjson.loads("1.67893")
+        assert 1.7893 == ssrjson.loads("1.7893")
+        assert 1.893 == ssrjson.loads("1.893")
+        assert 1.3 == ssrjson.loads("1.3")
 
     def test_float_precision_loads(self):
         """
         float precision loads()
         """
-        assert pyyjson.loads("31.245270191439438") == 31.245270191439438
-        assert pyyjson.loads("-31.245270191439438") == -31.245270191439438
-        assert pyyjson.loads("121.48791951161945") == 121.48791951161945
-        assert pyyjson.loads("-121.48791951161945") == -121.48791951161945
-        assert pyyjson.loads("100.78399658203125") == 100.78399658203125
-        assert pyyjson.loads("-100.78399658203125") == -100.78399658203125
+        assert ssrjson.loads("31.245270191439438") == 31.245270191439438
+        assert ssrjson.loads("-31.245270191439438") == -31.245270191439438
+        assert ssrjson.loads("121.48791951161945") == 121.48791951161945
+        assert ssrjson.loads("-121.48791951161945") == -121.48791951161945
+        assert ssrjson.loads("100.78399658203125") == 100.78399658203125
+        assert ssrjson.loads("-100.78399658203125") == -100.78399658203125
 
-        assert pyyjson.loads("3.1245270191439438e1") == 31.245270191439438
-        assert pyyjson.loads("-3.1245270191439438e1") == -31.245270191439438
-        assert pyyjson.loads("1.2148791951161945e2") == 121.48791951161945
-        assert pyyjson.loads("-1.2148791951161945e2") == -121.48791951161945
-        assert pyyjson.loads("1.0078399658203125e2") == 100.78399658203125
-        assert pyyjson.loads("-1.0078399658203125e2") == -100.78399658203125
+        assert ssrjson.loads("3.1245270191439438e1") == 31.245270191439438
+        assert ssrjson.loads("-3.1245270191439438e1") == -31.245270191439438
+        assert ssrjson.loads("1.2148791951161945e2") == 121.48791951161945
+        assert ssrjson.loads("-1.2148791951161945e2") == -121.48791951161945
+        assert ssrjson.loads("1.0078399658203125e2") == 100.78399658203125
+        assert ssrjson.loads("-1.0078399658203125e2") == -100.78399658203125
 
     def test_float_precision_dumps(self):
         """
         float precision dumps()
         """
-        assert pyyjson.dumps(31.245270191439438) == "3.1245270191439438e1"
-        assert pyyjson.dumps(-31.245270191439438) == "-3.1245270191439438e1"
-        assert pyyjson.dumps(121.48791951161945) == "1.2148791951161945e2"
-        assert pyyjson.dumps(-121.48791951161945) == "-1.2148791951161945e2"
-        assert pyyjson.dumps(100.78399658203125) == "1.0078399658203125e2"
-        assert pyyjson.dumps(-100.78399658203125) == "-1.0078399658203125e2"
+        assert ssrjson.dumps(31.245270191439438) == "3.1245270191439438e1"
+        assert ssrjson.dumps(-31.245270191439438) == "-3.1245270191439438e1"
+        assert ssrjson.dumps(121.48791951161945) == "1.2148791951161945e2"
+        assert ssrjson.dumps(-121.48791951161945) == "-1.2148791951161945e2"
+        assert ssrjson.dumps(100.78399658203125) == "1.0078399658203125e2"
+        assert ssrjson.dumps(-100.78399658203125) == "-1.0078399658203125e2"
 
-        assert pyyjson.dumps_to_bytes(31.245270191439438) == b"3.1245270191439438e1"
-        assert pyyjson.dumps_to_bytes(-31.245270191439438) == b"-3.1245270191439438e1"
-        assert pyyjson.dumps_to_bytes(121.48791951161945) == b"1.2148791951161945e2"
-        assert pyyjson.dumps_to_bytes(-121.48791951161945) == b"-1.2148791951161945e2"
-        assert pyyjson.dumps_to_bytes(100.78399658203125) == b"1.0078399658203125e2"
-        assert pyyjson.dumps_to_bytes(-100.78399658203125) == b"-1.0078399658203125e2"
+        assert ssrjson.dumps_to_bytes(31.245270191439438) == b"3.1245270191439438e1"
+        assert ssrjson.dumps_to_bytes(-31.245270191439438) == b"-3.1245270191439438e1"
+        assert ssrjson.dumps_to_bytes(121.48791951161945) == b"1.2148791951161945e2"
+        assert ssrjson.dumps_to_bytes(-121.48791951161945) == b"-1.2148791951161945e2"
+        assert ssrjson.dumps_to_bytes(100.78399658203125) == b"1.0078399658203125e2"
+        assert ssrjson.dumps_to_bytes(-100.78399658203125) == b"-1.0078399658203125e2"
 
     def test_float_edge(self):
         """
         float edge cases
         """
-        assert pyyjson.dumps(0.8701) == "8.701e-1"
-        assert pyyjson.dumps_to_bytes(0.8701) == b"8.701e-1"
+        assert ssrjson.dumps(0.8701) == "8.701e-1"
+        assert ssrjson.dumps_to_bytes(0.8701) == b"8.701e-1"
 
-        assert pyyjson.loads("0.8701") == 0.8701
-        assert pyyjson.loads(b"0.8701") == 0.8701
-        assert pyyjson.loads("8.701e-1") == 0.8701
-        assert pyyjson.loads(b"8.701e-1") == 0.8701
+        assert ssrjson.loads("0.8701") == 0.8701
+        assert ssrjson.loads(b"0.8701") == 0.8701
+        assert ssrjson.loads("8.701e-1") == 0.8701
+        assert ssrjson.loads(b"8.701e-1") == 0.8701
         assert (
-            pyyjson.loads("0.0000000000000000000000000000000000000000000000000123e50")
+            ssrjson.loads("0.0000000000000000000000000000000000000000000000000123e50")
             == 1.23
         )
-        assert pyyjson.loads("0.4e5") == 40000.0
-        assert pyyjson.loads("0.00e-00") == 0.0
-        assert pyyjson.loads("0.4e-001") == 0.04
-        assert pyyjson.loads("0.123456789e-12") == 1.23456789e-13
-        assert pyyjson.loads("1.234567890E+34") == 1.23456789e34
-        assert pyyjson.loads("23456789012E66") == 2.3456789012e76
+        assert ssrjson.loads("0.4e5") == 40000.0
+        assert ssrjson.loads("0.00e-00") == 0.0
+        assert ssrjson.loads("0.4e-001") == 0.04
+        assert ssrjson.loads("0.123456789e-12") == 1.23456789e-13
+        assert ssrjson.loads("1.234567890E+34") == 1.23456789e34
+        assert ssrjson.loads("23456789012E66") == 2.3456789012e76
 
     def test_float_notation(self):
         """
         float notation
         """
         for val in ("1.337E40", "1.337e+40", "1337e40", "1.337E-4"):
-            obj = pyyjson.loads(val)
+            obj = ssrjson.loads(val)
             assert obj == float(val)
-            assert pyyjson.dumps(val) == ('"%s"' % val)
-            assert pyyjson.dumps_to_bytes(val) == ('"%s"' % val).encode("utf-8")
+            assert ssrjson.dumps(val) == ('"%s"' % val)
+            assert ssrjson.dumps_to_bytes(val) == ('"%s"' % val).encode("utf-8")
 
     def test_list(self):
         """
@@ -728,9 +728,9 @@ class TestType:
         """
         obj = ["a", "😊", True, {"b": 1.1}, 2]
         ref = '["a","😊",true,{"b":1.1},2]'
-        assert pyyjson.dumps(obj) == ref
-        assert pyyjson.dumps_to_bytes(obj) == ref.encode("utf-8")
-        assert pyyjson.loads(ref) == obj
+        assert ssrjson.dumps(obj) == ref
+        assert ssrjson.dumps_to_bytes(obj) == ref.encode("utf-8")
+        assert ssrjson.loads(ref) == obj
 
     def test_tuple(self):
         """
@@ -738,15 +738,15 @@ class TestType:
         """
         obj = ("a", "😊", True, {"b": 1.1}, 2)
         ref = '["a","😊",true,{"b":1.1},2]'
-        assert pyyjson.dumps(obj) == ref
-        assert pyyjson.dumps_to_bytes(obj) == ref.encode("utf-8")
-        assert pyyjson.loads(ref) == list(obj)
+        assert ssrjson.dumps(obj) == ref
+        assert ssrjson.dumps_to_bytes(obj) == ref.encode("utf-8")
+        assert ssrjson.loads(ref) == list(obj)
 
     def test_object(self):
         """
         object() dumps()
         """
-        with pytest.raises(pyyjson.JSONEncodeError):
-            pyyjson.dumps(object())
-        with pytest.raises(pyyjson.JSONEncodeError):
-            pyyjson.dumps_to_bytes(object())
+        with pytest.raises(ssrjson.JSONEncodeError):
+            ssrjson.dumps(object())
+        with pytest.raises(ssrjson.JSONEncodeError):
+            ssrjson.dumps_to_bytes(object())

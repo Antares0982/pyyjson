@@ -1,66 +1,66 @@
-#ifndef PYYJSON_H
-#define PYYJSON_H
+#ifndef SSRJSON_H
+#define SSRJSON_H
 
 
-#include "pyyjson_config.h"
+#include "ssrjson_config.h"
 
 /*==============================================================================
  * Macros
  *============================================================================*/
 /** compiler attribute check (since gcc 5.0, clang 2.9, icc 17) */
-#ifndef pyyjson_has_attribute
+#ifndef ssrjson_has_attribute
 #    ifdef __has_attribute
-#        define pyyjson_has_attribute(x) __has_attribute(x)
+#        define ssrjson_has_attribute(x) __has_attribute(x)
 #    else
-#        define pyyjson_has_attribute(x) 0
+#        define ssrjson_has_attribute(x) 0
 #    endif
 #endif
 
 
 /** compiler builtin check (since gcc 10.0, clang 2.6, icc 2021) */
-#ifndef pyyjson_has_builtin
+#ifndef ssrjson_has_builtin
 #    ifdef __has_builtin
-#        define pyyjson_has_builtin(x) __has_builtin(x)
+#        define ssrjson_has_builtin(x) __has_builtin(x)
 #    else
-#        define pyyjson_has_builtin(x) 0
+#        define ssrjson_has_builtin(x) 0
 #    endif
 #endif
 
 /** compiler version (GCC) */
 #ifdef __GNUC__
-#    define PYYJSON_GCC_VER __GNUC__
+#    define SSRJSON_GCC_VER __GNUC__
 #    if defined(__GNUC_PATCHLEVEL__)
-#        define pyyjson_gcc_available(major, minor, patch) \
+#        define ssrjson_gcc_available(major, minor, patch) \
             ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) >= (major * 10000 + minor * 100 + patch))
 #    else
-#        define pyyjson_gcc_available(major, minor, patch) \
+#        define ssrjson_gcc_available(major, minor, patch) \
             ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= (major * 10000 + minor * 100 + patch))
 #    endif
 #else
-#    define PYYJSON_GCC_VER 0
-#    define pyyjson_gcc_available(major, minor, patch) 0
+#    define SSRJSON_GCC_VER 0
+#    define ssrjson_gcc_available(major, minor, patch) 0
 #endif
 
 /* gcc builtin */
-#if pyyjson_has_builtin(__builtin_clz)
+#if ssrjson_has_builtin(__builtin_clz)
 #    define GCC_HAS_CLZ 1
 #else
 #    define GCC_HAS_CLZ 0
 #endif
 
-#if pyyjson_has_builtin(__builtin_clzll) || pyyjson_gcc_available(3, 4, 0)
+#if ssrjson_has_builtin(__builtin_clzll) || ssrjson_gcc_available(3, 4, 0)
 #    define GCC_HAS_CLZLL 1
 #else
 #    define GCC_HAS_CLZLL 0
 #endif
 
-#if pyyjson_has_builtin(__builtin_ctz)
+#if ssrjson_has_builtin(__builtin_ctz)
 #    define GCC_HAS_CTZ 1
 #else
 #    define GCC_HAS_CTZ 0
 #endif
 
-#if pyyjson_has_builtin(__builtin_ctzll) || pyyjson_gcc_available(3, 4, 0)
+#if ssrjson_has_builtin(__builtin_ctzll) || ssrjson_gcc_available(3, 4, 0)
 #    define GCC_HAS_CTZLL 1
 #else
 #    define GCC_HAS_CTZLL 0
@@ -68,45 +68,45 @@
 
 /** C version (STDC) */
 #if defined(__STDC__) && (__STDC__ >= 1) && defined(__STDC_VERSION__)
-#    define PYYJSON_STDC_VER __STDC_VERSION__
+#    define SSRJSON_STDC_VER __STDC_VERSION__
 #else
-#    define PYYJSON_STDC_VER 0
+#    define SSRJSON_STDC_VER 0
 #endif
 
 /** C++ version */
 #if defined(__cplusplus)
-#    define PYYJSON_CPP_VER __cplusplus
+#    define SSRJSON_CPP_VER __cplusplus
 #else
-#    define PYYJSON_CPP_VER 0
+#    define SSRJSON_CPP_VER 0
 #endif
 
 /** inline for compiler */
-#ifndef pyyjson_inline
+#ifndef ssrjson_inline
 #    if defined(_MSC_VER) && _MSC_VER >= 1200
-#        define pyyjson_inline __forceinline
+#        define ssrjson_inline __forceinline
 #    elif defined(_MSC_VER)
-#        define pyyjson_inline __inline
-#    elif pyyjson_has_attribute(always_inline) || PYYJSON_GCC_VER >= 4
-#        define pyyjson_inline __inline__ __attribute__((always_inline))
+#        define ssrjson_inline __inline
+#    elif ssrjson_has_attribute(always_inline) || SSRJSON_GCC_VER >= 4
+#        define ssrjson_inline __inline__ __attribute__((always_inline))
 #    elif defined(__clang__) || defined(__GNUC__)
-#        define pyyjson_inline __inline__
-#    elif defined(__cplusplus) || PYYJSON_STDC_VER >= 199901L
-#        define pyyjson_inline inline
+#        define ssrjson_inline __inline__
+#    elif defined(__cplusplus) || SSRJSON_STDC_VER >= 199901L
+#        define ssrjson_inline inline
 #    else
-#        define pyyjson_inline
+#        define ssrjson_inline
 #    endif
 #endif
 
 /** compiler version (MSVC) */
 #ifdef _MSC_VER
-#    define PYYJSON_MSC_VER _MSC_VER
+#    define SSRJSON_MSC_VER _MSC_VER
 #else
-#    define PYYJSON_MSC_VER 0
+#    define SSRJSON_MSC_VER 0
 #endif
 
 
 /* msvc intrinsic */
-#if PYYJSON_MSC_VER >= 1400
+#if SSRJSON_MSC_VER >= 1400
 #    include <intrin.h>
 #    if defined(_M_AMD64) || defined(_M_ARM64)
 #        define MSC_HAS_BIT_SCAN_64 1
@@ -136,52 +136,52 @@
 #endif
 
 /** noinline for compiler */
-#ifndef pyyjson_noinline
-#    if PYYJSON_MSC_VER >= 1400
-#        define pyyjson_noinline __declspec(noinline)
-#    elif pyyjson_has_attribute(noinline) || PYYJSON_GCC_VER >= 4
-#        define pyyjson_noinline __attribute__((noinline))
+#ifndef ssrjson_noinline
+#    if SSRJSON_MSC_VER >= 1400
+#        define ssrjson_noinline __declspec(noinline)
+#    elif ssrjson_has_attribute(noinline) || SSRJSON_GCC_VER >= 4
+#        define ssrjson_noinline __attribute__((noinline))
 #    else
-#        define pyyjson_noinline
+#        define ssrjson_noinline
 #    endif
 #endif
 
 /** real gcc check */
 #if !defined(__clang__) && !defined(__INTEL_COMPILER) && !defined(__ICC) && \
         defined(__GNUC__)
-#    define PYYJSON_IS_REAL_GCC 1
+#    define SSRJSON_IS_REAL_GCC 1
 #else
-#    define PYYJSON_IS_REAL_GCC 0
+#    define SSRJSON_IS_REAL_GCC 0
 #endif
 
 /** likely for compiler */
-#ifndef pyyjson_likely
-#    if pyyjson_has_builtin(__builtin_expect) || \
-            (PYYJSON_GCC_VER >= 4 && PYYJSON_GCC_VER != 5)
-#        define pyyjson_likely(expr) __builtin_expect(!!(expr), 1)
+#ifndef ssrjson_likely
+#    if ssrjson_has_builtin(__builtin_expect) || \
+            (SSRJSON_GCC_VER >= 4 && SSRJSON_GCC_VER != 5)
+#        define ssrjson_likely(expr) __builtin_expect(!!(expr), 1)
 #    else
-#        define pyyjson_likely(expr) (expr)
+#        define ssrjson_likely(expr) (expr)
 #    endif
 #endif
 
 /** unlikely for compiler */
-#ifndef pyyjson_unlikely
-#    if pyyjson_has_builtin(__builtin_expect) || \
-            (PYYJSON_GCC_VER >= 4 && PYYJSON_GCC_VER != 5)
-#        define pyyjson_unlikely(expr) __builtin_expect(!!(expr), 0)
+#ifndef ssrjson_unlikely
+#    if ssrjson_has_builtin(__builtin_expect) || \
+            (SSRJSON_GCC_VER >= 4 && SSRJSON_GCC_VER != 5)
+#        define ssrjson_unlikely(expr) __builtin_expect(!!(expr), 0)
 #    else
-#        define pyyjson_unlikely(expr) (expr)
+#        define ssrjson_unlikely(expr) (expr)
 #    endif
 #endif
 
-#define force_inline static pyyjson_inline
-#define force_noinline pyyjson_noinline
-#define likely pyyjson_likely
-#define unlikely pyyjson_unlikely
+#define force_inline static ssrjson_inline
+#define force_noinline ssrjson_noinline
+#define likely ssrjson_likely
+#define unlikely ssrjson_unlikely
 
 
 /* x86: check cpu features */
-#if PYYJSON_X86
+#if SSRJSON_X86
 #    if defined(_MSC_VER)
 #        define cpuid_count(info, leaf, count) __cpuidex(info, (leaf), (count))
 #        define cpuid(info, x) __cpuid(info, (x))
@@ -212,11 +212,11 @@ force_inline int get_cpuid_max(void) {
 #define REPEAT_32(x) REPEAT_16(x) REPEAT_16(x)
 #define REPEAT_64(x) REPEAT_32(x) REPEAT_32(x)
 
-#define PYYJSON_CAST(type, expr) ((type)(expr))
+#define SSRJSON_CAST(type, expr) ((type)(expr))
 #ifdef NDEBUG
-#    define PYYJSON_UNREACHABLE() Py_UNREACHABLE()
+#    define SSRJSON_UNREACHABLE() Py_UNREACHABLE()
 #else
-#    define PYYJSON_UNREACHABLE() assert(false)
+#    define SSRJSON_UNREACHABLE() assert(false)
 #endif
 /*==============================================================================
  * Macros
@@ -243,71 +243,71 @@ force_inline int get_cpuid_max(void) {
 
 
 /** align for compiler */
-#ifndef pyyjson_align
+#ifndef ssrjson_align
 #    if defined(_MSC_VER) && _MSC_VER >= 1300
-#        define pyyjson_align(x) __declspec(align(x))
-#    elif pyyjson_has_attribute(aligned) || defined(__GNUC__)
-#        define pyyjson_align(x) __attribute__((aligned(x)))
-#    elif PYYJSON_CPP_VER >= 201103L
-#        define pyyjson_align(x) alignas(x)
+#        define ssrjson_align(x) __declspec(align(x))
+#    elif ssrjson_has_attribute(aligned) || defined(__GNUC__)
+#        define ssrjson_align(x) __attribute__((aligned(x)))
+#    elif SSRJSON_CPP_VER >= 201103L
+#        define ssrjson_align(x) alignas(x)
 #    else
-#        define pyyjson_align(x)
+#        define ssrjson_align(x)
 #    endif
 #endif
 
 
 /* Concat macros */
-#define PYYJSON_CONCAT2_EX(a, b) a##_##b
-#define PYYJSON_CONCAT2(a, b) PYYJSON_CONCAT2_EX(a, b)
+#define SSRJSON_CONCAT2_EX(a, b) a##_##b
+#define SSRJSON_CONCAT2(a, b) SSRJSON_CONCAT2_EX(a, b)
 
-#define PYYJSON_CONCAT3_EX(a, b, c) a##_##b##_##c
-#define PYYJSON_CONCAT3(a, b, c) PYYJSON_CONCAT3_EX(a, b, c)
+#define SSRJSON_CONCAT3_EX(a, b, c) a##_##b##_##c
+#define SSRJSON_CONCAT3(a, b, c) SSRJSON_CONCAT3_EX(a, b, c)
 
-#define PYYJSON_CONCAT4_EX(a, b, c, d) a##_##b##_##c##_##d
-#define PYYJSON_CONCAT4(a, b, c, d) PYYJSON_CONCAT4_EX(a, b, c, d)
+#define SSRJSON_CONCAT4_EX(a, b, c, d) a##_##b##_##c##_##d
+#define SSRJSON_CONCAT4(a, b, c, d) SSRJSON_CONCAT4_EX(a, b, c, d)
 
-#define PYYJSON_CONCAT5_EX(a, b, c, d, e) a##_##b##_##c##_##d##_##e
-#define PYYJSON_CONCAT5(a, b, c, d, e) PYYJSON_CONCAT5_EX(a, b, c, d, e)
+#define SSRJSON_CONCAT5_EX(a, b, c, d, e) a##_##b##_##c##_##d##_##e
+#define SSRJSON_CONCAT5(a, b, c, d, e) SSRJSON_CONCAT5_EX(a, b, c, d, e)
 
-#define PYYJSON_SIMPLE_CONCAT2_EX(a, b) a##b
-#define PYYJSON_SIMPLE_CONCAT2(a, b) PYYJSON_SIMPLE_CONCAT2_EX(a, b)
+#define SSRJSON_SIMPLE_CONCAT2_EX(a, b) a##b
+#define SSRJSON_SIMPLE_CONCAT2(a, b) SSRJSON_SIMPLE_CONCAT2_EX(a, b)
 
-#define PYYJSON_SIMPLE_CONCAT3_EX(a, b, c) a##b##c
-#define PYYJSON_SIMPLE_CONCAT3(a, b, c) PYYJSON_SIMPLE_CONCAT3_EX(a, b, c)
+#define SSRJSON_SIMPLE_CONCAT3_EX(a, b, c) a##b##c
+#define SSRJSON_SIMPLE_CONCAT3(a, b, c) SSRJSON_SIMPLE_CONCAT3_EX(a, b, c)
 
-#define PYYJSON_SIMPLE_CONCAT4_EX(a, b, c, d) a##b##c##d
-#define PYYJSON_SIMPLE_CONCAT4(a, b, c, d) PYYJSON_SIMPLE_CONCAT4_EX(a, b, c, d)
+#define SSRJSON_SIMPLE_CONCAT4_EX(a, b, c, d) a##b##c##d
+#define SSRJSON_SIMPLE_CONCAT4(a, b, c, d) SSRJSON_SIMPLE_CONCAT4_EX(a, b, c, d)
 
-#define PYYJSON_SIMPLE_CONCAT5_EX(a, b, c, d, e) a##b##c##d##e
-#define PYYJSON_SIMPLE_CONCAT5(a, b, c, d, e) PYYJSON_SIMPLE_CONCAT3_EX(a, b, c, d, e)
+#define SSRJSON_SIMPLE_CONCAT5_EX(a, b, c, d, e) a##b##c##d##e
+#define SSRJSON_SIMPLE_CONCAT5(a, b, c, d, e) SSRJSON_SIMPLE_CONCAT3_EX(a, b, c, d, e)
 
-#define PYYJSON_MAX(x, y) ((x) > (y) ? (x) : (y))
-#define PYYJSON_MIN(x, y) ((x) < (y) ? (x) : (y))
+#define SSRJSON_MAX(x, y) ((x) > (y) ? (x) : (y))
+#define SSRJSON_MIN(x, y) ((x) < (y) ? (x) : (y))
 
 #ifdef _MSC_VER
-#    define PYYJSON_ALIGNED_ALLOC(_align, _size) _aligned_malloc(_size, _align)
-#    define PYYJSON_ALIGNED_FREE(_ptr) _aligned_free(_ptr)
+#    define SSRJSON_ALIGNED_ALLOC(_align, _size) _aligned_malloc(_size, _align)
+#    define SSRJSON_ALIGNED_FREE(_ptr) _aligned_free(_ptr)
 #else
-#    define PYYJSON_ALIGNED_ALLOC(_align, _size) aligned_alloc(_align, _size)
-#    define PYYJSON_ALIGNED_FREE(_ptr) free(_ptr)
+#    define SSRJSON_ALIGNED_ALLOC(_align, _size) aligned_alloc(_align, _size)
+#    define SSRJSON_ALIGNED_FREE(_ptr) free(_ptr)
 #endif
 
 /* String type macros */
-#define PYYJSON_STRING_TYPE_ASCII 0
-#define PYYJSON_STRING_TYPE_LATIN1 1
-#define PYYJSON_STRING_TYPE_UCS2 2
-#define PYYJSON_STRING_TYPE_UCS4 4
+#define SSRJSON_STRING_TYPE_ASCII 0
+#define SSRJSON_STRING_TYPE_LATIN1 1
+#define SSRJSON_STRING_TYPE_UCS2 2
+#define SSRJSON_STRING_TYPE_UCS4 4
 
-#ifndef PYYJSON_HAS_IEEE_754
+#ifndef SSRJSON_HAS_IEEE_754
 /* IEEE 754 floating-point binary representation */
 #    if defined(DOUBLE_IS_LITTLE_ENDIAN_IEEE754) || defined(DOUBLE_IS_BIG_ENDIAN_IEEE754) || defined(DOUBLE_IS_ARM_MIXED_ENDIAN_IEEE754) || _PY_SHORT_FLOAT_REPR == 1
-#        define PYYJSON_HAS_IEEE_754 1
+#        define SSRJSON_HAS_IEEE_754 1
 #    elif (FLT_RADIX == 2) && (DBL_MANT_DIG == 53) && (DBL_DIG == 15) && \
             (DBL_MIN_EXP == -1021) && (DBL_MAX_EXP == 1024) &&           \
             (DBL_MIN_10_EXP == -307) && (DBL_MAX_10_EXP == 308)
-#        define PYYJSON_HAS_IEEE_754 1
+#        define SSRJSON_HAS_IEEE_754 1
 #    else
-#        define PYYJSON_HAS_IEEE_754 0
+#        define SSRJSON_HAS_IEEE_754 0
 #    endif
 #endif
 
@@ -316,11 +316,11 @@ force_inline int get_cpuid_max(void) {
  Microsoft Visual C++ 6.0 doesn't support converting number from u64 to f64:
  error C2520: conversion from unsigned __int64 to double not implemented.
  */
-#ifndef PYYJSON_U64_TO_F64_NO_IMPL
-#    if (0 < PYYJSON_MSC_VER) && (PYYJSON_MSC_VER <= 1200)
-#        define PYYJSON_U64_TO_F64_NO_IMPL 1
+#ifndef SSRJSON_U64_TO_F64_NO_IMPL
+#    if (0 < SSRJSON_MSC_VER) && (SSRJSON_MSC_VER <= 1200)
+#        define SSRJSON_U64_TO_F64_NO_IMPL 1
 #    else
-#        define PYYJSON_U64_TO_F64_NO_IMPL 0
+#        define SSRJSON_U64_TO_F64_NO_IMPL 0
 #    endif
 #endif
 
@@ -328,12 +328,12 @@ force_inline int get_cpuid_max(void) {
 /* int128 type */
 #if defined(__SIZEOF_INT128__) && (__SIZEOF_INT128__ == 16) && \
         (defined(__GNUC__) || defined(__clang__) || defined(__INTEL_COMPILER))
-#    define PYYJSON_HAS_INT128 1
+#    define SSRJSON_HAS_INT128 1
 /** 128-bit integer, used by floating-point number reader and writer. */
 __extension__ typedef __int128 i128;
 __extension__ typedef unsigned __int128 u128;
 #else
-#    define PYYJSON_HAS_INT128 0
+#    define SSRJSON_HAS_INT128 0
 #endif
 
 
@@ -358,7 +358,7 @@ __extension__ typedef unsigned __int128 u128;
      msvc /arch:SSE or /arch:IA32
  
  If we are sure that there's no similar error described above, we can define the
- PYYJSON_DOUBLE_MATH_CORRECT as 1 to enable the fast path calculation. This is
+ SSRJSON_DOUBLE_MATH_CORRECT as 1 to enable the fast path calculation. This is
  not an accurate detection, it's just try to avoid the error at compile-time.
  An accurate detection can be done at run-time:
  
@@ -375,20 +375,20 @@ __extension__ typedef unsigned __int128 u128;
 #endif
 
 #if defined(FLT_EVAL_METHOD) && FLT_EVAL_METHOD != 0 && FLT_EVAL_METHOD != 1
-#    define PYYJSON_DOUBLE_MATH_CORRECT 0
+#    define SSRJSON_DOUBLE_MATH_CORRECT 0
 #elif defined(i386) || defined(__i386) || defined(__i386__) ||    \
         defined(_X86_) || defined(__X86__) || defined(_M_IX86) || \
         defined(__I86__) || defined(__IA32__) || defined(__THW_INTEL)
 #    if (defined(_MSC_VER) && defined(_M_IX86_FP) && _M_IX86_FP == 2) || \
             (defined(__SSE2_MATH__) && __SSE2_MATH__)
-#        define PYYJSON_DOUBLE_MATH_CORRECT 1
+#        define SSRJSON_DOUBLE_MATH_CORRECT 1
 #    else
-#        define PYYJSON_DOUBLE_MATH_CORRECT 0
+#        define SSRJSON_DOUBLE_MATH_CORRECT 0
 #    endif
 #elif defined(__mc68000__) || defined(__pnacl__) || defined(__native_client__)
-#    define PYYJSON_DOUBLE_MATH_CORRECT 0
+#    define SSRJSON_DOUBLE_MATH_CORRECT 0
 #else
-#    define PYYJSON_DOUBLE_MATH_CORRECT 1
+#    define SSRJSON_DOUBLE_MATH_CORRECT 1
 #endif
 
 
@@ -417,7 +417,7 @@ __extension__ typedef unsigned __int128 u128;
 /** Multiplies two 64-bit unsigned integers (a * b),
     returns the 128-bit result as 'hi' and 'lo'. */
 force_inline void u128_mul(u64 a, u64 b, u64 *hi, u64 *lo) {
-#if PYYJSON_HAS_INT128
+#if SSRJSON_HAS_INT128
     u128 m = (u128)a * b;
     *hi = (u64)(m >> 64);
     *lo = (u64)(m);
@@ -440,7 +440,7 @@ force_inline void u128_mul(u64 a, u64 b, u64 *hi, u64 *lo) {
 /** Multiplies two 64-bit unsigned integers and add a value (a * b + c),
     returns the 128-bit result as 'hi' and 'lo'. */
 force_inline void u128_mul_add(u64 a, u64 b, u64 c, u64 *hi, u64 *lo) {
-#if PYYJSON_HAS_INT128
+#if SSRJSON_HAS_INT128
     u128 m = (u128)a * b + c;
     *hi = (u64)(m >> 64);
     *lo = (u64)(m);
@@ -769,14 +769,14 @@ force_inline void split_tail_len_four_parts(usize tail_len, usize check_count, u
 force_inline usize get_tail_len_parts_by_index(usize tail_len, usize batch_count, usize parts, usize index) {
     usize small_batch = batch_count / parts;
     assert(batch_count == small_batch * parts);
-    usize ret = PYYJSON_MIN(tail_len, (index + 1) * small_batch);
-    ret = PYYJSON_MAX(ret, index * small_batch);
+    usize ret = SSRJSON_MIN(tail_len, (index + 1) * small_batch);
+    ret = SSRJSON_MAX(ret, index * small_batch);
     ret -= index * small_batch;
     return ret;
 }
 
 #define BLEND_HIGH_WRITER_2PARTS(_dst_, _u_vec_t_, _batch_size_, _len_, _blendv_func_, _get_high_mask_func_, _expr0_, _expr1_)                 \
-    _u_vec_t_ *uvec = PYYJSON_CAST(_u_vec_t_ *, _dst_);                                                                                        \
+    _u_vec_t_ *uvec = SSRJSON_CAST(_u_vec_t_ *, _dst_);                                                                                        \
     assert(_len_ > 0);                                                                                                                         \
     usize batch_half = (_batch_size_) / 2;                                                                                                     \
     usize batch_index = (_len_ - 1) / batch_half;                                                                                              \
@@ -791,12 +791,12 @@ force_inline usize get_tail_len_parts_by_index(usize tail_len, usize batch_count
             break;                                                                                                                             \
         }                                                                                                                                      \
         default: {                                                                                                                             \
-            PYYJSON_UNREACHABLE();                                                                                                             \
+            SSRJSON_UNREACHABLE();                                                                                                             \
         }                                                                                                                                      \
     }
 
 #define BLEND_HIGH_WRITER_4PARTS(_dst_, _u_vec_t_, _batch_size_, _len_, _blendv_func_, _get_high_mask_func_, _expr0_, _expr1_, _expr2_, _expr3_) \
-    _u_vec_t_ *uvec = PYYJSON_CAST(_u_vec_t_ *, _dst_);                                                                                          \
+    _u_vec_t_ *uvec = SSRJSON_CAST(_u_vec_t_ *, _dst_);                                                                                          \
     assert(_len_ > 0);                                                                                                                           \
     usize batch_quarter = (_batch_size_) / 4;                                                                                                    \
     usize batch_index = (_len_ - 1) / batch_quarter;                                                                                             \
@@ -824,12 +824,12 @@ force_inline usize get_tail_len_parts_by_index(usize tail_len, usize batch_count
             break;                                                                                                                               \
         }                                                                                                                                        \
         default: {                                                                                                                               \
-            PYYJSON_UNREACHABLE();                                                                                                               \
+            SSRJSON_UNREACHABLE();                                                                                                               \
         }                                                                                                                                        \
     }
 
 /* typedefs */
-typedef PyObject *pyyjson_cache_type;
+typedef PyObject *ssrjson_cache_type;
 
 
-#endif // PYYJSON_H
+#endif // SSRJSON_H

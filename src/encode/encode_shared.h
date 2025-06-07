@@ -1,7 +1,7 @@
-#ifndef PYYJSON_ENCODE_SHARED_H
-#define PYYJSON_ENCODE_SHARED_H
+#ifndef SSRJSON_ENCODE_SHARED_H
+#define SSRJSON_ENCODE_SHARED_H
 
-#include "pyyjson.h"
+#include "ssrjson.h"
 #include "simd/simd_detect.h"
 #include "tls.h"
 #include "unicode/unicode.h"
@@ -51,7 +51,7 @@
  * Buffer
  *============================================================================*/
 
-static_assert((PYYJSON_ENCODE_DST_BUFFER_INIT_SIZE % 64) == 0, "(PYYJSON_ENCODE_DST_BUFFER_INIT_SIZE % 64) == 0");
+static_assert((SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE % 64) == 0, "(SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE % 64) == 0");
 
 /*==============================================================================
  * Utils
@@ -162,9 +162,9 @@ extern PyTypeObject *PyNone_Type;
 force_inline PyFastTypes fast_type_check(PyObject *val) {
     PyTypeObject *type = Py_TYPE(val);
     assert(type);
-    // #if PYYJSON_X86 && __AVX2__
+    // #if SSRJSON_X86 && __AVX2__
     // #    if PY_MINOR_VERSION >= 13
-    //     static const pyyjson_align(64) PyTypeObject *vector_py_types[8] = {
+    //     static const ssrjson_align(64) PyTypeObject *vector_py_types[8] = {
     //             &PyUnicode_Type,
     //             &PyLong_Type,
     //             &PyBool_Type,
@@ -175,7 +175,7 @@ force_inline PyFastTypes fast_type_check(PyObject *val) {
     //             &PyTuple_Type,
     //     };
     // #    else
-    //     static const pyyjson_align(64) PyTypeObject *vector_py_types[8] = {
+    //     static const ssrjson_align(64) PyTypeObject *vector_py_types[8] = {
     //             &PyUnicode_Type,
     //             &PyLong_Type,
     //             &PyBool_Type,
@@ -200,18 +200,18 @@ force_inline PyFastTypes fast_type_check(PyObject *val) {
     //     return (PyFastTypes)index;
     // #    else
     //     __m256i vec = _mm256_set1_epi64x((i64)(uintptr_t)type);
-    //     __m256i m1 = _mm256_cmpeq_epi64(vec, *(PYYJSON_CAST(__m256i *, vector_py_types) + 0));
+    //     __m256i m1 = _mm256_cmpeq_epi64(vec, *(SSRJSON_CAST(__m256i *, vector_py_types) + 0));
     //     if (likely(!_mm256_testz_si256(m1, m1))) {
     //         u32 mask = (u32)_mm256_movemask_epi8(m1);
-    //         return PYYJSON_CAST(PyFastTypes, u32_tz_bits(mask) / 8);
+    //         return SSRJSON_CAST(PyFastTypes, u32_tz_bits(mask) / 8);
     //     }
     //     if (PY_MINOR_VERSION >= 13 && type == PyNone_Type) {
     //         return T_None;
     //     }
-    //     m1 = _mm256_cmpeq_epi64(vec, *(PYYJSON_CAST(__m256i *, vector_py_types) + 1));
+    //     m1 = _mm256_cmpeq_epi64(vec, *(SSRJSON_CAST(__m256i *, vector_py_types) + 1));
     //     if (likely(!_mm256_testz_si256(m1, m1))) {
     //         u32 mask = (u32)_mm256_movemask_epi8(m1);
-    //         return PYYJSON_CAST(PyFastTypes, u32_tz_bits(mask) / 8 + 4);
+    //         return SSRJSON_CAST(PyFastTypes, u32_tz_bits(mask) / 8 + 4);
     //     }
     //     return Unknown;
     // #    endif
@@ -262,14 +262,14 @@ typedef union {
 #define U16_WRITER(_writer_addr_) ((_writer_addr_)->writer_u16)
 #define U32_WRITER(_writer_addr_) ((_writer_addr_)->writer_u32)
 
-#define GET_VEC_ASCII_START(_unicode_buffer_info_) (PYYJSON_CAST(PyASCIIObject *, (_unicode_buffer_info_)->head) + 1)
-#define GET_VEC_COMPACT_START(_unicode_buffer_info_) (PYYJSON_CAST(PyCompactUnicodeObject *, (_unicode_buffer_info_)->head) + 1)
+#define GET_VEC_ASCII_START(_unicode_buffer_info_) (SSRJSON_CAST(PyASCIIObject *, (_unicode_buffer_info_)->head) + 1)
+#define GET_VEC_COMPACT_START(_unicode_buffer_info_) (SSRJSON_CAST(PyCompactUnicodeObject *, (_unicode_buffer_info_)->head) + 1)
 
 
 bool _unicode_buffer_reserve(EncodeUnicodeBufferInfo *unicode_buffer_info, usize target_size);
 
 force_inline bool check_unicode_writer_valid(void *writer, EncodeUnicodeBufferInfo *unicode_buffer_info) {
-    return PYYJSON_CAST(u8 *, writer) <= (u8 *)unicode_buffer_info->end && PYYJSON_CAST(u8 *, writer) >= (u8 *)unicode_buffer_info->head;
+    return SSRJSON_CAST(u8 *, writer) <= (u8 *)unicode_buffer_info->end && SSRJSON_CAST(u8 *, writer) >= (u8 *)unicode_buffer_info->head;
 }
 
 /* Resize the buffer described by `unicode_buffer_info`.
@@ -291,7 +291,7 @@ force_noinline bool resize_to_fit_pyunicode(EncodeUnicodeBufferInfo *unicode_buf
 
 
 /** Digit table from 00 to 99. */
-extern pyyjson_align(8) const u8 DIGIT_TABLE[200];
+extern ssrjson_align(8) const u8 DIGIT_TABLE[200];
 
 /** Normalized significant 128 bits of pow10, no rounded up (size: 10.4KB).
     This lookup table is used by both the double number reader and writer.
@@ -540,13 +540,13 @@ force_inline bool init_encode_ctn_stack(EncodeCtnWithIndex **ctn_stack_addr) {
 }
 
 force_inline bool _init_encode_buffer(EncodeUnicodeWriter *writer_addr, EncodeUnicodeBufferInfo *unicode_buffer_info, usize u8_start_offset) {
-    unicode_buffer_info->head = PyObject_Malloc(PYYJSON_ENCODE_DST_BUFFER_INIT_SIZE);
+    unicode_buffer_info->head = PyObject_Malloc(SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE);
     if (likely(unicode_buffer_info->head)) {
 #ifndef NDEBUG
-        memset(unicode_buffer_info->head, 0, PYYJSON_ENCODE_DST_BUFFER_INIT_SIZE);
+        memset(unicode_buffer_info->head, 0, SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE);
 #endif
-        writer_addr->writer_void = PYYJSON_CAST(u8 *, unicode_buffer_info->head) + u8_start_offset;
-        unicode_buffer_info->end = PYYJSON_CAST(u8 *, unicode_buffer_info->head) + PYYJSON_ENCODE_DST_BUFFER_INIT_SIZE;
+        writer_addr->writer_void = SSRJSON_CAST(u8 *, unicode_buffer_info->head) + u8_start_offset;
+        unicode_buffer_info->end = SSRJSON_CAST(u8 *, unicode_buffer_info->head) + SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE;
     } else {
         PyErr_NoMemory();
         return false;
@@ -563,8 +563,8 @@ force_inline bool init_bytes_buffer(EncodeUnicodeWriter *writer_addr, EncodeUnic
 }
 
 force_inline usize get_bytes_buffer_final_len(u8 *writer, void *head) {
-    assert(writer >= PYYJSON_CAST(u8 *, head) + PYBYTES_START_OFFSET);
-    usize ret = writer - PYYJSON_CAST(u8 *, head) - PYBYTES_START_OFFSET;
+    assert(writer >= SSRJSON_CAST(u8 *, head) + PYBYTES_START_OFFSET);
+    usize ret = writer - SSRJSON_CAST(u8 *, head) - PYBYTES_START_OFFSET;
     return ret;
 }
 
@@ -579,7 +579,7 @@ force_inline bool resize_to_fit_pybytes(EncodeUnicodeBufferInfo *unicode_buffer_
 }
 
 force_inline void init_pybytes(PyObject *in_new_bytes, usize final_len) {
-    PyBytesObject *new_bytes = PYYJSON_CAST(PyBytesObject *, in_new_bytes);
+    PyBytesObject *new_bytes = SSRJSON_CAST(PyBytesObject *, in_new_bytes);
     PyObject_Init(in_new_bytes, &PyBytes_Type);
     new_bytes->ob_base.ob_size = (Py_ssize_t)final_len;
 #if PY_MINOR_VERSION < 11
@@ -588,4 +588,4 @@ force_inline void init_pybytes(PyObject *in_new_bytes, usize final_len) {
     new_bytes->ob_sval[final_len] = 0;
 }
 
-#endif // PYYJSON_ENCODE_SHARED_H
+#endif // SSRJSON_ENCODE_SHARED_H

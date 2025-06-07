@@ -10,7 +10,7 @@ void _tls_buffer_destructor(void *ptr) {
     if (ptr) free(ptr);
 }
 
-bool pyyjson_tls_init(void) {
+bool ssrjson_tls_init(void) {
     bool success = true;
 #if defined(_POSIX_THREADS)
     success = success && (0 == pthread_key_create(&_EncodeObjStackBuffer_Key, _tls_buffer_destructor));
@@ -27,7 +27,7 @@ bool pyyjson_tls_init(void) {
     return success;
 }
 
-bool pyyjson_tls_free(void) {
+bool ssrjson_tls_free(void) {
     bool success = true;
 #if defined(_POSIX_THREADS)
     success = success && (0 == pthread_key_delete(_EncodeObjStackBuffer_Key));

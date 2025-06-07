@@ -1,4 +1,4 @@
-#ifdef PYYJSON_CLANGD_DUMMY
+#ifdef SSRJSON_CLANGD_DUMMY
 #    include "simd/avx2/checker.h"
 #    include "simd/avx2/common.h"
 #    include "simd/avx2/cvt.h"

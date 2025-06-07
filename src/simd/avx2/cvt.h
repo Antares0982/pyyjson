@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX2_CVT_H
-#define PYYJSON_SIMD_AVX2_CVT_H
+#ifndef SSRJSON_SIMD_AVX2_CVT_H
+#define SSRJSON_SIMD_AVX2_CVT_H
 
 #include "simd/simd_detect.h"
 #include "simd/vector_types.h"
@@ -173,4 +173,4 @@ force_inline void cvt_to_dst_blendhigh_u32_u8_256(u8 *dst, vector_a_u32_256 y, u
     w = w | w0;
     memcpy(dst, &w, sizeof(w));
 }
-#endif // PYYJSON_SIMD_AVX2_CVT_H
+#endif // SSRJSON_SIMD_AVX2_CVT_H

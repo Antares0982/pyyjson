@@ -1,5 +1,5 @@
-#ifndef PYYJSON_COMPILE_CONTEXT_RW
-#define PYYJSON_COMPILE_CONTEXT_RW
+#ifndef SSRJSON_COMPILE_CONTEXT_RW
+#define SSRJSON_COMPILE_CONTEXT_RW
 
 // Include sub contexts.
 #include "r_in.inl.h"
@@ -7,7 +7,7 @@
 
 
 // Name creation macro.
-#define MAKE_RW_NAME(_x_) PYYJSON_CONCAT3(_x_, _src_t, _dst_t)
+#define MAKE_RW_NAME(_x_) SSRJSON_CONCAT3(_x_, _src_t, _dst_t)
 
 #ifdef COMPILE_UCS_LEVEL
 #    define MAKE_UCS_W_NAME(_x_) MAKE_W_NAME(MAKE_UCS_NAME(_x_))
@@ -18,4 +18,4 @@
 #    define process_escape MAKE_UCS_W_NAME(process_escape)
 #endif
 
-#endif // PYYJSON_COMPILE_CONTEXT_RW
+#endif // SSRJSON_COMPILE_CONTEXT_RW

@@ -1,5 +1,5 @@
-#ifndef PYYJSON_SIMD_AVX512VLDQBW_UTF8_H
-#define PYYJSON_SIMD_AVX512VLDQBW_UTF8_H
+#ifndef SSRJSON_SIMD_AVX512VLDQBW_UTF8_H
+#define SSRJSON_SIMD_AVX512VLDQBW_UTF8_H
 
 #include "simd/avx/common.h"
 #include "simd/avx2/common.h"
@@ -10,4 +10,4 @@
 #include "bytes/ucs4.h"
 
 
-#endif // PYYJSON_SIMD_AVX512VLDQBW_UTF8_H
+#endif // SSRJSON_SIMD_AVX512VLDQBW_UTF8_H
