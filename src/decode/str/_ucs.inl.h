@@ -355,9 +355,9 @@ decode_loop_ucs2:;
             }                                               \
         }
 #    if COMPILE_UCS_LEVEL == 2
-#        define ON_ESCAPE process_escape_ucs2_u16(escape_info, &u16writer, &u32writer, &u16size, &max_escape, &temp_buffer)
+#        define ON_ESCAPE process_escape_ucs2_u16(escape_info, &u16writer, &u32writer, &u16size, &max_escape, temp_buffer)
 #    else
-#        define ON_ESCAPE process_escape_ucs1_u16(escape_info, &u16writer, &u32writer, &u8size, &u16size, &max_escape, &temp_buffer)
+#        define ON_ESCAPE process_escape_ucs1_u16(escape_info, &u16writer, &u32writer, &u8size, &u16size, &max_escape, temp_buffer)
 #    endif
         if (is_key) {
             while (CAN_LOOP4()) {

@@ -556,7 +556,7 @@ decode_loop_ucs2:;
             }                                           \
         }                                               \
     }
-#define ON_ESCAPE process_escape_ascii_u16(escape_info, &u16writer, &u32writer, &u16size, u8size, &temp_buffer)
+#define ON_ESCAPE process_escape_ascii_u16(escape_info, &u16writer, &u32writer, &u16size, u8size, temp_buffer)
         if (is_key) {
             while (CAN_LOOP4()) {
                 EscapeInfo escape_info;

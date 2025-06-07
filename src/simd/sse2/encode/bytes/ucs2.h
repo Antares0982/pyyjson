@@ -57,7 +57,7 @@ force_inline void ucs2_encode_3bytes_utf8_ssse3(u8 *writer, vector_a x) {
     vector_a_u8_128 x15 = alignr_128(byte_lshift_128(x13, 4), x14, 4);
     vector_a_u8_128 x16 = byte_rshift_128(x14, 4);
     *(vector_u_u8_128 *)(writer + 0) = x15;
-    *(vector_u_u8_128 *)(writer + 16) = x16;
+    memcpy(writer + 16, &x16, 8);
 }
 #endif
 
