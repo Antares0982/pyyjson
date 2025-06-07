@@ -27,8 +27,7 @@
             },
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
-            "environment": [
-            ],
+            "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
@@ -253,8 +252,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/pyyjson_test",
-            "args": [
-            ],
+            "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build",
             "environment": [],
