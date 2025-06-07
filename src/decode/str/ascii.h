@@ -709,7 +709,7 @@ failed:;
 #undef CAN_LOOP
 }
 
-force_inline PyObject *decode_str_ascii(
+static force_noinline PyObject *decode_str_ascii(
         const _src_t **src_addr,
         const _src_t *const src_end,
         void *temp_buffer,
