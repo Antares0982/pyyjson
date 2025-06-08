@@ -1,4 +1,3 @@
-
 /**
  Read a JSON string.
  @param ptr The head pointer of string before '"' prefix (inout).
@@ -8,7 +7,7 @@
  @param msg The error message pointer.
  @return Whether success.
  */
-static force_noinline PyObject *read_bytes(const u8 **ptr, u8 *write_buffer, bool is_key) {
+force_inline PyObject *read_bytes(const u8 **ptr, u8 *write_buffer, bool is_key) {
     /*
      Each unicode code point is encoded as 1 to 4 bytes in UTF-8 encoding,
      we use 4-byte mask and pattern value to validate UTF-8 byte sequence,
@@ -1068,6 +1067,10 @@ read_finalize:
 #undef is_valid_seq_4
 }
 
+static force_noinline PyObject *read_bytes_not_key(const u8 **ptr, u8 *write_buffer) {
+    return read_bytes(ptr, write_buffer, false);
+}
+
 #define READ_ROOT_IMPL read_bytes_root_pretty
 #define DECODE_READ_PRETTY 1
 #include "decode_bytes_root.inl.h"
@@ -1112,7 +1115,7 @@ static force_noinline PyObject *read_root_single_bytes(const u8 *dat, usize len)
         } else {
             write_buffer = _DecodeTempBuffer;
         }
-        ret = read_bytes(&cur, write_buffer, false);
+        ret = read_bytes_not_key(&cur, write_buffer);
         if (dynamic) free(write_buffer);
         if (likely(ret)) goto single_end;
         goto fail_string;

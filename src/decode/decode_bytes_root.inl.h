@@ -97,7 +97,7 @@ arr_val_begin:
         goto fail_number;
     }
     if (*cur == '"') {
-        PyObject *str_obj = read_bytes(&cur, string_buffer_head, false);
+        PyObject *str_obj = read_bytes_not_key(&cur, string_buffer_head);
         if (likely(str_obj && ssrjson_push_obj(decode_obj_stack_info, str_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
@@ -278,7 +278,7 @@ obj_key_end:
 
 obj_val_begin:
     if (*cur == '"') {
-        PyObject *str_obj = read_bytes(&cur, string_buffer_head, false);
+        PyObject *str_obj = read_bytes_not_key(&cur, string_buffer_head);
         if (likely(str_obj && ssrjson_push_obj(decode_obj_stack_info, str_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
