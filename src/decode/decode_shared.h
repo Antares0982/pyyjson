@@ -345,6 +345,53 @@ force_inline bool ssrjson_decode_arr(DecodeObjStackInfo *restrict decode_obj_sta
 
 force_inline bool ssrjson_decode_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t dict_len);
 
+
+#if PY_MINOR_VERSION >= 12
+#    define SSRJSON_PY_DECREF_DEBUG() (_Py_DECREF_STAT_INC())
+#    define SSRJSON_PY_INCREF_DEBUG() (_Py_INCREF_STAT_INC())
+#else
+#    ifdef Py_REF_DEBUG
+#        define SSRJSON_PY_DECREF_DEBUG() (_Py_RefTotal--)
+#        define SSRJSON_PY_INCREF_DEBUG() (_Py_RefTotal++)
+#    else
+#        define SSRJSON_PY_DECREF_DEBUG()
+#        define SSRJSON_PY_INCREF_DEBUG()
+#    endif
+#endif
+
+
+force_inline void Py_DecRef_NoCheck(PyObject *op) {
+    // Non-limited C API and limited C API for Python 3.9 and older access
+    // directly PyObject.ob_refcnt.
+#if PY_MINOR_VERSION >= 12
+    if (_Py_IsImmortal(op)) {
+        return;
+    }
+#endif
+    SSRJSON_PY_DECREF_DEBUG();
+    assert(op->ob_refcnt > 1);
+    --op->ob_refcnt;
+}
+
+force_inline void Py_Immortal_IncRef(PyObject *op) {
+    // Non-limited C API and limited C API for Python 3.9 and older access
+    // directly PyObject.ob_refcnt.
+#if PY_MINOR_VERSION >= 12
+#    if SIZEOF_VOID_P > 4
+    // Portable saturated add, branching on the carry flag and set low bits
+#        if !defined(NDEBUG) && PY_MINOR_VERSION < 14
+    assert(0 > (int32_t)op->ob_refcnt_split[PY_BIG_ENDIAN]);
+#        endif // NDEBUG
+#    else      // SIZEOF_VOID_P > 4
+    // Explicitly check immortality against the immortal value
+    assert(_Py_IsImmortal(op));
+#    endif     // SIZEOF_VOID_P > 4
+#else          // PY_MINOR_VERSION >= 12
+    op->ob_refcnt++;
+#endif         // PY_MINOR_VERSION >= 12
+    SSRJSON_PY_INCREF_DEBUG();
+}
+
 /*==============================================================================
  * Power10 Lookup Table
  * These data are used by the floating-point number reader and writer.

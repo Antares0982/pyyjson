@@ -1,13 +1,18 @@
 #ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_SIMD_BITS
+#        define COMPILE_CONTEXT_DECODE
 #        include "decode/str/str.h"
 #        include "decode_float_utils.h"
+#        include "decode_float_wrap.h"
 #        include "decode_shared.h"
+#        include "decode_str_root_wrap.h"
 #        include "simd/cvt.h"
 #        include "simd/long_cvt.h"
 #        include "simd/mask_table.h"
 #        include "simd/simd_impl.h"
 #        include "ssrjson.h"
+#        include "str/ascii.h"
+#        include "str/ucs.h"
 //
 #        include "simd/compile_feature_check.h"
 #        define COMPILE_UCS_LEVEL 0
@@ -22,8 +27,6 @@
 #endif
 //
 #include "compile_context/sr_in.inl.h"
-
-#define read_number MAKE_R_NAME(read_number)
 
 force_inline bool check_and_reserve_str_buffer(Py_ssize_t len, _src_t **buffer_head_addr, bool *need_dealloc) {
     // consider the max length of the buffer we need
@@ -48,18 +51,6 @@ force_inline bool check_and_reserve_str_buffer(Py_ssize_t len, _src_t **buffer_h
     }
     return true;
 }
-
-#define READ_ROOT_IMPL decode_root_pretty
-#define DECODE_READ_PRETTY 1
-#include "decode_str_root.inl.h"
-#undef DECODE_READ_PRETTY
-#undef READ_ROOT_IMPL
-//
-#define READ_ROOT_IMPL decode_root_minify
-#define DECODE_READ_PRETTY 0
-#include "decode_str_root.inl.h"
-#undef DECODE_READ_PRETTY
-#undef READ_ROOT_IMPL
 
 /** Read single value JSON document. */
 static force_noinline PyObject *decode_root_single(const _src_t *dat, Py_ssize_t len) {
@@ -239,7 +230,5 @@ static force_noinline PyObject *decode(PyUnicodeObject *in_unicode) {
     return ret;
 }
 
-#undef read_number
-//
 #undef COMPILE_READ_UCS_LEVEL
 #include "compile_context/sr_out.inl.h"

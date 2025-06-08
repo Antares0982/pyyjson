@@ -1,57 +1,54 @@
-#ifdef SSRJSON_CLANGD_DUMMY
-#    ifndef COMPILE_SIMD_BITS
-#        include "decode_float_utils.h"
-#        include "decode_shared.h"
-#        define DECODE_READ_PRETTY 1
-#        define COMPILE_UCS_LEVEL 0
-#        define COMPILE_READ_UCS_LEVEL 1
-#        include "simd/compile_feature_check.h"
-//
-#        include "compile_context/sr_in.inl.h"
-//
-force_inline bool check_and_reserve_str_buffer(Py_ssize_t len, _src_t **buffer_head_addr, bool *need_dealloc);
-#    endif
-#endif
-
 /*
  * Required macros:
  *   READ_ROOT_IMPL, points to the function name
  *   DECODE_READ_PRETTY, true/false
  */
+#ifdef SSRJSON_CLANGD_DUMMY
+#    ifndef DECODE_READ_PRETTY
+#        define COMPILE_CONTEXT_DECODE 1
+#        include "decode/decode_float_wrap.h"
+#        include "decode/decode_shared.h"
+#        include "decode/str/tools.h"
+#        include "simd/simd_impl.h"
+#        define DECODE_READ_PRETTY 1
+#        include "simd/compile_feature_check.h"
+#    endif
+#endif
 
-#define WRAPPED_CHAR_IS_SPACE(_u8ptr) (*_u8ptr <= U8MAX && char_is_space(*_u8ptr))
-// use SKIP_CONSECUTIVE_SPACES after a `WRAPPED_CHAR_IS_SPACE` check
-#define SKIP_CONSECUTIVE_SPACES(_u8ptr)          \
-    do {                                         \
-        do {                                     \
-            _u8ptr++;                            \
-        } while (WRAPPED_CHAR_IS_SPACE(_u8ptr)); \
+//
+#include "compile_context/s_in.inl.h"
+
+#define SKIP_CONSECUTIVE_SPACES(_u8ptr)   \
+    do {                                  \
+        do {                              \
+            _u8ptr++;                     \
+        } while (char_is_space(*_u8ptr)); \
     } while (0)
 
-/** Read JSON document (accept all style, but optimized for pretty). */
-static force_noinline PyObject *READ_ROOT_IMPL(const _src_t *dat, Py_ssize_t len) {
-    static _src_t _CommaReturn[2] = {',', '\n'};
-    static _src_t _CommaSpace[2] = {',', ' '};
-    static _src_t _ColonSpace[2] = {':', ' '};
-
-    const _src_t *cur = dat;
-    const _src_t *const end = cur + len;
+static force_noinline PyObject *READ_ROOT_IMPL(const u8 *dat, usize len) {
     // container stack info
     DecodeCtnStackInfo _decode_ctn_info;
     DecodeCtnStackInfo *decode_ctn_info = &_decode_ctn_info;
     // object stack info
     DecodeObjStackInfo _decode_obj_stack_info;
     DecodeObjStackInfo *const decode_obj_stack_info = &_decode_obj_stack_info;
-    //
     memset(decode_ctn_info, 0, sizeof(DecodeCtnStackInfo));
     memset(decode_obj_stack_info, 0, sizeof(DecodeObjStackInfo));
     // init
     if (!init_decode_ctn_stack_info(decode_ctn_info) || !init_decode_obj_stack_info(decode_obj_stack_info)) goto failed_cleanup;
-    _src_t *string_buffer_head;
-    bool need_dealloc = false;
-    if (unlikely(!check_and_reserve_str_buffer(len, &string_buffer_head, &need_dealloc))) {
+    u8 *string_buffer_head = (u8 *)_DecodeTempBuffer;
+
+    //
+    if (unlikely(len > ((size_t)(-1)) / 4)) {
         goto fail_alloc;
     }
+    if (unlikely(4 * len > SSRJSON_STRING_BUFFER_SIZE)) {
+        string_buffer_head = malloc(4 * len);
+        if (!string_buffer_head) goto fail_alloc;
+    }
+    //
+    const u8 *cur = (const u8 *)dat;
+    const u8 *const end = (const u8 *)dat + len;
 
     if (*cur++ == '{') {
         set_decode_ctn(decode_ctn_info->ctn, 0, false);
@@ -74,27 +71,25 @@ arr_begin:
 
 arr_val_begin:
 #if DECODE_READ_PRETTY
-    // assume that we jumped from arr_val_end, already skipped a dot and a return
     if (*cur == ' ') {
         // cur++;
         // if (*cur == ' ')
-        fast_skip_spaces(&cur, end);
+        fast_skip_spaces_u8(&cur, end);
     }
-    // #if SSRJSON_IS_REAL_GCC
-    //     while (true) REPEAT_CALL_16({
-    //         if (byte_match_2((void *)cur, "  ")) cur += 2;
-    //         else
-    //             break;
-    //     })
-    // #else
-    //     while (true) REPEAT_CALL_16({
-    //         if (likely(byte_match_2(cur, "  "))) cur += 2;
-    //         else
-    //             break;
-    //     })
-    // #endif
+// #    if SSRJSON_IS_REAL_GCC
+//     while (true) REPEAT_CALL_16({
+//         if (byte_match_2((void *)cur, "  ")) cur += 2;
+//         else
+//             break;
+//     })
+// #    else
+//     while (true) REPEAT_CALL_16({
+//         if (likely(byte_match_2(cur, "  "))) cur += 2;
+//         else
+//             break;
+//     })
+// #    endif
 #endif
-
     if (*cur == '{') {
         cur++;
         goto obj_begin;
@@ -103,8 +98,8 @@ arr_val_begin:
         cur++;
         goto arr_begin;
     }
-    if (*cur <= U8MAX && char_is_number(*cur)) {
-        PyObject *number_obj = read_number(&cur, end);
+    if (char_is_number(*cur)) {
+        PyObject *number_obj = read_number_u8(&cur, end);
         if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
@@ -112,13 +107,7 @@ arr_val_begin:
         goto fail_number;
     }
     if (*cur == '"') {
-        cur++;
-        PyObject *str_obj =
-#if COMPILE_UCS_LEVEL == 0
-                decode_str_ascii_not_key(&cur, end, string_buffer_head);
-#else
-                decode_str(&cur, end, string_buffer_head, false);
-#endif
+        PyObject *str_obj = read_bytes_not_key(&cur, string_buffer_head);
         if (likely(str_obj && ssrjson_push_obj(decode_obj_stack_info, str_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
@@ -126,25 +115,25 @@ arr_val_begin:
         goto fail_string;
     }
     if (*cur == 't') {
-        if (likely(_read_true(&cur, end) && ssrjson_decode_true(decode_obj_stack_info))) {
+        if (likely(_read_true_u8(&cur, end) && ssrjson_decode_true(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
         goto fail_literal_true;
     }
     if (*cur == 'f') {
-        if (likely(_read_false(&cur, end) && ssrjson_decode_false(decode_obj_stack_info))) {
+        if (likely(_read_false_u8(&cur, end) && ssrjson_decode_false(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
         goto fail_literal_false;
     }
     if (*cur == 'n') {
-        if (likely(_read_null(&cur, end) && ssrjson_decode_null(decode_obj_stack_info))) {
+        if (likely(_read_null_u8(&cur, end) && ssrjson_decode_null(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
-        if (likely(_read_nan(&cur, end) && ssrjson_decode_nan(decode_obj_stack_info, false))) {
+        if (likely(_read_nan_u8(&cur, end) && ssrjson_decode_nan(decode_obj_stack_info, false))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
@@ -156,7 +145,7 @@ arr_val_begin:
         while (*cur != ',') cur--;
         goto fail_trailing_comma;
     }
-    if (WRAPPED_CHAR_IS_SPACE(cur)) {
+    if (char_is_space(*cur)) {
         // read pretty:
         //   the ",\n" and white spaces after them are all read out,
         //   this case is unlikely.
@@ -165,10 +154,11 @@ arr_val_begin:
         // guess it occurs when the document is using some `CHAR_TYPE_SPACE` characters
         // other than space itself as indent, like, tabs.
         SKIP_CONSECUTIVE_SPACES(cur);
+        // while (char_is_space(*++cur));
         goto arr_val_begin;
     }
     if ((*cur == 'i' || *cur == 'I' || *cur == 'N')) {
-        PyObject *number_obj = read_inf_or_nan(false, &cur, end);
+        PyObject *number_obj = read_inf_or_nan_u8(false, &cur, end);
         if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
@@ -178,13 +168,11 @@ arr_val_begin:
 
     goto fail_character_val;
 
-arr_val_end:;
+arr_val_end:
 #if DECODE_READ_PRETTY
-    // ",\n"
-    if (cmpeq_2chars(cur, _CommaReturn, end)) {
+    if (byte_match_2((void *)cur, ",\n")) {
 #else
-    // ", "
-    if (cmpeq_2chars(cur, _CommaSpace, end)) {
+    if (byte_match_2((void *)cur, ", ")) {
 #endif
         cur += 2;
         goto arr_val_begin;
@@ -197,14 +185,14 @@ arr_val_end:;
         cur++;
         goto arr_end;
     }
-    if (WRAPPED_CHAR_IS_SPACE(cur)) {
+    if (char_is_space(*cur)) {
         // unlikely case, we expect a "," or "]" but not found right after the value
         cur++;
-        if (*cur == ' ') fast_skip_spaces(&cur, end);
-        if (WRAPPED_CHAR_IS_SPACE(cur)) {
+        if (*cur == ' ') fast_skip_spaces_u8(&cur, end);
+        if (char_is_space(*cur)) {
             SKIP_CONSECUTIVE_SPACES(cur);
         }
-        //
+        // while (char_is_space(*++cur));
         goto arr_val_end;
     }
 
@@ -237,26 +225,25 @@ obj_key_begin:
     if (*cur == ' ') {
         // cur++;
         // if (*cur == ' ')
-        fast_skip_spaces(&cur, end);
+        fast_skip_spaces_u8(&cur, end);
     }
-    // #if SSRJSON_IS_REAL_GCC
-    //     while (true) REPEAT_CALL_16({
-    //         if (byte_match_2((void *)cur, "  ")) cur += 2;
-    //         else
-    //             break;
-    //     })
-    // #else
-    //     while (true) REPEAT_CALL_16({
-    //         if (likely(byte_match_2(cur, "  "))) cur += 2;
-    //         else
-    //             break;
-    //     })
-    // #endif
+// #if SSRJSON_IS_REAL_GCC
+//     while (true) REPEAT_CALL_16({
+//         if (byte_match_2((void *)cur, "  ")) cur += 2;
+//         else
+//             break;
+//     })
+// #else
+//     while (true) REPEAT_CALL_16({
+//         if (likely(byte_match_2(cur, "  "))) cur += 2;
+//         else
+//             break;
+//     })
+// #endif
 #endif
 
     if (likely(*cur == '"')) {
-        cur++;
-        PyObject *str_obj = decode_str(&cur, end, string_buffer_head, true);
+        PyObject *str_obj = read_bytes(&cur, string_buffer_head, true);
         if (likely(str_obj && ssrjson_push_obj(decode_obj_stack_info, str_obj))) {
             goto obj_key_end;
         }
@@ -267,18 +254,19 @@ obj_key_begin:
         if (likely(get_decode_ctn_len(decode_ctn_info->ctn) == 0)) goto obj_end;
         goto fail_trailing_comma;
     }
-    if (WRAPPED_CHAR_IS_SPACE(cur)) {
+    if (char_is_space(*cur)) {
         // for both read pretty and minify:
         //   likely occurs when the document is using some `CHAR_TYPE_SPACE` characters
         //   other than space as indent.
         //   see the comment in `arr_val_begin` for more details.
         SKIP_CONSECUTIVE_SPACES(cur);
+        // while (char_is_space(*++cur));
         goto obj_key_begin;
     }
     goto fail_character_obj_key;
 
-obj_key_end:;
-    if (cmpeq_2chars(cur, _ColonSpace, end)) {
+obj_key_end:
+    if (byte_match_2((void *)cur, ": ")) {
         cur += 2;
         goto obj_val_begin;
     }
@@ -286,27 +274,21 @@ obj_key_end:;
         cur++;
         goto obj_val_begin;
     }
-    if (WRAPPED_CHAR_IS_SPACE(cur)) {
+    if (char_is_space(*cur)) {
         // unlikely case, we expect a colon here
         cur++;
-        if (*cur == ' ') fast_skip_spaces(&cur, end);
-        if (WRAPPED_CHAR_IS_SPACE(cur)) {
+        if (*cur == ' ') fast_skip_spaces_u8(&cur, end);
+        if (char_is_space(*cur)) {
             SKIP_CONSECUTIVE_SPACES(cur);
         }
-        //
+        // while (char_is_space(*++cur));
         goto obj_key_end;
     }
     goto fail_character_obj_sep;
 
 obj_val_begin:
     if (*cur == '"') {
-        cur++;
-        PyObject *str_obj =
-#if COMPILE_UCS_LEVEL == 0
-                decode_str_ascii_not_key(&cur, end, string_buffer_head);
-#else
-                decode_str(&cur, end, string_buffer_head, false);
-#endif
+        PyObject *str_obj = read_bytes_not_key(&cur, string_buffer_head);
         if (likely(str_obj && ssrjson_push_obj(decode_obj_stack_info, str_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
@@ -314,7 +296,7 @@ obj_val_begin:
         goto fail_string;
     }
     if (char_is_number(*cur)) {
-        PyObject *number_obj = read_number(&cur, end);
+        PyObject *number_obj = read_number_u8(&cur, end);
         if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
@@ -330,47 +312,48 @@ obj_val_begin:
         goto arr_begin;
     }
     if (*cur == 't') {
-        if (likely(_read_true(&cur, end) && ssrjson_decode_true(decode_obj_stack_info))) {
+        if (likely(_read_true_u8(&cur, end) && ssrjson_decode_true(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
         goto fail_literal_true;
     }
     if (*cur == 'f') {
-        if (likely(_read_false(&cur, end) && ssrjson_decode_false(decode_obj_stack_info))) {
+        if (likely(_read_false_u8(&cur, end) && ssrjson_decode_false(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
         goto fail_literal_false;
     }
     if (*cur == 'n') {
-        if (likely(_read_null(&cur, end) && ssrjson_decode_null(decode_obj_stack_info))) {
+        if (likely(_read_null_u8(&cur, end) && ssrjson_decode_null(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
-        if (likely(_read_nan(&cur, end) && ssrjson_decode_nan(decode_obj_stack_info, false))) {
+        if (likely(_read_nan_u8(&cur, end) && ssrjson_decode_nan(decode_obj_stack_info, false))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
         goto fail_literal_null;
     }
-    if (WRAPPED_CHAR_IS_SPACE(cur)) {
+    if (char_is_space(*cur)) {
         // read pretty:
         //   the ": " is read out, this character is likely to be "\n", then we should skip spaces before new line
         // read minify:
         //   the ": " or ":" is read out, this is an unlikely case
         cur++;
 #if DECODE_READ_PRETTY
-        if (*cur == ' ') fast_skip_spaces(&cur, end);
+        if (*cur == ' ') fast_skip_spaces_u8(&cur, end);
 #endif
-        if (WRAPPED_CHAR_IS_SPACE(cur)) {
+        if (char_is_space(*cur)) {
             // handle unlikely cases
             SKIP_CONSECUTIVE_SPACES(cur);
         }
+        // while (char_is_space(*++cur));
         goto obj_val_begin;
     }
     if ((*cur == 'i' || *cur == 'I' || *cur == 'N')) {
-        PyObject *number_obj = read_inf_or_nan(false, &cur, end);
+        PyObject *number_obj = read_inf_or_nan_u8(false, &cur, end);
         if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
@@ -380,17 +363,16 @@ obj_val_begin:
 
     goto fail_character_val;
 
-obj_val_end:;
+obj_val_end:
 #if DECODE_READ_PRETTY
-    // ",\n"
-    if (cmpeq_2chars(cur, _CommaReturn, end)) {
+    if (byte_match_2((void *)cur, ",\n")) {
 #else
-    // ", "
-    if (cmpeq_2chars(cur, _CommaSpace, end)) {
+    if (byte_match_2((void *)cur, ", ")) {
 #endif
         cur += 2;
         goto obj_key_begin;
     }
+
     if (likely(*cur == ',')) {
         cur++;
         goto obj_key_begin;
@@ -399,14 +381,14 @@ obj_val_end:;
         cur++;
         goto obj_end;
     }
-    if (WRAPPED_CHAR_IS_SPACE(cur)) {
+    if (char_is_space(*cur)) {
         // unlikely case
         cur++;
-        if (*cur == ' ') fast_skip_spaces(&cur, end);
-        if (WRAPPED_CHAR_IS_SPACE(cur)) {
+        if (*cur == ' ') fast_skip_spaces_u8(&cur, end);
+        if (char_is_space(*cur)) {
             SKIP_CONSECUTIVE_SPACES(cur);
         }
-        //
+        // while (char_is_space(*++cur));
         goto obj_val_end;
     }
 
@@ -431,10 +413,11 @@ obj_end:
 doc_end:
     /* check invalid contents after json document */
     if (unlikely(cur < end)) {
-        if (*cur == ' ') fast_skip_spaces(&cur, end);
-        if (WRAPPED_CHAR_IS_SPACE(cur)) {
+        if (*cur == ' ') fast_skip_spaces_u8(&cur, end);
+        if (char_is_space(*cur)) {
             SKIP_CONSECUTIVE_SPACES(cur);
         }
+        // while (char_is_space(*cur)) cur++;
         if (unlikely(cur < end)) goto fail_garbage;
     }
 
@@ -445,8 +428,8 @@ success:;
     assert(obj && !PyErr_Occurred());
     assert(obj->ob_refcnt == 1);
     // free string buffer
-    if (need_dealloc) {
-        free((void *)((u8 *)string_buffer_head - TAIL_PADDING));
+    if (unlikely(string_buffer_head != _DecodeTempBuffer)) {
+        free(string_buffer_head);
     }
     // free obj stack buffer if allocated dynamically
     if (unlikely(decode_obj_stack_info->result_stack_end - decode_obj_stack_info->result_stack > SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE)) {
@@ -455,14 +438,14 @@ success:;
 
     return obj;
 
-#define return_err(_pos, _type, _msg)                                                                     \
-    do {                                                                                                  \
-        if (_type == JSONDecodeError) {                                                                   \
-            PyErr_Format(JSONDecodeError, "%s, at position %zu", _msg, ((_src_t *)_pos) - (_src_t *)dat); \
-        } else {                                                                                          \
-            PyErr_SetString(_type, _msg);                                                                 \
-        }                                                                                                 \
-        goto failed_cleanup;                                                                              \
+#define return_err(_pos, _type, _msg)                                                             \
+    do {                                                                                          \
+        if (_type == JSONDecodeError) {                                                           \
+            PyErr_Format(JSONDecodeError, "%s, at position %zu", _msg, ((u8 *)_pos) - (u8 *)dat); \
+        } else {                                                                                  \
+            PyErr_SetString(_type, _msg);                                                         \
+        }                                                                                         \
+        goto failed_cleanup;                                                                      \
     } while (0)
 
 fail_string:
@@ -514,8 +497,8 @@ failed_cleanup:
         Py_XDECREF(*obj_ptr);
     }
     // free string buffer
-    if (need_dealloc) {
-        free((void *)((u8 *)string_buffer_head - TAIL_PADDING));
+    if (unlikely(string_buffer_head != _DecodeTempBuffer)) {
+        free(string_buffer_head);
     }
     // free obj stack buffer if allocated dynamically
     if (unlikely(decode_obj_stack_info->result_stack_end - decode_obj_stack_info->result_stack > SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE)) {
@@ -526,4 +509,4 @@ failed_cleanup:
 }
 
 #undef SKIP_CONSECUTIVE_SPACES
-#undef WRAPPED_CHAR_IS_SPACE
+#include "compile_context/s_out.inl.h"

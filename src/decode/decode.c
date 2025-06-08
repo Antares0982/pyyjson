@@ -1,8 +1,9 @@
 #define COMPILE_CONTEXT_DECODE
 
 #define XXH_INLINE_ALL
+#include "decode_bytes_root_wrap.h"
 #include "decode_shared.h"
-
+#include "decode_str_root_wrap.h"
 #include "simd/cvt.h"
 #include "simd/mask_table.h"
 #include "simd/memcpy.h"
@@ -13,22 +14,6 @@
 #include "tls.h"
 
 static_assert((SSRJSON_STRING_BUFFER_SIZE % 64) == 0, "(SSRJSON_STRING_BUFFER_SIZE % 64) == 0");
-
-// force_inline PyObject *read_bytes(const u8 **ptr, u8 *write_buffer, bool is_key);
-// force_inline PyObject *read_bytes_root_pretty(const u8 *dat, usize len);
-
-#if PY_MINOR_VERSION >= 12
-#    define SSRJSON_PY_DECREF_DEBUG() (_Py_DECREF_STAT_INC())
-#    define SSRJSON_PY_INCREF_DEBUG() (_Py_INCREF_STAT_INC())
-#else
-#    ifdef Py_REF_DEBUG
-#        define SSRJSON_PY_DECREF_DEBUG() (_Py_RefTotal--)
-#        define SSRJSON_PY_INCREF_DEBUG() (_Py_RefTotal++)
-#    else
-#        define SSRJSON_PY_DECREF_DEBUG()
-#        define SSRJSON_PY_INCREF_DEBUG()
-#    endif
-#endif
 
 
 #if SSRJSON_ENABLE_TRACE
@@ -50,38 +35,6 @@ size_t __hash_add_key_call_count = 0;
 #    define SSRJSON_TRACE_CACHE_HIT() (void)(0)
 #    define SSRJSON_TRACE_HASH_CONFLICT(_hash) (void)(0)
 #endif // SSRJSON_ENABLE_TRACE
-
-force_inline void Py_DecRef_NoCheck(PyObject *op) {
-    // Non-limited C API and limited C API for Python 3.9 and older access
-    // directly PyObject.ob_refcnt.
-#if PY_MINOR_VERSION >= 12
-    if (_Py_IsImmortal(op)) {
-        return;
-    }
-#endif
-    SSRJSON_PY_DECREF_DEBUG();
-    assert(op->ob_refcnt > 1);
-    --op->ob_refcnt;
-}
-
-force_inline void Py_Immortal_IncRef(PyObject *op) {
-    // Non-limited C API and limited C API for Python 3.9 and older access
-    // directly PyObject.ob_refcnt.
-#if PY_MINOR_VERSION >= 12
-#    if SIZEOF_VOID_P > 4
-    // Portable saturated add, branching on the carry flag and set low bits
-#        if !defined(NDEBUG) && PY_MINOR_VERSION < 14
-    assert(0 > (int32_t)op->ob_refcnt_split[PY_BIG_ENDIAN]);
-#        endif // NDEBUG
-#    else      // SIZEOF_VOID_P > 4
-    // Explicitly check immortality against the immortal value
-    assert(_Py_IsImmortal(op));
-#    endif     // SIZEOF_VOID_P > 4
-#else          // PY_MINOR_VERSION >= 12
-    op->ob_refcnt++;
-#endif         // PY_MINOR_VERSION >= 12
-    SSRJSON_PY_INCREF_DEBUG();
-}
 
 force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int type_flag, bool is_key) {
     SSRJSON_TRACE_STR_LEN(len);
@@ -272,31 +225,13 @@ force_inline bool ssrjson_decode_nan(DecodeObjStackInfo *restrict decode_obj_sta
 
 #include "decode/str/str.h"
 //
-#include "decode_float_wrap.inl.h"
+#include "decode_float_wrap.h"
 //
 #include "simd/long_cvt.h"
 //
-#include "simd/compile_feature_check.h"
-
-#define COMPILE_UCS_LEVEL 0
-#include "decode_str.inl.h"
-#undef COMPILE_UCS_LEVEL
-
-#define COMPILE_UCS_LEVEL 1
-#include "decode_str.inl.h"
-#undef COMPILE_UCS_LEVEL
-
-#define COMPILE_UCS_LEVEL 2
-#include "decode_str.inl.h"
-#undef COMPILE_UCS_LEVEL
-
-#define COMPILE_UCS_LEVEL 4
-#include "decode_str.inl.h"
-#undef COMPILE_UCS_LEVEL
-
+#include "decode_str_wrap.h"
+//
 #include "decode_bytes.h"
-
-#undef COMPILE_SIMD_BITS
 
 static int invalid_arg_checked = 0;
 

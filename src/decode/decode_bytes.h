@@ -1,10 +1,14 @@
 #ifndef SSRJSON_DECODE_DECODE_BYTES_H
 #define SSRJSON_DECODE_DECODE_BYTES_H
 
+#include "decode_bytes_root_wrap.h"
+#include "decode_float_wrap.h"
 #include "decode_shared.h"
 #include "simd/memcpy.h"
 #include "ssrjson.h"
 #include "str/tools.h"
+//
+#include "simd/compile_feature_check.h"
 
 /**
  Read a JSON string.
@@ -1079,18 +1083,6 @@ static force_noinline PyObject *read_bytes_not_key(const u8 **ptr, u8 *write_buf
     return read_bytes(ptr, write_buffer, false);
 }
 
-#define READ_ROOT_IMPL read_bytes_root_pretty
-#define DECODE_READ_PRETTY 1
-#include "decode_bytes_root.inl.h"
-#undef DECODE_READ_PRETTY
-#undef READ_ROOT_IMPL
-
-#define READ_ROOT_IMPL read_bytes_root_minify
-#define DECODE_READ_PRETTY 0
-#include "decode_bytes_root.inl.h"
-#undef DECODE_READ_PRETTY
-#undef READ_ROOT_IMPL
-
 /** Read single value JSON document. */
 static force_noinline PyObject *read_root_single_bytes(const u8 *dat, usize len) {
 #define return_err(_pos, _type, _msg)                                                             \
@@ -1304,5 +1296,7 @@ static force_noinline PyObject *ssrjson_decode_bytes(char *_buffer, Py_ssize_t l
     if (is_dynamic) SSRJSON_ALIGNED_FREE(_new_buffer);
     return ret;
 }
+
+#undef COMPILE_SIMD_BITS
 
 #endif // SSRJSON_DECODE_DECODE_BYTES_H

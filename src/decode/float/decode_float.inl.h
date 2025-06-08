@@ -1,7 +1,7 @@
 #ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_READ_UCS_LEVEL
-#        include "decode_float_utils.h"
-#        include "str/tools.h"
+#        include "decode/decode_float_utils.h"
+#        include "decode/str/tools.h"
 #    endif
 #endif
 
