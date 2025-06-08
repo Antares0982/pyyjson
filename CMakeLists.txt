@@ -158,13 +158,13 @@ endif()
 # set ssrjson src files
 set(SRC_FILES
     src/ssrjson.c
-    src/simd/mask_table.c
     src/tls.c
-    src/float/tables.c
     src/pyutils.c
-    src/utils/unicode_utils.c
-    src/utils/encode_utils.c
     src/utils/decode_utils.c
+    src/utils/encode_utils.c
+    src/utils/float_tables.c
+    src/utils/mask_table.c
+    src/utils/unicode_utils.c
 )
 
 set(SRC_WITH_SIMD
@@ -180,7 +180,7 @@ set(SRC_DRAGON_BOX
 set(SRC_TEST
     src/ctests/tools.c
     src/ctests/main.c
-    src/float/tables.c
+    src/utils/float_tables.c
 )
 
 set(SRC_TEST_WITH_SIMD
