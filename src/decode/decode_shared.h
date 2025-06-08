@@ -220,7 +220,7 @@ force_inline u32 byte_load_4(const void *src) {
  * These functions are used by JSON reader to read literals and comments.
  *============================================================================*/
 
-force_inline bool ssrjson_decode_nan(DecodeObjStackInfo *restrict decode_obj_stack_info, bool is_signed);
+force_inline bool decode_nan(DecodeObjStackInfo *restrict decode_obj_stack_info, bool is_signed);
 
 extern const u8 char_table[256];
 
@@ -329,21 +329,21 @@ force_inline bool ctn_grow_check(DecodeCtnStackInfo *decode_ctn_info) {
 
 force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int type_flag, bool is_key);
 
-force_inline bool ssrjson_push_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, PyObject *obj);
+force_inline bool push_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, PyObject *obj);
 
 force_inline PyObject *read_bytes(const u8 **ptr, u8 *write_buffer, bool is_key);
 
 static force_noinline PyObject *read_bytes_not_key(const u8 **ptr, u8 *write_buffer);
 
-force_inline bool ssrjson_decode_true(DecodeObjStackInfo *restrict decode_obj_stack_info);
+force_inline bool decode_true(DecodeObjStackInfo *restrict decode_obj_stack_info);
 
-force_inline bool ssrjson_decode_false(DecodeObjStackInfo *restrict decode_obj_stack_info);
+force_inline bool decode_false(DecodeObjStackInfo *restrict decode_obj_stack_info);
 
-force_inline bool ssrjson_decode_null(DecodeObjStackInfo *restrict decode_obj_stack_info);
+force_inline bool decode_null(DecodeObjStackInfo *restrict decode_obj_stack_info);
 
-force_inline bool ssrjson_decode_arr(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t arr_len);
+force_inline bool decode_arr(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t arr_len);
 
-force_inline bool ssrjson_decode_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t dict_len);
+force_inline bool decode_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t dict_len);
 
 
 #if PY_MINOR_VERSION >= 12
@@ -439,14 +439,14 @@ force_inline void init_read_state(ReadStrState *state) {
 
 
 #define REHASHER(_x) (((size_t)(_x)) % (SSRJSON_KEY_CACHE_SIZE))
-typedef XXH64_hash_t ssrjson_hash_t;
-extern ssrjson_cache_type AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
+typedef XXH64_hash_t decode_keyhash_t;
+extern decode_cache_t AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
 
-force_inline void add_key_cache(ssrjson_hash_t hash, PyObject *obj) {
+force_inline void add_key_cache(decode_keyhash_t hash, PyObject *obj) {
     assert(PyUnicode_GET_LENGTH(obj) * PyUnicode_KIND(obj) <= 64);
     size_t index = REHASHER(hash);
     // SSRJSON_TRACE_HASH(index);
-    ssrjson_cache_type old = AssociativeKeyCache[index];
+    decode_cache_t old = AssociativeKeyCache[index];
     if (old) {
         // SSRJSON_TRACE_HASH_CONFLICT(hash);
         Py_DECREF(old);
@@ -455,9 +455,9 @@ force_inline void add_key_cache(ssrjson_hash_t hash, PyObject *obj) {
     AssociativeKeyCache[index] = obj;
 }
 
-force_inline PyObject *get_key_cache(const void *unicode_str, ssrjson_hash_t hash, size_t real_len, int kind, bool ascii) {
+force_inline PyObject *get_key_cache(const void *unicode_str, decode_keyhash_t hash, size_t real_len, int kind, bool ascii) {
     assert(real_len <= 64);
-    ssrjson_cache_type cache = AssociativeKeyCache[REHASHER(hash)];
+    decode_cache_t cache = AssociativeKeyCache[REHASHER(hash)];
     if (!cache) return NULL;
     PyASCIIObject *cache_ascii = SSRJSON_CAST(PyASCIIObject *, cache);
     Py_ssize_t cache_length = cache_ascii->length;

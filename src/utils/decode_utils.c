@@ -1,6 +1,6 @@
 #include "decode/decode_shared.h"
 
-bool _ssrjson_decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+bool _decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_stack_info) {
     // resize
     if (likely(SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE == decode_obj_stack_info->result_stack_end - decode_obj_stack_info->result_stack)) {
         void *new_buffer = malloc(sizeof(PyObject *) * (SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1));
@@ -33,7 +33,7 @@ bool _ssrjson_decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_st
 
 #if !defined(Py_GIL_DISABLED)
 ssrjson_align(64) u8 _DecodeTempBuffer[SSRJSON_STRING_BUFFER_SIZE];
-ssrjson_cache_type AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
+decode_cache_t AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
 ssrjson_align(64) u8 _DecodeBytesSrcBuffer[SSRJSON_STRING_BUFFER_SIZE];
 DecodeCtnWithSize _DecodeCtnBuffer[SSRJSON_DECODE_MAX_RECURSION];
 PyObject *_DecodeObjBuffer[SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE];

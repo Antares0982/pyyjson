@@ -111,16 +111,9 @@ force_inline bool _read_inf(const _src_t **ptr, const _src_t *end) {
     read_inf_vector _mask = {~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20,
                              ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20};
     read_inf_vector _template = {'I', 'N', 'F', 'I', 'N', 'I', 'T', 'Y'};
-    // ssrjson_align(sizeof(_src_t) * 8) static const _src_t _mask[8] = {
-    //         ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20,
-    //         ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20};
-    // ssrjson_align(sizeof(_src_t) * 8) static const _src_t _template[8] = {
-    //         'I', 'N', 'F', 'I', 'N', 'I', 'T', 'Y'};
     read_inf_vector data;
     data = *(read_inf_vector_u *)(*ptr);
-    // memcpy(&data, *ptr, sizeof(data));
     data = data & _mask;
-    // data = data & *(read_inf_vector *)&_mask;
     if (likely(0 == memcmp(&data, &_template, sizeof(data)))) {
         *ptr += 8;
         return true;
@@ -139,13 +132,9 @@ force_inline bool _read_nan(const _src_t **restrict ptr, const _src_t *restrict 
     }
     // it is safe to load *end, so here we load `4 * sizeof(_src_t)` bytes
     read_nan_vector _mask = {~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, 0};
-    // ssrjson_align(sizeof(_src_t) * 4) static const _src_t _mask[4] = {~(_src_t)0x20, ~(_src_t)0x20, ~(_src_t)0x20, 0};
     read_nan_vector _template = {'N', 'A', 'N', 0};
-    // ssrjson_align(sizeof(_src_t) * 4) static const _src_t _template[4] = {'N', 'A', 'N', 0};
     read_nan_vector data = *(read_nan_vector_u *)(*ptr);
-    // memcpy(&data, *ptr, sizeof(data));
     data = data & _mask;
-    // data = data & *(read_nan_vector *)&_mask;
     if (likely(0 == memcmp(&data, &_template, sizeof(data)))) {
         *ptr += 3;
         return true;

@@ -100,7 +100,7 @@ arr_val_begin:
     }
     if (char_is_number(*cur)) {
         PyObject *number_obj = read_number_u8(&cur, end);
-        if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
+        if (likely(number_obj && push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
@@ -108,32 +108,32 @@ arr_val_begin:
     }
     if (*cur == '"') {
         PyObject *str_obj = read_bytes_not_key(&cur, string_buffer_head);
-        if (likely(str_obj && ssrjson_push_obj(decode_obj_stack_info, str_obj))) {
+        if (likely(str_obj && push_obj(decode_obj_stack_info, str_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
         goto fail_string;
     }
     if (*cur == 't') {
-        if (likely(_read_true_u8(&cur, end) && ssrjson_decode_true(decode_obj_stack_info))) {
+        if (likely(_read_true_u8(&cur, end) && decode_true(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
         goto fail_literal_true;
     }
     if (*cur == 'f') {
-        if (likely(_read_false_u8(&cur, end) && ssrjson_decode_false(decode_obj_stack_info))) {
+        if (likely(_read_false_u8(&cur, end) && decode_false(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
         goto fail_literal_false;
     }
     if (*cur == 'n') {
-        if (likely(_read_null_u8(&cur, end) && ssrjson_decode_null(decode_obj_stack_info))) {
+        if (likely(_read_null_u8(&cur, end) && decode_null(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
-        if (likely(_read_nan_u8(&cur, end) && ssrjson_decode_nan(decode_obj_stack_info, false))) {
+        if (likely(_read_nan_u8(&cur, end) && decode_nan(decode_obj_stack_info, false))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
@@ -159,7 +159,7 @@ arr_val_begin:
     }
     if ((*cur == 'i' || *cur == 'I' || *cur == 'N')) {
         PyObject *number_obj = read_inf_or_nan_u8(false, &cur, end);
-        if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
+        if (likely(number_obj && push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
         }
@@ -200,7 +200,7 @@ arr_val_end:
 
 arr_end:
     assert(decode_ctn_is_arr(decode_ctn_info->ctn));
-    if (!ssrjson_decode_arr(decode_obj_stack_info, get_decode_ctn_len(decode_ctn_info->ctn))) goto failed_cleanup;
+    if (!decode_arr(decode_obj_stack_info, get_decode_ctn_len(decode_ctn_info->ctn))) goto failed_cleanup;
     /* pop parent as current container */
     if (unlikely(decode_ctn_info->ctn-- == decode_ctn_info->ctn_start)) {
         goto doc_end;
@@ -244,7 +244,7 @@ obj_key_begin:
 
     if (likely(*cur == '"')) {
         PyObject *str_obj = read_bytes(&cur, string_buffer_head, true);
-        if (likely(str_obj && ssrjson_push_obj(decode_obj_stack_info, str_obj))) {
+        if (likely(str_obj && push_obj(decode_obj_stack_info, str_obj))) {
             goto obj_key_end;
         }
         goto fail_string;
@@ -289,7 +289,7 @@ obj_key_end:
 obj_val_begin:
     if (*cur == '"') {
         PyObject *str_obj = read_bytes_not_key(&cur, string_buffer_head);
-        if (likely(str_obj && ssrjson_push_obj(decode_obj_stack_info, str_obj))) {
+        if (likely(str_obj && push_obj(decode_obj_stack_info, str_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
@@ -297,7 +297,7 @@ obj_val_begin:
     }
     if (char_is_number(*cur)) {
         PyObject *number_obj = read_number_u8(&cur, end);
-        if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
+        if (likely(number_obj && push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
@@ -312,25 +312,25 @@ obj_val_begin:
         goto arr_begin;
     }
     if (*cur == 't') {
-        if (likely(_read_true_u8(&cur, end) && ssrjson_decode_true(decode_obj_stack_info))) {
+        if (likely(_read_true_u8(&cur, end) && decode_true(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
         goto fail_literal_true;
     }
     if (*cur == 'f') {
-        if (likely(_read_false_u8(&cur, end) && ssrjson_decode_false(decode_obj_stack_info))) {
+        if (likely(_read_false_u8(&cur, end) && decode_false(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
         goto fail_literal_false;
     }
     if (*cur == 'n') {
-        if (likely(_read_null_u8(&cur, end) && ssrjson_decode_null(decode_obj_stack_info))) {
+        if (likely(_read_null_u8(&cur, end) && decode_null(decode_obj_stack_info))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
-        if (likely(_read_nan_u8(&cur, end) && ssrjson_decode_nan(decode_obj_stack_info, false))) {
+        if (likely(_read_nan_u8(&cur, end) && decode_nan(decode_obj_stack_info, false))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
@@ -354,7 +354,7 @@ obj_val_begin:
     }
     if ((*cur == 'i' || *cur == 'I' || *cur == 'N')) {
         PyObject *number_obj = read_inf_or_nan_u8(false, &cur, end);
-        if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
+        if (likely(number_obj && push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;
         }
@@ -396,7 +396,7 @@ obj_val_end:
 
 obj_end:
     assert(!decode_ctn_is_arr(decode_ctn_info->ctn));
-    if (unlikely(!ssrjson_decode_obj(decode_obj_stack_info, get_decode_ctn_len(decode_ctn_info->ctn)))) goto failed_cleanup;
+    if (unlikely(!decode_obj(decode_obj_stack_info, get_decode_ctn_len(decode_ctn_info->ctn)))) goto failed_cleanup;
     /* pop container */
     /* point to the next value */
     if (unlikely(decode_ctn_info->ctn-- == decode_ctn_info->ctn_start)) {

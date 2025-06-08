@@ -829,7 +829,7 @@ force_inline usize get_tail_len_parts_by_index(usize tail_len, usize batch_count
     }
 
 /* typedefs */
-typedef PyObject *ssrjson_cache_type;
+typedef PyObject *decode_cache_t;
 
 
 #endif // SSRJSON_H

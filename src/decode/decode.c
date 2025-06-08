@@ -40,7 +40,7 @@ size_t __hash_add_key_call_count = 0;
 force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int type_flag, bool is_key) {
     SSRJSON_TRACE_STR_LEN(len);
     PyObject *obj;
-    ssrjson_hash_t hash;
+    decode_keyhash_t hash;
     size_t real_len;
     Py_ssize_t offset;
     Py_UCS4 max_char;
@@ -131,19 +131,19 @@ success:
 #endif
 
 
-bool _ssrjson_decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_stack_info);
+bool _decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_stack_info);
 
-force_inline bool ssrjson_push_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, PyObject *obj) {
+force_inline bool push_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, PyObject *obj) {
     static_assert(((Py_ssize_t)SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1) > 0, "(SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1) > 0");
     if (unlikely(decode_obj_stack_info->cur_write_result_addr >= decode_obj_stack_info->result_stack_end)) {
-        bool c = _ssrjson_decode_obj_stack_resize(decode_obj_stack_info);
+        bool c = _decode_obj_stack_resize(decode_obj_stack_info);
         RETURN_ON_UNLIKELY_ERR(!c);
     }
     *decode_obj_stack_info->cur_write_result_addr++ = obj;
     return true;
 }
 
-force_inline bool ssrjson_decode_arr(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t arr_len) {
+force_inline bool decode_arr(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t arr_len) {
     assert(arr_len >= 0);
     PyObject *list = PyList_New(arr_len);
     RETURN_ON_UNLIKELY_ERR(!list);
@@ -155,10 +155,10 @@ force_inline bool ssrjson_decode_arr(DecodeObjStackInfo *restrict decode_obj_sta
         PyList_SET_ITEM(list, j, val); // this never fails
     }
     decode_obj_stack_info->cur_write_result_addr -= arr_len;
-    return ssrjson_push_obj(decode_obj_stack_info, list);
+    return push_obj(decode_obj_stack_info, list);
 }
 
-force_inline bool ssrjson_decode_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t dict_len) {
+force_inline bool decode_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t dict_len) {
     PyObject *dict = _PyDict_NewPresized(dict_len);
     RETURN_ON_UNLIKELY_ERR(!dict);
     PyObject **dict_val_start = decode_obj_stack_info->cur_write_result_addr - dict_len * 2;
@@ -185,32 +185,32 @@ force_inline bool ssrjson_decode_obj(DecodeObjStackInfo *restrict decode_obj_sta
         }
     }
     decode_obj_stack_info->cur_write_result_addr -= dict_len * 2;
-    return ssrjson_push_obj(decode_obj_stack_info, dict);
+    return push_obj(decode_obj_stack_info, dict);
 }
 
-force_inline bool ssrjson_decode_null(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+force_inline bool decode_null(DecodeObjStackInfo *restrict decode_obj_stack_info) {
     SSRJSON_TRACE_OP(SSRJSON_OP_CONSTANTS);
     Py_Immortal_IncRef(Py_None);
-    return ssrjson_push_obj(decode_obj_stack_info, Py_None);
+    return push_obj(decode_obj_stack_info, Py_None);
 }
 
-force_inline bool ssrjson_decode_false(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+force_inline bool decode_false(DecodeObjStackInfo *restrict decode_obj_stack_info) {
     SSRJSON_TRACE_OP(SSRJSON_OP_CONSTANTS);
     Py_Immortal_IncRef(Py_False);
-    return ssrjson_push_obj(decode_obj_stack_info, Py_False);
+    return push_obj(decode_obj_stack_info, Py_False);
 }
 
-force_inline bool ssrjson_decode_true(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+force_inline bool decode_true(DecodeObjStackInfo *restrict decode_obj_stack_info) {
     SSRJSON_TRACE_OP(SSRJSON_OP_CONSTANTS);
     Py_Immortal_IncRef(Py_True);
-    return ssrjson_push_obj(decode_obj_stack_info, Py_True);
+    return push_obj(decode_obj_stack_info, Py_True);
 }
 
-force_inline bool ssrjson_decode_nan(DecodeObjStackInfo *restrict decode_obj_stack_info, bool is_signed) {
+force_inline bool decode_nan(DecodeObjStackInfo *restrict decode_obj_stack_info, bool is_signed) {
     SSRJSON_TRACE_OP(SSRJSON_OP_NAN_INF);
     PyObject *o = PyFloat_FromDouble(is_signed ? -fabs(Py_NAN) : fabs(Py_NAN));
     RETURN_ON_UNLIKELY_ERR(!o);
-    return ssrjson_push_obj(decode_obj_stack_info, o);
+    return push_obj(decode_obj_stack_info, o);
 }
 
 static int invalid_arg_checked = 0;

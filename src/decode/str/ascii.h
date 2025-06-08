@@ -18,7 +18,7 @@
 
 force_inline PyObject *make_unicode_from_src_ascii(const _src_t *start, usize count, bool is_key) {
     PyObject *ret;
-    ssrjson_hash_t hash;
+    decode_keyhash_t hash;
     bool should_cache = is_key && count <= 64;
     bool should_hash = is_key && count > 0;
     if (should_cache) {

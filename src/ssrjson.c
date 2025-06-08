@@ -3,9 +3,9 @@
 #include "version.h"
 
 
-typedef PyObject *ssrjson_cache_type;
+typedef PyObject *decode_cache_t;
 
-extern ssrjson_cache_type AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
+extern decode_cache_t AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
 
 PyObject *ssrjson_Encode(PyObject *self, PyObject *args, PyObject *kwargs);
 PyObject *ssrjson_EncodeToBytes(PyObject *self, PyObject *args, PyObject *kwargs);

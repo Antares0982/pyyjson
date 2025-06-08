@@ -78,7 +78,7 @@ force_inline PyObject *make_unicode_from_src(const _src_t *start, usize count, b
     const _src_t upper_bound = (COMPILE_UCS_LEVEL == 1) ? 0x7f : ((COMPILE_UCS_LEVEL == 2) ? 0xff : 0xffff);
 
     PyObject *ret;
-    ssrjson_hash_t hash;
+    decode_keyhash_t hash;
 
     bool need_cvt = checkmax(maxvec, upper_bound);
     int kind = COMPILE_UCS_LEVEL;
