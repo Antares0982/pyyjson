@@ -450,25 +450,8 @@ force_inline bool unicode_buffer_append_arr_end(_dst_t **writer_addr, EncodeUnic
     return true;
 }
 
-// #define GET_UNICODE_BUFFER_FINAL_LEN SSRJSON_CONCAT2(get_unicode_buffer_final_len, COMPILE_UCS_LEVEL)
-// #if COMPILE_INDENT_LEVEL == 0
-// // avoid compile again
-// force_inline Py_ssize_t GET_UNICODE_BUFFER_FINAL_LEN(EncodeUnicodeBufferInfo *unicode_buffer_info) {
-// #    if COMPILE_UCS_LEVEL == 0
-//     return unicode_buffer_info->writer.writer_u8 - (u8 *)GET_VEC_ASCII_START(unicode_buffer_info);
-// #    elif COMPILE_UCS_LEVEL == 1
-//     return unicode_buffer_info->writer.writer_u8 - (u8 *)GET_VEC_COMPACT_START(unicode_buffer_info);
-// #    elif COMPILE_UCS_LEVEL == 2
-//     return unicode_buffer_info->writer.writer_u16 - (u16 *)GET_VEC_COMPACT_START(unicode_buffer_info);
-// #    elif COMPILE_UCS_LEVEL == 4
-//     return unicode_buffer_info->writer.writer_u32 - (u32 *)GET_VEC_COMPACT_START(unicode_buffer_info);
-// #    endif
-// }
-// #endif
 
-#define ENCODE_PROCESS_VAL SSRJSON_CONCAT3(encode_process_val, COMPILE_INDENT_LEVEL, COMPILE_UCS_LEVEL)
-
-force_inline EncodeValJumpFlag ENCODE_PROCESS_VAL(
+force_inline EncodeValJumpFlag encode_process_val(
         EncodeUnicodeWriter *writer_addr,
         EncodeUnicodeBufferInfo *unicode_buffer_info, PyObject *val,
         PyObject **cur_obj_addr,
@@ -595,7 +578,6 @@ force_inline EncodeValJumpFlag ENCODE_PROCESS_VAL(
 #undef CTN_SIZE_GROW
 }
 
-#define ssrjson_dumps_obj SSRJSON_CONCAT3(_ssrjson_dumps_obj, __UCS_NAME, __INDENT_NAME)
 #define dumps_next(_u_) SSRJSON_CONCAT3(_ssrjson_dumps_obj, _u_, __INDENT_NAME)
 #define _DUMPS_PASS_ARGSDECL EncodeUnicodeWriter writer, PyObject *key, PyObject *val, PyObject *cur_obj, Py_ssize_t cur_pos, Py_ssize_t cur_nested_depth, Py_ssize_t cur_list_size, EncodeCtnWithIndex *ctn_stack, EncodeUnicodeInfo unicode_info, bool cur_is_tuple, EncodeUnicodeBufferInfo _unicode_buffer_info, EncodeCallFlag encode_call_flag
 #define _DUMPS_PASS_ARGS writer, key, val, cur_obj, cur_pos, cur_nested_depth, cur_list_size, ctn_stack, unicode_info, cur_is_tuple
@@ -741,7 +723,7 @@ dict_pair_begin:;
         }
     dict_key_done:;
         //
-        EncodeValJumpFlag jump_flag = ENCODE_PROCESS_VAL(&writer, &_unicode_buffer_info, val, &cur_obj, &cur_pos, &cur_nested_depth, &cur_list_size, ctn_stack, &unicode_info, true);
+        EncodeValJumpFlag jump_flag = encode_process_val(&writer, &_unicode_buffer_info, val, &cur_obj, &cur_pos, &cur_nested_depth, &cur_list_size, ctn_stack, &unicode_info, true);
         switch ((jump_flag)) {
             case JumpFlag_Default: {
                 break;
@@ -821,7 +803,7 @@ arr_val_begin:;
         }
         cur_pos++;
         //
-        EncodeValJumpFlag jump_flag = ENCODE_PROCESS_VAL(&writer, &_unicode_buffer_info, val, &cur_obj, &cur_pos, &cur_nested_depth, &cur_list_size, ctn_stack, &unicode_info, false);
+        EncodeValJumpFlag jump_flag = encode_process_val(&writer, &_unicode_buffer_info, val, &cur_obj, &cur_pos, &cur_nested_depth, &cur_list_size, ctn_stack, &unicode_info, false);
         switch ((jump_flag)) {
             case JumpFlag_Default: {
                 break;
@@ -929,12 +911,10 @@ fail_keytype:;
 #undef _DUMPS_PASS_ARGS
 #undef _DUMPS_PASS_ARGSDECL
 #undef dumps_next
-#undef ssrjson_dumps_obj
 
 #include "compile_context/sirw_out.inl.h"
 
-#undef ENCODE_PROCESS_VAL
-#undef VEC_BACK1
 #undef WRITE_INDENT_RETURN_IF_FAIL
+//
 #undef COMPILE_WRITE_UCS_LEVEL
 #undef COMPILE_READ_UCS_LEVEL

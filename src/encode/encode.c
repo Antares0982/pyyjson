@@ -15,79 +15,12 @@
 #include "encode_cvt.h"
 #include "pyutils.h"
 #include "states.h"
-// typedef struct {
-//     u8 *writer;
-//     void *head;
-//     void *end;
-// } EncodeUTF8BufferInfo;
-
-// typedef struct {
-//     // cache
-//     PyObject *key, *val;
-//     PyObject *cur_obj;           // = in_obj;
-//     Py_ssize_t cur_pos;          // = 0;
-//     Py_ssize_t cur_nested_depth; // = 0;
-//     Py_ssize_t cur_list_size;
-//     // alias thread local buffer
-//     EncodeCtnWithIndex *ctn_stack;
-//     bool cur_is_tuple;
-// } EncodeUTF8StackVars;
-
-// force_inline bool init_utf8_buffer(EncodeUTF8BufferInfo *utf8_buffer_info) {
-//     utf8_buffer_info->head = PyObject_Malloc(SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE);
-//     if (likely(utf8_buffer_info->head)) {
-// #ifndef NDEBUG
-//         memset(utf8_buffer_info->head, 0, SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE);
-// #endif
-//         const usize offset = PYBYTES_START_OFFSET;
-//         utf8_buffer_info->writer = SSRJSON_CAST(u8 *, utf8_buffer_info->head) + offset;
-//         utf8_buffer_info->end = SSRJSON_CAST(u8 *, utf8_buffer_info->head) + SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE;
-//     } else {
-//         PyErr_NoMemory();
-//         return false;
-//     }
-//     return true;
-// }
-
-// force_inline bool init_utf8_stack_vars(EncodeUTF8StackVars *stack_vars, PyObject *in_obj) {
-//     stack_vars->cur_obj = in_obj;
-//     stack_vars->cur_pos = 0;
-//     stack_vars->cur_nested_depth = 0;
-//     stack_vars->ctn_stack = get_encode_obj_stack_buffer();
-//     if (unlikely(!stack_vars->ctn_stack)) {
-//         PyErr_NoMemory();
-//         return false;
-//     }
-//     return true;
-// }
-
-
-// force_inline bool bytes_buffer_reserve(EncodeUnicodeWriter *writer_addr, EncodeUTF8BufferInfo *utf8_buffer_info, Py_ssize_t target_size) {
-//     return unicode_buffer_reserve_u8(&writer_addr->writer_u8, SSRJSON_CAST(EncodeUnicodeBufferInfo *, utf8_buffer_info), target_size);
-// }
 
 /* 
  * Some utility functions only related to *write*, like unicode buffer reserve, writing number
  * need macro: COMPILE_WRITE_UCS_LEVEL, value: 1, 2, or 4.
  */
 #include "encode_utils_impl_wrap.h"
-
-/* 
- * Some utility functions related to SIMD, like getting escape mask,
- * elevating ucs level, read/write simd vars.
- * need macro:
- *      COMPILE_READ_UCS_LEVEL, value: 1, 2, or 4.
- *      COMPILE_WRITE_UCS_LEVEL, value: 1, 2, or 4.
- */
-// #include "encode_simd_utils_wrap.h"
-
-/* 
- * Some functions for writing the unicode buffer, like writing key, writing value str.
- * need macro:
- *      COMPILE_READ_UCS_LEVEL, value: 1, 2, or 4.
- *      COMPILE_WRITE_UCS_LEVEL, value: 1, 2, or 4.
- */
-// #include "encode_unicode_impl_wrap.h"
 
 /* 
  * Top-level encode functions for encoding container types: dict, list and tuple.
@@ -263,9 +196,7 @@ force_inline PyObject *ssrjson_dumps_single_float(PyObject *val, bool to_bytes_o
     u64 *raw = (u64 *)&v;
     u8 *buffer_end = dragonbox_to_chars_n(f64_from_raw(*raw), buffer);
     usize size = buffer_end - buffer;
-    // size_t size = d2s_buffered_n(f64_from_raw(*raw), (char *)buffer);
     assert(size < 64);
-    // u8 *buffer_end = buffer + size;
     PyObject *unicode;
     if (to_bytes_obj) {
         unicode = PyObject_Malloc(PYBYTES_START_OFFSET + size + 1);

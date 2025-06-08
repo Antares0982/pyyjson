@@ -36,3 +36,6 @@
 #undef unicode_buffer_append_obj_begin
 #undef write_unicode_obj_end
 #undef unicode_buffer_append_obj_end
+#undef ssrjson_dumps_obj
+//
+#undef encode_process_val
