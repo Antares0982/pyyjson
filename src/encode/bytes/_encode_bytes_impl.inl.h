@@ -4,7 +4,7 @@
 #    include "encode_utf8.h"
 #    include "ssrjson.h"
 #    include "tls.h"
-#    include "unicode/unicode.h"
+#    include "utils/unicode.h"
 //
 #    ifndef COMPILE_INDENT_LEVEL
 #        define COMPILE_INDENT_LEVEL 2

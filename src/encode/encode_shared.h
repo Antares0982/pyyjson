@@ -4,7 +4,7 @@
 #include "simd/simd_detect.h"
 #include "ssrjson.h"
 #include "tls.h"
-#include "unicode/unicode.h"
+#include "utils/unicode.h"
 
 #define CONTROL_SEQ_ESCAPE_PREFIX _Slash, 'u', '0', '0'
 #define CONTROL_SEQ_ESCAPE_SUFFIX '\0', '\0'
@@ -294,7 +294,7 @@ force_inline bool check_unicode_writer_valid(void *writer, EncodeUnicodeBufferIn
  *     len: Count of valid unicode points in the buffer.
  *     ucs_type: The unicode type of the buffer (0 stands for ascii).
  */
-force_noinline bool resize_to_fit_pyunicode(EncodeUnicodeBufferInfo *unicode_buffer_info, Py_ssize_t len, int ucs_type);
+bool resize_to_fit_pyunicode(EncodeUnicodeBufferInfo *unicode_buffer_info, Py_ssize_t len, int ucs_type);
 
 
 /*==============================================================================

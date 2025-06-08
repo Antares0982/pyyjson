@@ -6,7 +6,7 @@
 #include "simd/simd_detect.h"
 #include "simd/simd_impl.h"
 #include "tls.h"
-#include "unicode/unicode.h"
+#include "utils/unicode.h"
 
 /* Implmentations of some inline functions used in current scope */
 #include "encode/indent_writer.h"

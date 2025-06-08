@@ -2,26 +2,23 @@
 #define SSRJSON_DECODE_DECODE_STR_WRAP_H
 
 #include "decode_str_root_wrap.h"
-#include "str/ascii.h"
-#include "str/tools.h"
-#include "str/ucs.h"
 //
 #include "simd/compile_feature_check.h"
 
 #define COMPILE_UCS_LEVEL 0
-#include "decode_str.inl.h"
+#include "decode/decode_str.inl.h"
 #undef COMPILE_UCS_LEVEL
 
 #define COMPILE_UCS_LEVEL 1
-#include "decode_str.inl.h"
+#include "decode/decode_str.inl.h"
 #undef COMPILE_UCS_LEVEL
 
 #define COMPILE_UCS_LEVEL 2
-#include "decode_str.inl.h"
+#include "decode/decode_str.inl.h"
 #undef COMPILE_UCS_LEVEL
 
 #define COMPILE_UCS_LEVEL 4
-#include "decode_str.inl.h"
+#include "decode/decode_str.inl.h"
 #undef COMPILE_UCS_LEVEL
 
 #undef COMPILE_SIMD_BITS

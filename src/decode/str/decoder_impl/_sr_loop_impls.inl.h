@@ -7,7 +7,7 @@
 #        define COMPILE_SIMD_BITS 512
 // #        include "simd/compile_feature_check.h"
 //
-#        include "_r_impls.inl.h"
+#        include "decoder_impl/_sr_impls.inl.h"
 #    endif
 #endif
 

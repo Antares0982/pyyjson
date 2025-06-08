@@ -4,7 +4,7 @@
 #include "pythonlib.h"
 #include "simd/long_cvt.h"
 #include "simd/memcpy.h"
-#include "unicode/unicode.h"
+#include "utils/unicode.h"
 //
 #include "simd/compile_feature_check.h"
 //

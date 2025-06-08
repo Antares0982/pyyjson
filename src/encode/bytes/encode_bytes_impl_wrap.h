@@ -6,7 +6,7 @@
 #include "encode_utf8.h"
 #include "ssrjson.h"
 #include "tls.h"
-#include "unicode/unicode.h"
+#include "utils/unicode.h"
 
 
 #define COMPILE_INDENT_LEVEL 0

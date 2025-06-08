@@ -3,7 +3,7 @@
 
 #include "simd/mask_table.h"
 #include "simd_detect.h"
-#include "unicode/unicode.h"
+#include "utils/unicode.h"
 
 
 void SIMD_NAME_MODIFIER(long_back_cvt_noinline_u8_u16)(u16 *write_start, const u8 *read_start, usize len);

@@ -150,13 +150,6 @@ if(ASAN_ENABLED)
     target_compile_definitions(commonBuild INTERFACE SSRJSON_ASAN_CHECK=1)
 
     add_asan_compile_option(commonBuild INTERFACE)
-
-    # if(MSVC)
-    # target_compile_options(commonBuild INTERFACE /fsanitize=address)
-    # else()
-    # target_compile_options(commonBuild INTERFACE -fsanitize=address)
-    # target_link_options(commonBuild INTERFACE -fsanitize=address)
-    # endif()
 endif()
 
 # ------------------------------------------------------------------------------
@@ -165,13 +158,13 @@ endif()
 # set ssrjson src files
 set(SRC_FILES
     src/ssrjson.c
-    src/unicode/utils.c
     src/simd/mask_table.c
     src/tls.c
     src/float/tables.c
-    src/decode/decode_utils.c
     src/pyutils.c
-    src/encode/encode_utils.c
+    src/utils/unicode_utils.c
+    src/utils/encode_utils.c
+    src/utils/decode_utils.c
 )
 
 set(SRC_WITH_SIMD

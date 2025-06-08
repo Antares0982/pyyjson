@@ -1,10 +1,11 @@
 #ifndef SSRJSON_ENCODE_CVT_H
 #define SSRJSON_ENCODE_CVT_H
 
-#include "ssrjson.h"
+#include "encode_shared.h"
 #include "simd/cvt.h"
 #include "simd/simd_detect.h"
-#include "unicode/unicode.h"
+#include "ssrjson.h"
+#include "utils/unicode.h"
 
 force_inline void ascii_elevate2(EncodeUnicodeBufferInfo *unicode_buffer_info, EncodeUnicodeInfo *unicode_info) {
     u8 *start = ((u8 *)GET_VEC_ASCII_START(unicode_buffer_info));

@@ -1,5 +1,4 @@
-#include "decode_shared.h"
-#include <threads.h>
+#include "decode/decode_shared.h"
 
 bool _ssrjson_decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_stack_info) {
     // resize

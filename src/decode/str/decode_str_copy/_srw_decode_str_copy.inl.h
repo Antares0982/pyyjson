@@ -1,6 +1,6 @@
 #ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_UCS_LEVEL
-#        include "decoder_impl_wrap.h"
+#        include "decode/str/decoder_impl_wrap.h"
 #        include "simd/simd_impl.h"
 #        include "simd/union_vector.h"
 #        define COMPILE_UCS_LEVEL 1
@@ -63,80 +63,6 @@ force_inline int decode_str_copy_trailing(_dst_t **dst_addr, const _src_t **src_
     //
     return ret;
 }
-
-// force_inline int process_escape(
-//         EscapeInfo escape_info,
-// #if COMPILE_WRITE_UCS_LEVEL <= 1
-//         u8 **u8writer_addr,
-// #endif
-// #if COMPILE_WRITE_UCS_LEVEL <= 2
-//         u16 **u16writer_addr,
-// #endif
-//         u32 **u32writer_addr,
-// #if COMPILE_WRITE_UCS_LEVEL <= 2
-//         usize *u8size_addr,
-// #endif
-// #if COMPILE_WRITE_UCS_LEVEL == 2
-//         usize *u16size_addr,
-// #endif
-//         u32 *max_escapeval_addr
-// #if COMPILE_WRITE_UCS_LEVEL < 4
-//         ,
-//         void *temp_buffer
-// #endif
-// ) {
-//     u32 escape_val;
-//     usize escape_len;
-//     escape_val = escape_info.escape_val;
-//     *max_escapeval_addr = SSRJSON_MAX(*max_escapeval_addr, escape_val);
-//     assert(escape_val != _DECODE_UNICODE_ERR);
-// #if COMPILE_WRITE_UCS_LEVEL <= 1
-//     if (escape_val < 0x100) {
-//         // R: ucs1 W: ucs1
-//         *(*u8writer_addr)++ = (u8)escape_val;
-//         return 1;
-//     } else
-// #endif
-// #if COMPILE_WRITE_UCS_LEVEL <= 2
-//             if (escape_val < 0x10000) {
-//         // R: ucs1,ucs2 W: ucs1,ucs2
-// #    if COMPILE_WRITE_UCS_LEVEL == 1
-//         usize u8size = (*u8writer_addr) - SSRJSON_CAST(u8 *, temp_buffer);
-//         *u8size_addr = u8size;
-//         *u8writer_addr = NULL;
-//         *u16writer_addr = SSRJSON_CAST(u16 *, temp_buffer) + u8size;
-// #    endif
-//         *(*u16writer_addr)++ = (u16)escape_val;
-//         return 2;
-//     } else
-// #endif
-//     {
-//         // R: ucs1,ucs2,ucs4 W: ucs1,ucs2,ucs4
-// #if COMPILE_WRITE_UCS_LEVEL == 1
-//         // R,W: ucs1
-//         usize u8size = (*u8writer_addr) - SSRJSON_CAST(u8 *, temp_buffer);
-//         *u8size_addr = u8size;
-//         *u8writer_addr = NULL;
-//         *u32writer_addr = SSRJSON_CAST(u32 *, temp_buffer) + u8size;
-// #elif COMPILE_WRITE_UCS_LEVEL == 2
-// #    if COMPILE_READ_UCS_LEVEL == 1
-//         // R: ucs1 W: ucs2
-//         usize totalsize = (*u16writer_addr) - SSRJSON_CAST(u16 *, temp_buffer);
-//         *u16size_addr = totalsize - *u8size_addr;
-//         *u16writer_addr = NULL;
-//         *u32writer_addr = SSRJSON_CAST(u32 *, temp_buffer) + totalsize;
-// #    else
-//         // R: ucs2 W: ucs2
-//         usize u16size = (*u16writer_addr) - SSRJSON_CAST(u16 *, temp_buffer);
-//         *u16size_addr = u16size;
-//         *u16writer_addr = NULL;
-//         *u32writer_addr = SSRJSON_CAST(u32 *, temp_buffer) + u16size;
-// #    endif
-// #endif
-//         *(*u32writer_addr)++ = escape_val;
-//         return 4;
-//     }
-// }
 
 #include "compile_context/srw_out.inl.h"
 #undef COMPILE_READ_UCS_LEVEL

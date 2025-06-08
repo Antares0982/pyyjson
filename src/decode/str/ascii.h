@@ -3,18 +3,18 @@
 #include "xxhash.h"
 
 #include "decode/decode_shared.h"
+#include "decoder_impl_wrap.h"
 #include "simd/cvt.h"
 #include "simd/memcpy.h"
 #include "simd/simd_impl.h"
 #include "simd/union_vector.h"
-#include "str.h"
+#include "utils/unicode.h"
 
 #define COMPILE_UCS_LEVEL 1
 #define COMPILE_READ_UCS_LEVEL 1
 #include "simd/compile_feature_check.h"
 //
 #include "compile_context/sr_in.inl.h"
-#include "unicode/unicode.h"
 
 force_inline PyObject *make_unicode_from_src_ascii(const _src_t *start, usize count, bool is_key) {
     PyObject *ret;

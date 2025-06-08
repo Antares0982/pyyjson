@@ -1,18 +1,7 @@
 #ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_SIMD_BITS
 #        define COMPILE_CONTEXT_DECODE
-#        include "decode/str/str.h"
-#        include "decode_float_utils.h"
-#        include "decode_float_wrap.h"
-#        include "decode_shared.h"
 #        include "decode_str_root_wrap.h"
-#        include "simd/cvt.h"
-#        include "simd/long_cvt.h"
-#        include "simd/mask_table.h"
-#        include "simd/simd_impl.h"
-#        include "ssrjson.h"
-#        include "str/ascii.h"
-#        include "str/ucs.h"
 //
 #        include "simd/compile_feature_check.h"
 #        define COMPILE_UCS_LEVEL 0

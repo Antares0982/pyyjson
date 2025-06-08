@@ -1,5 +1,6 @@
 #ifdef SSRJSON_CLANGD_DUMMY
-#    include "unicode/unicode.h"
+#    include "encode/encode_shared.h"
+#    include "utils/unicode.h"
 #endif
 
 #include "compile_context/w_in.inl.h"

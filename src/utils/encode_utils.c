@@ -1,4 +1,4 @@
-#include "encode_shared.h"
+#include "encode/encode_shared.h"
 
 
 #define RESERVE_MAX ((~(usize)PY_SSIZE_T_MAX) >> 1)
@@ -24,7 +24,7 @@ bool _unicode_buffer_reserve(EncodeUnicodeBufferInfo *unicode_buffer_info, usize
     return true;
 }
 
-force_noinline bool resize_to_fit_pyunicode(EncodeUnicodeBufferInfo *unicode_buffer_info, Py_ssize_t len, int ucs_type) {
+bool resize_to_fit_pyunicode(EncodeUnicodeBufferInfo *unicode_buffer_info, Py_ssize_t len, int ucs_type) {
     Py_ssize_t char_size = ucs_type ? ucs_type : 1;
     Py_ssize_t struct_size = ucs_type ? sizeof(PyCompactUnicodeObject) : sizeof(PyASCIIObject);
     assert(len <= ((PY_SSIZE_T_MAX - struct_size) / char_size - 1));

@@ -1,7 +1,7 @@
 #include "pyutils.h"
 #include "pythonlib.h"
 #include "simd/memcpy.h"
-#include "unicode/unicode.h"
+#include "utils/unicode.h"
 
 force_noinline void init_pyunicode_noinline(void *head, Py_ssize_t size, int kind) {
     init_pyunicode(head, size, kind);

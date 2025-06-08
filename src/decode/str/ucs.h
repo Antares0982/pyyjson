@@ -3,7 +3,8 @@
 
 #include "cache_key.h"
 #include "copy_to_new.h"
-#include "escape.h"
+#include "decode_str_copy.h"
+#include "process_escape.h"
 #include "pythonlib.h"
 #include "simd/long_cvt.h"
 //

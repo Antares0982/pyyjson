@@ -2,12 +2,10 @@
 #    ifndef COMPILE_UCS_LEVEL
 #        include "cache_key.h"
 #        include "copy_to_new.h"
-#        include "decode/decode_shared.h"
-#        include "escape.h"
-#        include "simd/cvt.h"
+#        include "decode_str_copy.h"
+#        include "process_escape.h"
+#        include "pythonlib.h"
 #        include "simd/long_cvt.h"
-#        include "simd/memcpy.h"
-#        include "str.h"
 #        define COMPILE_UCS_LEVEL 1
 #        include "simd/compile_feature_check.h"
 #    endif

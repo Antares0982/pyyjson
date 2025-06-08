@@ -1,6 +1,7 @@
 #define COMPILE_CONTEXT_DECODE
 
 #define XXH_INLINE_ALL
+#include "decode_bytes.h"
 #include "decode_bytes_root_wrap.h"
 #include "decode_shared.h"
 #include "decode_str_root_wrap.h"
@@ -211,27 +212,6 @@ force_inline bool ssrjson_decode_nan(DecodeObjStackInfo *restrict decode_obj_sta
     RETURN_ON_UNLIKELY_ERR(!o);
     return ssrjson_push_obj(decode_obj_stack_info, o);
 }
-
-/** Match a line end character: '\\n', '\\r', '\0'. */
-// force_inline bool char_is_line_end(u8 c) {
-//     return char_is_type(c, (u8)CHAR_TYPE_LINE_END);
-// }
-
-/** Match a hexadecimal numeric character: [0-9a-fA-F]. */
-// force_inline bool char_is_hex(u8 c) {
-//     return char_is_type(c, (u8)CHAR_TYPE_HEX);
-// }
-
-
-#include "decode/str/str.h"
-//
-#include "decode_float_wrap.h"
-//
-#include "simd/long_cvt.h"
-//
-#include "decode_str_wrap.h"
-//
-#include "decode_bytes.h"
 
 static int invalid_arg_checked = 0;
 
