@@ -134,6 +134,8 @@ force_inline PyObject *read_bytes(const u8 **ptr, u8 *write_buffer, bool is_key)
     u8 cur_max_ucs_size = 1;
     u16 *dst_ucs2;
     u32 *dst_ucs4;
+    Py_ssize_t final_string_length;
+    int final_type_flag;
     bool is_ascii = true;
     /* modified END */
 
@@ -1059,7 +1061,9 @@ read_finalize:
             *start-- = *ucs1_back--;
             len_ucs1--;
         }
-        return make_string(temp_string_buf, dst_ucs4 - (u32 *)temp_string_buf, SSRJSON_STRING_TYPE_UCS4, is_key);
+        final_string_length = dst_ucs4 - (u32 *)temp_string_buf;
+        final_type_flag = SSRJSON_STRING_TYPE_UCS4;
+        // return make_string(temp_string_buf, dst_ucs4 - (u32 *)temp_string_buf, SSRJSON_STRING_TYPE_UCS4, is_key);
     } else if (unlikely(cur_max_ucs_size == 2)) {
         u16 *start = (u16 *)temp_string_buf + len_ucs1 - 1;
         u8 *ucs1_back = (u8 *)temp_string_buf + len_ucs1 - 1;
@@ -1067,10 +1071,16 @@ read_finalize:
             *start-- = *ucs1_back--;
             len_ucs1--;
         }
-        return make_string(temp_string_buf, dst_ucs2 - (u16 *)temp_string_buf, SSRJSON_STRING_TYPE_UCS2, is_key);
+        final_string_length = dst_ucs2 - (u16 *)temp_string_buf;
+        final_type_flag = SSRJSON_STRING_TYPE_UCS2;
+        // return make_string(temp_string_buf, dst_ucs2 - (u16 *)temp_string_buf, SSRJSON_STRING_TYPE_UCS2, is_key);
     } else {
-        return make_string(temp_string_buf, dst - (u8 *)temp_string_buf, is_ascii ? SSRJSON_STRING_TYPE_ASCII : SSRJSON_STRING_TYPE_LATIN1, is_key);
+        final_string_length = dst - (u8 *)temp_string_buf;
+        final_type_flag = is_ascii ? SSRJSON_STRING_TYPE_ASCII : SSRJSON_STRING_TYPE_LATIN1;
+        // return make_string(temp_string_buf, dst - (u8 *)temp_string_buf, is_ascii ? SSRJSON_STRING_TYPE_ASCII : SSRJSON_STRING_TYPE_LATIN1, is_key);
     }
+
+    return make_string(temp_string_buf, final_string_length, final_type_flag, is_key);
 
 #undef return_err
 #undef is_valid_seq_1
