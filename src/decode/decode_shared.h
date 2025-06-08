@@ -289,7 +289,6 @@ force_inline bool init_decode_obj_stack_info(
         decode_obj_stack_ptr_t *decode_obj_writer_addr,
         decode_obj_stack_ptr_t *decode_obj_stack_addr,
         decode_obj_stack_ptr_t *decode_obj_stack_end_addr) {
-    assert(!*decode_obj_stack);
     pyobj_ptr_t *new_buffer = get_decode_obj_stack_buffer();
     if (unlikely(!new_buffer)) {
         PyErr_NoMemory();
