@@ -1,7 +1,6 @@
 #ifndef SSRJSON_SIMD_DETECT_H
 #define SSRJSON_SIMD_DETECT_H
 
-#include <Python.h>
 #if SSRJSON_DETECT_SIMD
 
 #    if SSRJSON_X86
