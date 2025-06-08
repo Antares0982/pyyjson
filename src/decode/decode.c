@@ -43,39 +43,34 @@ force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int ty
     decode_keyhash_t hash;
     size_t real_len;
     Py_ssize_t offset;
-    Py_UCS4 max_char;
-    int kind;
+    int pyunicode_kind;
     bool ascii;
 
     switch (type_flag) {
         case SSRJSON_STRING_TYPE_ASCII: {
             ascii = true;
-            kind = 1;
-            max_char = 0x7f;
+            pyunicode_kind = 1;
             real_len = len;
             offset = sizeof(PyASCIIObject);
             break;
         }
         case SSRJSON_STRING_TYPE_LATIN1: {
             ascii = false;
-            kind = 1;
-            max_char = 0xff;
+            pyunicode_kind = 1;
             real_len = len;
             offset = sizeof(PyCompactUnicodeObject);
             break;
         }
         case SSRJSON_STRING_TYPE_UCS2: {
             ascii = false;
-            kind = 2;
-            max_char = 0xffff;
+            pyunicode_kind = 2;
             real_len = len * 2;
             offset = sizeof(PyCompactUnicodeObject);
             break;
         }
         case SSRJSON_STRING_TYPE_UCS4: {
             ascii = false;
-            kind = 4;
-            max_char = 0x10ffff;
+            pyunicode_kind = 4;
             real_len = len * 4;
             offset = sizeof(PyCompactUnicodeObject);
             break;
@@ -88,14 +83,14 @@ force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int ty
 
     if (should_cache) {
         hash = XXH3_64bits(unicode_str, real_len);
-        obj = get_key_cache(unicode_str, hash, real_len, kind, ascii);
+        obj = get_key_cache(unicode_str, hash, real_len, pyunicode_kind, ascii);
         if (obj) {
             Py_INCREF(obj);
             return obj;
         }
     }
 
-    obj = PyUnicode_New(len, max_char);
+    obj = create_empty_unicode(len, type_flag);
     if (obj == NULL) return NULL;
     ssrjson_memcpy(SSRJSON_CAST(u8 *, obj) + offset, unicode_str, real_len);
     if (should_cache) {
@@ -234,8 +229,8 @@ PyObject *SIMD_NAME_MODIFIER(ssrjson_Decode)(PyObject *self, PyObject *args, PyO
     if (PyUnicode_Check(obj)) {
         PyASCIIObject *ascii_head = SSRJSON_CAST(PyASCIIObject *, obj);
         PyUnicodeObject *in_unicode = SSRJSON_CAST(PyUnicodeObject *, obj);
-        int kind = ascii_head->state.ascii ? 0 : ascii_head->state.kind;
-        switch (kind) {
+        int pyunicode_kind = ascii_head->state.ascii ? 0 : ascii_head->state.kind;
+        switch (pyunicode_kind) {
             case SSRJSON_STRING_TYPE_ASCII: {
                 ret = decode_ascii(in_unicode);
                 break;

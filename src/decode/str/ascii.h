@@ -29,7 +29,7 @@ force_inline PyObject *make_unicode_from_src_ascii(const _src_t *start, usize co
             goto done;
         }
     }
-    ret = PyUnicode_New(count, 127);
+    ret = create_empty_unicode(count, 0);
     if (likely(ret)) {
         u8 *const target = PYUNICODE_ASCII_START(ret);
         ssrjson_memcpy(target, start, count);
@@ -50,7 +50,7 @@ force_inline PyObject *make_unicode_ucs1(const _src_t *start, usize count, bool 
     assert(count);
     PyObject *ret;
     bool should_hash = is_key;
-    ret = PyUnicode_New(count, 255);
+    ret = create_empty_unicode(count, 1);
     if (likely(ret)) {
         u8 *const target = PYUNICODE_UCS1_START(ret);
         memcpy(target, start, count); // not use inline version
@@ -68,7 +68,7 @@ force_inline PyObject *make_unicode_ucs2(void *src_buffer, usize u8count, usize 
     assert(total_count > 0 && total_count >= u8count);
     PyObject *ret;
     bool should_hash = is_key;
-    ret = PyUnicode_New(total_count, 0xffff);
+    ret = create_empty_unicode(total_count, 2);
     if (likely(ret)) {
         u16 *const target = PYUNICODE_UCS2_START(ret);
         // not use inline version
@@ -90,7 +90,7 @@ force_inline PyObject *make_unicode_ucs4(void *src_buffer, usize u8count, usize 
     assert(total_count > 0 && total_count >= u8count + u16count);
     PyObject *ret;
     bool should_hash = is_key;
-    ret = PyUnicode_New(total_count, 1114111);
+    ret = create_empty_unicode(total_count, 4);
     if (likely(ret)) {
         u32 *const target = PYUNICODE_UCS4_START(ret);
         // not use inline version

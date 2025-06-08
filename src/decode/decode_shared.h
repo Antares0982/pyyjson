@@ -455,7 +455,7 @@ force_inline void add_key_cache(decode_keyhash_t hash, PyObject *obj) {
     AssociativeKeyCache[index] = obj;
 }
 
-force_inline PyObject *get_key_cache(const void *unicode_str, decode_keyhash_t hash, size_t real_len, int kind, bool ascii) {
+force_inline PyObject *get_key_cache(const void *unicode_str, decode_keyhash_t hash, size_t real_len, int pyunicode_kind, bool ascii) {
     assert(real_len <= 64);
     decode_cache_t cache = AssociativeKeyCache[REHASHER(hash)];
     if (!cache) return NULL;
@@ -464,7 +464,7 @@ force_inline PyObject *get_key_cache(const void *unicode_str, decode_keyhash_t h
     Py_ssize_t cache_kind = cache_ascii->state.kind;
     bool cache_is_ascii = cache_ascii->state.ascii;
     Py_ssize_t cache_offset = cache_is_ascii ? sizeof(PyASCIIObject) : sizeof(PyCompactUnicodeObject);
-    if (likely(kind == cache_kind && ascii == cache_is_ascii && ((real_len == cache_length * cache_kind)) && (ssrjson_memcmp_neq_le64(SSRJSON_CAST(u8 *, unicode_str), SSRJSON_CAST(u8 *, cache) + cache_offset, real_len) == 0))) {
+    if (likely(pyunicode_kind == cache_kind && ascii == cache_is_ascii && ((real_len == cache_length * cache_kind)) && (ssrjson_memcmp_neq_le64(SSRJSON_CAST(u8 *, unicode_str), SSRJSON_CAST(u8 *, cache) + cache_offset, real_len) == 0))) {
         // SSRJSON_TRACE_CACHE_HIT();
         return cache;
     }
