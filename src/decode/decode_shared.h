@@ -19,6 +19,7 @@ typedef struct DecodeCtnWithSize {
 
 #if !defined(Py_GIL_DISABLED)
 extern DecodeCtnWithSize _DecodeCtnBuffer[SSRJSON_DECODE_MAX_RECURSION];
+extern u8 _DecodeTempBuffer[SSRJSON_STRING_BUFFER_SIZE];
 
 force_inline DecodeCtnWithSize *get_decode_ctn_stack_buffer(void) {
     return _DecodeCtnBuffer;
@@ -221,6 +222,128 @@ force_inline u32 byte_load_4(const void *src) {
 
 force_inline bool ssrjson_decode_nan(DecodeObjStackInfo *restrict decode_obj_stack_info, bool is_signed);
 
+extern const u8 char_table[256];
+
+/** Match a character with specified type. */
+force_inline bool char_is_type(u8 c, u8 type) {
+    return (char_table[c] & type) != 0;
+}
+
+/** Match a whitespace: ' ', '\\t', '\\n', '\\r'. */
+force_inline bool char_is_space(u8 c) {
+    return char_is_type(c, (u8)CHAR_TYPE_SPACE);
+}
+
+/** Match a whitespace or comment: ' ', '\\t', '\\n', '\\r', '/'. */
+force_inline bool char_is_space_or_comment(u8 c) {
+    return char_is_type(c, (u8)(CHAR_TYPE_SPACE | CHAR_TYPE_COMMENT));
+}
+
+/** Match a JSON number: '-', [0-9]. */
+force_inline bool char_is_number(u8 c) {
+    return char_is_type(c, (u8)CHAR_TYPE_NUMBER);
+}
+
+/** Match a JSON container: '{', '['. */
+force_inline bool char_is_container(u8 c) {
+    return char_is_type(c, (u8)CHAR_TYPE_CONTAINER);
+}
+
+/** Match a stop character in ASCII string: '"', '\', [0x00-0x1F,0x80-0xFF]. */
+force_inline bool char_is_ascii_stop(u8 c) {
+    return char_is_type(c, (u8)(CHAR_TYPE_ESC_ASCII |
+                                CHAR_TYPE_NON_ASCII));
+}
+
+force_inline u16 read_b2_unicode(u32 uni) {
+#if PY_BIG_ENDIAN
+    return ((uni & 0x1f000000) >> 18) | ((uni & 0x3f0000) >> 16);
+#else
+    return ((uni & 0x1f) << 6) | ((uni & 0x3f00) >> 8);
+#endif
+}
+
+force_inline u16 read_b3_unicode(u32 uni) {
+#if PY_BIG_ENDIAN
+    return ((uni & 0x0f000000) >> 12) | ((uni & 0x3f0000) >> 10) | ((uni & 0x3f00) >> 8);
+#else
+    return ((uni & 0x0f) << 12) | ((uni & 0x3f00) >> 2) | ((uni & 0x3f0000) >> 16);
+#endif
+}
+
+force_inline u32 read_b4_unicode(u32 uni) {
+#if PY_BIG_ENDIAN
+    return ((uni & 0x07000000) >> 6) | ((uni & 0x3f0000) >> 4) | ((uni & 0x3f00) >> 2) | ((uni & 0x3f));
+#else
+    return ((uni & 0x07) << 18) | ((uni & 0x3f00) << 4) | ((uni & 0x3f0000) >> 10) | ((uni & 0x3f000000) >> 24);
+#endif
+}
+
+force_inline bool init_decode_obj_stack_info(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+    assert(!decode_obj_stack_info->result_stack);
+    PyObject **new_buffer = get_decode_obj_stack_buffer();
+    if (unlikely(!new_buffer)) {
+        PyErr_NoMemory();
+        return false;
+    }
+    decode_obj_stack_info->result_stack = new_buffer;
+    decode_obj_stack_info->cur_write_result_addr = new_buffer;
+    decode_obj_stack_info->result_stack_end = new_buffer + SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE;
+    return true;
+}
+
+force_inline bool init_decode_ctn_stack_info(DecodeCtnStackInfo *restrict decode_ctn_stack_info) {
+    assert(!decode_ctn_stack_info->ctn_start);
+    DecodeCtnWithSize *new_buffer = get_decode_ctn_stack_buffer();
+    if (unlikely(!new_buffer)) {
+        PyErr_NoMemory();
+        return false;
+    }
+    decode_ctn_stack_info->ctn_start = new_buffer;
+    decode_ctn_stack_info->ctn = new_buffer;
+    decode_ctn_stack_info->ctn_end = new_buffer + SSRJSON_DECODE_MAX_RECURSION;
+    return true;
+}
+
+force_inline bool decode_ctn_is_arr(DecodeCtnWithSize *ctn) {
+    return ctn->raw < 0;
+}
+
+force_inline Py_ssize_t get_decode_ctn_len(DecodeCtnWithSize *ctn) {
+    return ctn->raw & PY_SSIZE_T_MAX;
+}
+
+force_inline void set_decode_ctn(DecodeCtnWithSize *ctn, Py_ssize_t len, bool is_arr) {
+    assert(len >= 0);
+    ctn->raw = len | (is_arr ? PY_SSIZE_T_MIN : 0);
+}
+
+force_inline void incr_decode_ctn_size(DecodeCtnWithSize *ctn) {
+    assert(ctn->raw != PY_SSIZE_T_MAX);
+    ctn->raw++;
+}
+
+force_inline bool ctn_grow_check(DecodeCtnStackInfo *decode_ctn_info) {
+    return ++decode_ctn_info->ctn < decode_ctn_info->ctn_end;
+}
+
+force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int type_flag, bool is_key);
+
+force_inline bool ssrjson_push_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, PyObject *obj);
+
+force_inline PyObject *read_bytes(const u8 **ptr, u8 *write_buffer, bool is_key);
+
+static force_noinline PyObject *read_bytes_not_key(const u8 **ptr, u8 *write_buffer);
+
+force_inline bool ssrjson_decode_true(DecodeObjStackInfo *restrict decode_obj_stack_info);
+
+force_inline bool ssrjson_decode_false(DecodeObjStackInfo *restrict decode_obj_stack_info);
+
+force_inline bool ssrjson_decode_null(DecodeObjStackInfo *restrict decode_obj_stack_info);
+
+force_inline bool ssrjson_decode_arr(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t arr_len);
+
+force_inline bool ssrjson_decode_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t dict_len);
 
 /*==============================================================================
  * Power10 Lookup Table

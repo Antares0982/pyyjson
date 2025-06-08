@@ -1,3 +1,11 @@
+#ifndef SSRJSON_DECODE_DECODE_BYTES_H
+#define SSRJSON_DECODE_DECODE_BYTES_H
+
+#include "decode_shared.h"
+#include "simd/memcpy.h"
+#include "ssrjson.h"
+#include "str/tools.h"
+
 /**
  Read a JSON string.
  @param ptr The head pointer of string before '"' prefix (inout).
@@ -1296,3 +1304,5 @@ static force_noinline PyObject *ssrjson_decode_bytes(char *_buffer, Py_ssize_t l
     if (is_dynamic) SSRJSON_ALIGNED_FREE(_new_buffer);
     return ret;
 }
+
+#endif // SSRJSON_DECODE_DECODE_BYTES_H

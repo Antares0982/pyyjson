@@ -1,30 +1,29 @@
-#include "decode_float_utils.h"
+#ifdef SSRJSON_CLANGD_DUMMY
+#    ifndef COMPILE_READ_UCS_LEVEL
+#        include "decode_float_utils.h"
+#        include "str/tools.h"
+#    endif
+#endif
 
-#define READ_NUMBER MAKE_R_NAME(read_number)
-#define DIGI_IS_DIGIT MAKE_R_NAME(digi_is_digit)
-#define DIGI_IS_DIGIT_OR_FP MAKE_R_NAME(digi_is_digit_or_fp)
-#define DIGI_IS_EXP MAKE_R_NAME(digi_is_exp)
-#define DIGI_IS_SIGN MAKE_R_NAME(digi_is_sign)
-#define DIGI_IS_FP MAKE_R_NAME(digi_is_fp)
+#include "compile_context/r_in.inl.h"
 
-/////////////////
-force_inline bool DIGI_IS_DIGIT(_src_t d) {
+force_inline bool digi_is_digit(_src_t d) {
     return d <= U8MAX && _digi_is_digit((u8)d);
 }
 
-force_inline bool DIGI_IS_DIGIT_OR_FP(_src_t d) {
+force_inline bool digi_is_digit_or_fp(_src_t d) {
     return d <= U8MAX && _digi_is_digit_or_fp((u8)d);
 }
 
-force_inline bool DIGI_IS_EXP(_src_t d) {
+force_inline bool digi_is_exp(_src_t d) {
     return d <= U8MAX && _digi_is_exp((u8)d);
 }
 
-force_inline bool DIGI_IS_SIGN(_src_t d) {
+force_inline bool digi_is_sign(_src_t d) {
     return d <= U8MAX && _digi_is_sign((u8)d);
 }
 
-force_inline bool DIGI_IS_FP(_src_t d) {
+force_inline bool digi_is_fp(_src_t d) {
     return d <= U8MAX && _digi_is_fp((u8)d);
 }
 
@@ -102,7 +101,7 @@ static force_noinline void BIGINT_SET_BUF(
     number is infinite, the return value is based on flag.
  3. This function (with inline attribute) may generate a lot of instructions.
  */
-static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *buffer_end) {
+static force_noinline PyObject *read_number(const _src_t **ptr, const _src_t *buffer_end) {
 #    define return_err(_end, _msg)                                                  \
         do {                                                                        \
             PyErr_Format(JSONDecodeError, "%s, at position %zu", _msg, _end - hdr); \
@@ -187,29 +186,29 @@ static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *bu
             return NULL;
         }
         /* begin with 0 */
-        if (likely(!DIGI_IS_DIGIT_OR_FP(*++cur))) return_0();
+        if (likely(!digi_is_digit_or_fp(*++cur))) return_0();
         if (likely(*cur == '.')) {
             dot_pos = cur++;
-            if (unlikely(!DIGI_IS_DIGIT(*cur))) {
+            if (unlikely(!digi_is_digit(*cur))) {
                 return_err(cur, "no digit after decimal point");
             }
             while (unlikely(*cur == '0')) cur++;
-            if (likely(DIGI_IS_DIGIT(*cur))) {
+            if (likely(digi_is_digit(*cur))) {
                 /* first non-zero digit after decimal point */
                 sig = (u64)(*cur - '0'); /* read first digit */
                 cur--;
                 goto digi_frac_1; /* continue read fraction part */
             }
         }
-        if (unlikely(DIGI_IS_DIGIT(*cur))) {
+        if (unlikely(digi_is_digit(*cur))) {
             return_err(cur - 1, "number with leading zero is not allowed");
         }
-        if (unlikely(DIGI_IS_EXP(*cur))) { /* 0 with any exponent is still 0 */
-            cur += (usize)1 + DIGI_IS_SIGN(cur[1]);
-            if (unlikely(!DIGI_IS_DIGIT(*cur))) {
+        if (unlikely(digi_is_exp(*cur))) { /* 0 with any exponent is still 0 */
+            cur += (usize)1 + digi_is_sign(cur[1]);
+            if (unlikely(!digi_is_digit(*cur))) {
                 return_err(cur, "no digit after exponent sign");
             }
-            while (DIGI_IS_DIGIT(*++cur));
+            while (digi_is_digit(*++cur));
         }
         return_f64_bin(0);
     }
@@ -234,7 +233,7 @@ static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *bu
 
 
     cur += 19; /* skip continuous 19 digits */
-    if (!DIGI_IS_DIGIT_OR_FP(*cur)) {
+    if (!digi_is_digit_or_fp(*cur)) {
         /* this number is an integer consisting of 19 digits */
         if (sign && (sig > ((u64)1 << 63))) { /* overflow */
             // if (has_read_flag(BIGNUM_AS_RAW)) return_raw();
@@ -247,7 +246,7 @@ static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *bu
 
     /* process first non-digit character */
 #    define expr_sepr(i)                                   \
-        digi_sepr_##i : if (likely(!DIGI_IS_FP(cur[i]))) { \
+        digi_sepr_##i : if (likely(!digi_is_fp(cur[i]))) { \
             cur += i;                                      \
             return_i64(sig);                               \
         }                                                  \
@@ -269,7 +268,7 @@ static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *bu
 #    undef expr_frac
 
     cur += 20;                                    /* skip 19 digits and 1 decimal point */
-    if (!DIGI_IS_DIGIT(*cur)) goto digi_frac_end; /* fraction part end */
+    if (!digi_is_digit(*cur)) goto digi_frac_end; /* fraction part end */
     goto digi_frac_more;                          /* read more digits in fraction part */
 
 
@@ -283,8 +282,8 @@ static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *bu
 
     /* read more digits in integral part */
 digi_intg_more:
-    if (DIGI_IS_DIGIT(*cur)) {
-        if (!DIGI_IS_DIGIT_OR_FP(cur[1])) {
+    if (digi_is_digit(*cur)) {
+        if (!digi_is_digit_or_fp(cur[1])) {
             /* this number is an integer consisting of 20 digits */
             num = (u64)(*cur - '0');
             if ((sig < (U64_MAX / 10)) ||
@@ -301,14 +300,14 @@ digi_intg_more:
         }
     }
 
-    if (DIGI_IS_EXP(*cur)) {
+    if (digi_is_exp(*cur)) {
         dot_pos = cur;
         goto digi_exp_more;
     }
 
     if (*cur == '.') {
         dot_pos = cur++;
-        if (!DIGI_IS_DIGIT(*cur)) {
+        if (!digi_is_digit(*cur)) {
             return_err(cur, "no digit after decimal point");
         }
     }
@@ -318,17 +317,17 @@ digi_intg_more:
 digi_frac_more:
     sig_cut = cur;        /* too large to fit in u64, excess digits need to be cut */
     sig += (*cur >= '5'); /* round */
-    while (DIGI_IS_DIGIT(*++cur));
+    while (digi_is_digit(*++cur));
     if (!dot_pos) {
-        // if (!DIGI_IS_FP(*cur) && has_read_flag(BIGNUM_AS_RAW)) {
+        // if (!digi_is_fp(*cur) && has_read_flag(BIGNUM_AS_RAW)) {
         //     return_raw(); /* it's a large integer */
         // }
         dot_pos = cur;
         if (*cur == '.') {
-            if (!DIGI_IS_DIGIT(*++cur)) {
+            if (!digi_is_digit(*++cur)) {
                 return_err(cur, "no digit after decimal point");
             }
-            while (DIGI_IS_DIGIT(*cur)) cur++;
+            while (digi_is_digit(*cur)) cur++;
         }
     }
     exp_sig = (i64)(dot_pos - sig_cut);
@@ -343,7 +342,7 @@ digi_frac_more:
         sig_end = cur;
     }
 
-    if (DIGI_IS_EXP(*cur)) goto digi_exp_more;
+    if (digi_is_exp(*cur)) goto digi_exp_more;
     goto digi_exp_finish;
 
 
@@ -354,7 +353,7 @@ digi_frac_end:
     }
     sig_end = cur;
     exp_sig = -(i64)((u64)(cur - dot_pos) - 1);
-    if (likely(!DIGI_IS_EXP(*cur))) {
+    if (likely(!digi_is_exp(*cur))) {
         if (unlikely(exp_sig < F64_MIN_DEC_EXP - 19)) {
             return_f64_bin(0); /* underflow */
         }
@@ -368,15 +367,15 @@ digi_frac_end:
     /* read exponent part */
 digi_exp_more:
     exp_sign = (*++cur == '-');
-    cur += DIGI_IS_SIGN(*cur);
-    if (unlikely(!DIGI_IS_DIGIT(*cur))) {
+    cur += digi_is_sign(*cur);
+    if (unlikely(!digi_is_digit(*cur))) {
         return_err(cur, "no digit after exponent sign");
     }
     while (*cur == '0') cur++;
 
     /* read exponent literal */
     tmp = cur;
-    while (DIGI_IS_DIGIT(*cur)) {
+    while (digi_is_digit(*cur)) {
         exp_lit = (i64)((u64)(*cur++ - '0') + (u64)exp_lit * 10);
     }
     if (unlikely(cur - tmp >= U64_SAFE_DIG)) {
@@ -716,7 +715,7 @@ digi_finish:
  This is a fallback function if the custom number reader is disabled.
  This function use libc's strtod() to read floating-point number.
  */
-static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *buffer_end) {
+static force_noinline PyObject *read_number(const _src_t **ptr, const _src_t *buffer_end) {
 
 #    define return_err(_end, _msg)                                                  \
         do {                                                                        \
@@ -774,7 +773,7 @@ static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *bu
     sig = (u64)(*cur - '0');
 
     /* read first digit, check leading zero */
-    if (unlikely(!DIGI_IS_DIGIT(*cur))) {
+    if (unlikely(!digi_is_digit(*cur))) {
         // if (has_read_flag(ALLOW_INF_AND_NAN)) {
         PyObject *number_obj = read_inf_or_nan(sign, &cur, buffer_end);
         if (likely(number_obj)) {
@@ -789,10 +788,10 @@ static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *bu
     }
     if (*cur == '0') {
         cur++;
-        if (unlikely(DIGI_IS_DIGIT(*cur))) {
+        if (unlikely(digi_is_digit(*cur))) {
             return_err(cur - 1, "number with leading zero is not allowed");
         }
-        if (!DIGI_IS_FP(*cur)) return_0();
+        if (!digi_is_fp(*cur)) return_0();
         goto read_double;
     }
 
@@ -808,7 +807,7 @@ static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *bu
 
     /* here are 19 continuous digits, skip them */
     cur += 19;
-    if (DIGI_IS_DIGIT(cur[0]) && !DIGI_IS_DIGIT_OR_FP(cur[1])) {
+    if (digi_is_digit(cur[0]) && !digi_is_digit_or_fp(cur[1])) {
         /* this number is an integer consisting of 20 digits */
         num = (u64)(*cur - '0');
         if ((sig < (U64_MAX / 10)) ||
@@ -825,7 +824,7 @@ static force_noinline PyObject *READ_NUMBER(const _src_t **ptr, const _src_t *bu
 
 intg_end:
     /* continuous digits ended */
-    if (!DIGI_IS_DIGIT_OR_FP(*cur)) {
+    if (!digi_is_digit_or_fp(*cur)) {
         /* this number is an integer consisting of 1 to 19 digits */
         if (sign && (sig > ((u64)1 << 63))) {
             // if (has_read_flag(BIGNUM_AS_RAW)) return_raw();
@@ -836,28 +835,28 @@ intg_end:
 
 read_double:
     /* this number should be read as double */
-    while (DIGI_IS_DIGIT(*cur)) cur++;
-    // if (!DIGI_IS_FP(*cur) && has_read_flag(BIGNUM_AS_RAW)) {
+    while (digi_is_digit(*cur)) cur++;
+    // if (!digi_is_fp(*cur) && has_read_flag(BIGNUM_AS_RAW)) {
     //     return_raw(); /* it's a large integer */
     // }
     if (*cur == '.') {
         /* skip fraction part */
         dot = cur;
         cur++;
-        if (!DIGI_IS_DIGIT(*cur)) {
+        if (!digi_is_digit(*cur)) {
             return_err(cur, "no digit after decimal point");
         }
         cur++;
-        while (DIGI_IS_DIGIT(*cur)) cur++;
+        while (digi_is_digit(*cur)) cur++;
     }
-    if (DIGI_IS_EXP(*cur)) {
+    if (digi_is_exp(*cur)) {
         /* skip exponent part */
-        cur += 1 + DIGI_IS_SIGN(cur[1]);
-        if (!DIGI_IS_DIGIT(*cur)) {
+        cur += 1 + digi_is_sign(cur[1]);
+        if (!digi_is_digit(*cur)) {
             return_err(cur, "no digit after exponent sign");
         }
         cur++;
-        while (DIGI_IS_DIGIT(*cur)) cur++;
+        while (digi_is_digit(*cur)) cur++;
     }
 
 /*
@@ -944,9 +943,11 @@ read_double:
 
 #endif /* !SSRJSON_HAS_IEEE_754 */
 
-#undef DIGI_IS_FP
-#undef DIGI_IS_SIGN
-#undef DIGI_IS_EXP
-#undef DIGI_IS_DIGIT_OR_FP
-#undef DIGI_IS_DIGIT
-#undef READ_NUMBER
+#undef digi_is_fp
+#undef digi_is_sign
+#undef digi_is_exp
+#undef digi_is_digit_or_fp
+#undef digi_is_digit
+#undef read_number
+//
+#include "compile_context/r_out.inl.h"

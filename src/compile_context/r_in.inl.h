@@ -92,6 +92,12 @@
 #define _decode_str_loop4_decoder_impl MAKE_R_NAME(_decode_str_loop4_decoder_impl)
 #define _decode_str_loop_decoder_impl MAKE_R_NAME(_decode_str_loop_decoder_impl)
 #define _decode_str_trailing_decoder_impl MAKE_R_NAME(_decode_str_trailing_decoder_impl)
+#define read_number MAKE_R_NAME(read_number)
+#define digi_is_digit MAKE_R_NAME(digi_is_digit)
+#define digi_is_digit_or_fp MAKE_R_NAME(digi_is_digit_or_fp)
+#define digi_is_exp MAKE_R_NAME(digi_is_exp)
+#define digi_is_sign MAKE_R_NAME(digi_is_sign)
+#define digi_is_fp MAKE_R_NAME(digi_is_fp)
 
 #ifdef COMPILE_UCS_LEVEL
 #    define decode MAKE_UCS_NAME(decode)

@@ -32,6 +32,12 @@
 #undef _decode_str_loop4_decoder_impl
 #undef _decode_str_loop_decoder_impl
 #undef _decode_str_trailing_decoder_impl
+#undef read_number
+#undef digi_is_digit
+#undef digi_is_digit_or_fp
+#undef digi_is_exp
+#undef digi_is_sign
+#undef digi_is_fp
 //
 #undef decode
 #undef should_read_pretty

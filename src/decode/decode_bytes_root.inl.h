@@ -3,8 +3,18 @@
  *   READ_ROOT_IMPL, points to the function name
  *   DECODE_READ_PRETTY, true/false
  */
+#ifdef SSRJSON_CLANGD_DUMMY
+#    ifndef DECODE_READ_PRETTY
+#        define COMPILE_CONTEXT_DECODE 1
+#        include "decode_float_wrap.inl.h"
+#        include "decode_shared.h"
+#        include "simd/simd_impl.h"
+#        include "str/tools.h"
+#        define DECODE_READ_PRETTY 1
+#        include "simd/compile_feature_check.h"
+#    endif
+#endif
 
-#include "ssrjson.h"
 //
 #include "compile_context/s_in.inl.h"
 

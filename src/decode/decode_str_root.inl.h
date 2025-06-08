@@ -1,12 +1,18 @@
 #ifdef SSRJSON_CLANGD_DUMMY
 #    ifndef COMPILE_SIMD_BITS
+#        include "decode_float_utils.h"
 #        include "decode_shared.h"
 #        define DECODE_READ_PRETTY 1
-#        define COMPILE_SIMD_BITS 256
+#        define COMPILE_UCS_LEVEL 0
 #        define COMPILE_READ_UCS_LEVEL 1
+#        include "simd/compile_feature_check.h"
+//
 #        include "compile_context/sr_in.inl.h"
+//
+force_inline bool check_and_reserve_str_buffer(Py_ssize_t len, _src_t **buffer_head_addr, bool *need_dealloc);
 #    endif
 #endif
+
 /*
  * Required macros:
  *   READ_ROOT_IMPL, points to the function name
@@ -98,7 +104,7 @@ arr_val_begin:
         goto arr_begin;
     }
     if (*cur <= U8MAX && char_is_number(*cur)) {
-        PyObject *number_obj = READ_NUMBER(&cur, end);
+        PyObject *number_obj = read_number(&cur, end);
         if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto arr_val_end;
@@ -308,7 +314,7 @@ obj_val_begin:
         goto fail_string;
     }
     if (char_is_number(*cur)) {
-        PyObject *number_obj = READ_NUMBER(&cur, end);
+        PyObject *number_obj = read_number(&cur, end);
         if (likely(number_obj && ssrjson_push_obj(decode_obj_stack_info, number_obj))) {
             incr_decode_ctn_size(decode_ctn_info->ctn);
             goto obj_val_end;

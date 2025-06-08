@@ -1,12 +1,16 @@
 #ifdef SSRJSON_CLANGD_DUMMY
-#    include "decode/str/str.h"
-#    include "ssrjson.h"
-#    include "simd/cvt.h"
-#    include "simd/long_cvt.h"
-#    include "simd/mask_table.h"
-#    include "simd/simd_impl.h"
 #    ifndef COMPILE_SIMD_BITS
-#        define COMPILE_SIMD_BITS 512
+#        include "decode/str/str.h"
+#        include "decode_float_utils.h"
+#        include "decode_shared.h"
+#        include "simd/cvt.h"
+#        include "simd/long_cvt.h"
+#        include "simd/mask_table.h"
+#        include "simd/simd_impl.h"
+#        include "ssrjson.h"
+//
+#        include "simd/compile_feature_check.h"
+#        define COMPILE_UCS_LEVEL 0
 #    endif
 #endif
 
@@ -19,7 +23,7 @@
 //
 #include "compile_context/sr_in.inl.h"
 
-#define READ_NUMBER MAKE_R_NAME(read_number)
+#define read_number MAKE_R_NAME(read_number)
 
 force_inline bool check_and_reserve_str_buffer(Py_ssize_t len, _src_t **buffer_head_addr, bool *need_dealloc) {
     // consider the max length of the buffer we need
@@ -77,7 +81,7 @@ static force_noinline PyObject *decode_root_single(const _src_t *dat, Py_ssize_t
     PyObject *ret = NULL;
 
     if (*cur <= U8MAX && char_is_number(*cur)) {
-        ret = READ_NUMBER(&cur, end);
+        ret = read_number(&cur, end);
         if (likely(ret)) goto single_end;
         goto fail_number;
     }
@@ -235,7 +239,7 @@ static force_noinline PyObject *decode(PyUnicodeObject *in_unicode) {
     return ret;
 }
 
-#undef READ_NUMBER
+#undef read_number
 //
 #undef COMPILE_READ_UCS_LEVEL
 #include "compile_context/sr_out.inl.h"

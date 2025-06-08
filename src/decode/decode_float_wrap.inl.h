@@ -1,23 +1,18 @@
+#ifndef SSRJSON_DECODE_DECODE_FLOAT_WRAP_H
+#define SSRJSON_DECODE_DECODE_FLOAT_WRAP_H
+
+#include "decode_float_utils.h"
+
 #define COMPILE_READ_UCS_LEVEL 1
-#include "compile_context/r_in.inl.h"
-//
 #include "decode_float.inl.h"
-//
-#include "compile_context/r_out.inl.h"
 #undef COMPILE_READ_UCS_LEVEL
 
 #define COMPILE_READ_UCS_LEVEL 2
-#include "compile_context/r_in.inl.h"
-//
 #include "decode_float.inl.h"
-//
-#include "compile_context/r_out.inl.h"
 #undef COMPILE_READ_UCS_LEVEL
 
 #define COMPILE_READ_UCS_LEVEL 4
-#include "compile_context/r_in.inl.h"
-//
 #include "decode_float.inl.h"
-//
-#include "compile_context/r_out.inl.h"
 #undef COMPILE_READ_UCS_LEVEL
+
+#endif // SSRJSON_DECODE_DECODE_FLOAT_WRAP_H
