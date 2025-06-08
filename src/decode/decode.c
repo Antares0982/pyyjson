@@ -279,19 +279,19 @@ force_inline bool ssrjson_decode_nan(DecodeObjStackInfo *restrict decode_obj_sta
 #include "simd/compile_feature_check.h"
 
 #define COMPILE_UCS_LEVEL 0
-#include "decode_str.inl.c"
+#include "decode_str.inl.h"
 #undef COMPILE_UCS_LEVEL
 
 #define COMPILE_UCS_LEVEL 1
-#include "decode_str.inl.c"
+#include "decode_str.inl.h"
 #undef COMPILE_UCS_LEVEL
 
 #define COMPILE_UCS_LEVEL 2
-#include "decode_str.inl.c"
+#include "decode_str.inl.h"
 #undef COMPILE_UCS_LEVEL
 
 #define COMPILE_UCS_LEVEL 4
-#include "decode_str.inl.c"
+#include "decode_str.inl.h"
 #undef COMPILE_UCS_LEVEL
 
 #include "decode_bytes.h"
