@@ -6,10 +6,13 @@
 #include "ssrjson.h"
 #include "xxhash.h"
 
+
+typedef pyobj_ptr_t *decode_obj_stack_ptr_t;
+
 typedef struct DecodeObjStackInfo {
-    PyObject **cur_write_result_addr;
-    PyObject **result_stack;
-    PyObject **result_stack_end;
+    decode_obj_stack_ptr_t decode_obj_writer;
+    decode_obj_stack_ptr_t decode_obj_stack;
+    decode_obj_stack_ptr_t decode_obj_stack_end;
 } DecodeObjStackInfo;
 
 typedef struct DecodeCtnWithSize {
@@ -27,16 +30,16 @@ force_inline DecodeCtnWithSize *get_decode_ctn_stack_buffer(void) {
 
 extern PyObject *_DecodeObjBuffer[SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE];
 
-force_inline PyObject **get_decode_obj_stack_buffer(void) {
+force_inline decode_obj_stack_ptr_t get_decode_obj_stack_buffer(void) {
     return _DecodeObjBuffer;
 }
 #endif
 
-typedef struct DecodeCtnStackInfo {
-    DecodeCtnWithSize *ctn;
-    DecodeCtnWithSize *ctn_start;
-    DecodeCtnWithSize *ctn_end;
-} DecodeCtnStackInfo;
+// typedef struct DecodeCtnStackInfo {
+//     DecodeCtnWithSize *ctn;
+//     DecodeCtnWithSize *ctn_start;
+//     DecodeCtnWithSize *ctn_end;
+// } DecodeCtnStackInfo;
 
 typedef union {
     struct {
@@ -220,7 +223,9 @@ force_inline u32 byte_load_4(const void *src) {
  * These functions are used by JSON reader to read literals and comments.
  *============================================================================*/
 
-force_inline bool decode_nan(DecodeObjStackInfo *restrict decode_obj_stack_info, bool is_signed);
+force_inline bool decode_nan(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_end_addr, bool is_signed);
 
 extern const u8 char_table[256];
 
@@ -279,29 +284,32 @@ force_inline u32 read_b4_unicode(u32 uni) {
 #endif
 }
 
-force_inline bool init_decode_obj_stack_info(DecodeObjStackInfo *restrict decode_obj_stack_info) {
-    assert(!decode_obj_stack_info->result_stack);
-    PyObject **new_buffer = get_decode_obj_stack_buffer();
+force_inline bool init_decode_obj_stack_info(
+        // DecodeObjStackInfo *restrict decode_obj_stack_info
+        decode_obj_stack_ptr_t *decode_obj_writer_addr,
+        decode_obj_stack_ptr_t *decode_obj_stack_addr,
+        decode_obj_stack_ptr_t *decode_obj_stack_end_addr) {
+    assert(!*decode_obj_stack);
+    pyobj_ptr_t *new_buffer = get_decode_obj_stack_buffer();
     if (unlikely(!new_buffer)) {
         PyErr_NoMemory();
         return false;
     }
-    decode_obj_stack_info->result_stack = new_buffer;
-    decode_obj_stack_info->cur_write_result_addr = new_buffer;
-    decode_obj_stack_info->result_stack_end = new_buffer + SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE;
+    *decode_obj_stack_addr = new_buffer;
+    *decode_obj_writer_addr = new_buffer;
+    *decode_obj_stack_end_addr = new_buffer + SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE;
     return true;
 }
 
-force_inline bool init_decode_ctn_stack_info(DecodeCtnStackInfo *restrict decode_ctn_stack_info) {
-    assert(!decode_ctn_stack_info->ctn_start);
+force_inline bool init_decode_ctn_stack_info(DecodeCtnWithSize **ctn_start_addr, DecodeCtnWithSize **ctn_addr, DecodeCtnWithSize **ctn_end_addr) {
     DecodeCtnWithSize *new_buffer = get_decode_ctn_stack_buffer();
     if (unlikely(!new_buffer)) {
         PyErr_NoMemory();
         return false;
     }
-    decode_ctn_stack_info->ctn_start = new_buffer;
-    decode_ctn_stack_info->ctn = new_buffer;
-    decode_ctn_stack_info->ctn_end = new_buffer + SSRJSON_DECODE_MAX_RECURSION;
+    *ctn_start_addr = new_buffer;
+    *ctn_addr = new_buffer;
+    *ctn_end_addr = new_buffer + SSRJSON_DECODE_MAX_RECURSION;
     return true;
 }
 
@@ -323,27 +331,39 @@ force_inline void incr_decode_ctn_size(DecodeCtnWithSize *ctn) {
     ctn->raw++;
 }
 
-force_inline bool ctn_grow_check(DecodeCtnStackInfo *decode_ctn_info) {
-    return ++decode_ctn_info->ctn < decode_ctn_info->ctn_end;
+force_inline bool ctn_grow_check(DecodeCtnWithSize **ctn_addr, DecodeCtnWithSize *ctn_end) {
+    return ++(*ctn_addr) < ctn_end;
 }
 
 force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int type_flag, bool is_key);
 
-force_inline bool push_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, PyObject *obj);
+force_inline bool push_obj(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                           decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                           decode_obj_stack_ptr_t *decode_obj_stack_end_addr, pyobj_ptr_t obj);
 
 force_inline PyObject *read_bytes(const u8 **ptr, u8 *write_buffer, bool is_key);
 
 static force_noinline PyObject *read_bytes_not_key(const u8 **ptr, u8 *write_buffer);
 
-force_inline bool decode_true(DecodeObjStackInfo *restrict decode_obj_stack_info);
+force_inline bool decode_true(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                              decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                              decode_obj_stack_ptr_t *decode_obj_stack_end_addr);
 
-force_inline bool decode_false(DecodeObjStackInfo *restrict decode_obj_stack_info);
+force_inline bool decode_false(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                               decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                               decode_obj_stack_ptr_t *decode_obj_stack_end_addr);
 
-force_inline bool decode_null(DecodeObjStackInfo *restrict decode_obj_stack_info);
+force_inline bool decode_null(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                              decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                              decode_obj_stack_ptr_t *decode_obj_stack_end_addr);
 
-force_inline bool decode_arr(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t arr_len);
+force_inline bool decode_arr(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_end_addr, Py_ssize_t arr_len);
 
-force_inline bool decode_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t dict_len);
+force_inline bool decode_obj(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_end_addr, Py_ssize_t dict_len);
 
 
 #if PY_MINOR_VERSION >= 12

@@ -114,6 +114,7 @@ typedef int64_t i64;
 typedef uint64_t u64;
 typedef size_t usize;
 
+typedef PyObject *pyobj_ptr_t;
 
 /* Some feature checks. */
 

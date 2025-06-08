@@ -101,7 +101,7 @@ extern TLS_KEY_TYPE _DecodeObjStackBuffer_Key;
 SSRJSON_DECLARE_TLS_GETTER(_DecodeObjStackBuffer_Key, _get_decode_obj_stack_buffer_pointer)
 SSRJSON_DECLARE_TLS_SETTER(_DecodeObjStackBuffer_Key, _set_decode_obj_stack_buffer_pointer)
 
-force_inline PyObject **get_decode_obj_stack_buffer(void) {
+force_inline decode_obj_stack_ptr_t get_decode_obj_stack_buffer(void) {
     void *value = _get_decode_obj_stack_buffer_pointer();
     if (unlikely(value == NULL)) {
         value = malloc(SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE * sizeof(PyObject *));
@@ -112,7 +112,7 @@ force_inline PyObject **get_decode_obj_stack_buffer(void) {
             return NULL;
         }
     }
-    return (PyObject **)value;
+    return (decode_obj_stack_ptr_t)value;
 }
 
 #endif // defined(Py_GIL_DISABLED)

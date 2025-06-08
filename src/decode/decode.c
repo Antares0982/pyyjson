@@ -126,38 +126,47 @@ success:
 #endif
 
 
-bool _decode_obj_stack_resize(DecodeObjStackInfo *restrict decode_obj_stack_info);
+bool _decode_obj_stack_resize(
+        decode_obj_stack_ptr_t *decode_obj_writer_addr,
+        decode_obj_stack_ptr_t *decode_obj_stack_addr,
+        decode_obj_stack_ptr_t *decode_obj_stack_end_addr);
 
-force_inline bool push_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, PyObject *obj) {
+force_inline bool push_obj(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                           decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                           decode_obj_stack_ptr_t *decode_obj_stack_end_addr, pyobj_ptr_t obj) {
     static_assert(((Py_ssize_t)SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1) > 0, "(SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE << 1) > 0");
-    if (unlikely(decode_obj_stack_info->cur_write_result_addr >= decode_obj_stack_info->result_stack_end)) {
-        bool c = _decode_obj_stack_resize(decode_obj_stack_info);
+    if (unlikely((*decode_obj_writer_addr) >= (*decode_obj_stack_end_addr))) {
+        bool c = _decode_obj_stack_resize(decode_obj_writer_addr, decode_obj_stack_addr, decode_obj_stack_end_addr);
         RETURN_ON_UNLIKELY_ERR(!c);
     }
-    *decode_obj_stack_info->cur_write_result_addr++ = obj;
+    *(*decode_obj_writer_addr)++ = obj;
     return true;
 }
 
-force_inline bool decode_arr(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t arr_len) {
+force_inline bool decode_arr(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_end_addr, Py_ssize_t arr_len) {
     assert(arr_len >= 0);
     PyObject *list = PyList_New(arr_len);
     RETURN_ON_UNLIKELY_ERR(!list);
-    PyObject **list_val_start = decode_obj_stack_info->cur_write_result_addr - arr_len;
-    assert(list_val_start >= decode_obj_stack_info->result_stack);
+    decode_obj_stack_ptr_t list_val_start = (*decode_obj_writer_addr) - arr_len;
+    assert(list_val_start >= (*decode_obj_stack_addr));
     for (Py_ssize_t j = 0; j < arr_len; j++) {
         PyObject *val = list_val_start[j];
         assert(val);
         PyList_SET_ITEM(list, j, val); // this never fails
     }
-    decode_obj_stack_info->cur_write_result_addr -= arr_len;
-    return push_obj(decode_obj_stack_info, list);
+    (*decode_obj_writer_addr) -= arr_len;
+    return push_obj(decode_obj_writer_addr, decode_obj_stack_addr, decode_obj_stack_end_addr, list);
 }
 
-force_inline bool decode_obj(DecodeObjStackInfo *restrict decode_obj_stack_info, Py_ssize_t dict_len) {
+force_inline bool decode_obj(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_end_addr, Py_ssize_t dict_len) {
     PyObject *dict = _PyDict_NewPresized(dict_len);
     RETURN_ON_UNLIKELY_ERR(!dict);
-    PyObject **dict_val_start = decode_obj_stack_info->cur_write_result_addr - dict_len * 2;
-    PyObject **dict_val_view = dict_val_start;
+    decode_obj_stack_ptr_t dict_val_start = (*decode_obj_writer_addr) - dict_len * 2;
+    decode_obj_stack_ptr_t dict_val_view = dict_val_start;
     for (size_t j = 0; j < dict_len; j++) {
         PyObject *key = *dict_val_view++;
         assert(PyUnicode_Check(key));
@@ -174,38 +183,46 @@ force_inline bool decode_obj(DecodeObjStackInfo *restrict decode_obj_stack_info,
             for (size_t k = j * 2; k < dict_len * 2; k++) {
                 Py_DECREF(dict_val_start[k]);
             }
-            // move cur_write_result_addr to the first key addr, avoid double decref
-            decode_obj_stack_info->cur_write_result_addr = dict_val_start;
+            // move decode_obj_writer to the first key addr, avoid double decref
+            (*decode_obj_writer_addr) = dict_val_start;
             return false;
         }
     }
-    decode_obj_stack_info->cur_write_result_addr -= dict_len * 2;
-    return push_obj(decode_obj_stack_info, dict);
+    (*decode_obj_writer_addr) -= dict_len * 2;
+    return push_obj(decode_obj_writer_addr, decode_obj_stack_addr, decode_obj_stack_end_addr, dict);
 }
 
-force_inline bool decode_null(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+force_inline bool decode_null(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                              decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                              decode_obj_stack_ptr_t *decode_obj_stack_end_addr) {
     SSRJSON_TRACE_OP(SSRJSON_OP_CONSTANTS);
     Py_Immortal_IncRef(Py_None);
-    return push_obj(decode_obj_stack_info, Py_None);
+    return push_obj(decode_obj_writer_addr, decode_obj_stack_addr, decode_obj_stack_end_addr, Py_None);
 }
 
-force_inline bool decode_false(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+force_inline bool decode_false(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                               decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                               decode_obj_stack_ptr_t *decode_obj_stack_end_addr) {
     SSRJSON_TRACE_OP(SSRJSON_OP_CONSTANTS);
     Py_Immortal_IncRef(Py_False);
-    return push_obj(decode_obj_stack_info, Py_False);
+    return push_obj(decode_obj_writer_addr, decode_obj_stack_addr, decode_obj_stack_end_addr, Py_False);
 }
 
-force_inline bool decode_true(DecodeObjStackInfo *restrict decode_obj_stack_info) {
+force_inline bool decode_true(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                              decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                              decode_obj_stack_ptr_t *decode_obj_stack_end_addr) {
     SSRJSON_TRACE_OP(SSRJSON_OP_CONSTANTS);
     Py_Immortal_IncRef(Py_True);
-    return push_obj(decode_obj_stack_info, Py_True);
+    return push_obj(decode_obj_writer_addr, decode_obj_stack_addr, decode_obj_stack_end_addr, Py_True);
 }
 
-force_inline bool decode_nan(DecodeObjStackInfo *restrict decode_obj_stack_info, bool is_signed) {
+force_inline bool decode_nan(decode_obj_stack_ptr_t *decode_obj_writer_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_addr,
+                             decode_obj_stack_ptr_t *decode_obj_stack_end_addr, bool is_signed) {
     SSRJSON_TRACE_OP(SSRJSON_OP_NAN_INF);
     PyObject *o = PyFloat_FromDouble(is_signed ? -fabs(Py_NAN) : fabs(Py_NAN));
     RETURN_ON_UNLIKELY_ERR(!o);
-    return push_obj(decode_obj_stack_info, o);
+    return push_obj(decode_obj_writer_addr, decode_obj_stack_addr, decode_obj_stack_end_addr, o);
 }
 
 static int invalid_arg_checked = 0;
