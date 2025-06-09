@@ -25,6 +25,10 @@ force_inline void bytes_write_ascii(u8 **writer_addr, const u8 *src, usize len) 
     encode_trailing_copy_with_cvt(writer_addr, src, len);
 }
 
+static force_noinline void bytes_write_ascii_noinline(u8 **writer_addr, const u8 *src, usize len) {
+    bytes_write_ascii(writer_addr, src, len);
+}
+
 /* UCS1 src. */
 force_inline void check_ascii_in_ucs1_and_get_done_countx4(unionvector_a_x4 vec, bool *out_checked, usize *out_done_count) {
     vector_a t1 = broadcast(_Quote);

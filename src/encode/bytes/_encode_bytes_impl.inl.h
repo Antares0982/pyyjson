@@ -71,7 +71,7 @@ force_inline bool bytes_buffer_append_str(PyObject *str, EncodeUnicodeWriter *wr
     }
     *writer_addr->writer_u8++ = '"';
     if (is_ascii) {
-        bytes_write_ascii(&writer_addr->writer_u8, SSRJSON_CAST(const u8 *, SSRJSON_CAST(PyASCIIObject *, str) + 1), len);
+        bytes_write_ascii_noinline(&writer_addr->writer_u8, SSRJSON_CAST(const u8 *, SSRJSON_CAST(PyASCIIObject *, str) + 1), len);
     } else {
         switch (read_kind_val) {
             case 1: {
