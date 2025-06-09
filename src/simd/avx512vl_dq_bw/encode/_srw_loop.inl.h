@@ -119,11 +119,15 @@ restart:;
     *dst_addr = dst;
 }
 
-static force_noinline void encode_unicode_impl(_dst_t **dst_addr, const _src_t *src, usize len) {
+force_inline void encode_unicode_impl(_dst_t **dst_addr, const _src_t *src, usize len) {
     encode_unicode_loop4(dst_addr, &src, &len);
     encode_unicode_loop(dst_addr, &src, &len);
     if (!len) return;
     encode_trailing_copy_with_cvt(dst_addr, src, len);
+}
+
+static force_noinline void encode_unicode_impl_noinline(_dst_t **dst_addr, const _src_t *src, usize len) {
+    encode_unicode_impl(dst_addr, src, len);
 }
 
 #include "compile_context/srw_out.inl.h"

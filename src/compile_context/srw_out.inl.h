@@ -13,5 +13,6 @@
 #undef encode_unicode_loop
 #undef encode_unicode_loop4
 #undef encode_unicode_impl
+#undef encode_unicode_impl_noinline
 #undef long_cvt
 #undef long_back_cvt
