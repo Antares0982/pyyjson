@@ -31,14 +31,9 @@ force_inline void get_cache_key_hash_and_size_ucs2(const void **hash_string_ptr_
             assert(more < 16);
             temp_dst -= more;
             temp_src -= more;
-            if (temp_count & 16) {
+            usize cnt = temp_count / 16;
+            for (usize i = 0; i < cnt; ++i) {
                 __partial_cvt_16_u16_u8(&temp_dst, &temp_src);
-            }
-            if (temp_count & 32) {
-                __partial_cvt_32_u16_u8(&temp_dst, &temp_src);
-            } else if (temp_count & 64) {
-                __partial_cvt_32_u16_u8(&temp_dst, &temp_src);
-                __partial_cvt_32_u16_u8(&temp_dst, &temp_src);
             }
         }
         *hash_string_ptr_addr = temp_buffer;
@@ -69,13 +64,9 @@ force_inline void get_cache_key_hash_and_size_ucs4(const void **hash_string_ptr_
             assert(more < 8);
             temp_dst -= more;
             temp_src -= more;
-            if (temp_count & 8) {
+            usize cnt = temp_count / 8;
+            for (usize i = 0; i < cnt; ++i) {
                 __partial_cvt_8_u32_u16(&temp_dst, &temp_src);
-            }
-            if (temp_count & 16) {
-                __partial_cvt_16_u32_u16(&temp_dst, &temp_src);
-            } else if (temp_count & 32) {
-                __partial_cvt_32_u32_u16(&temp_dst, &temp_src);
             }
         } else {
             assert(tpsize == 1);
@@ -89,17 +80,9 @@ force_inline void get_cache_key_hash_and_size_ucs4(const void **hash_string_ptr_
             assert(more < 8);
             temp_dst -= more;
             temp_src -= more;
-            if (temp_count & 8) {
+            usize cnt = temp_count / 8;
+            for (usize i = 0; i < cnt; ++i) {
                 __partial_cvt_8_u32_u8(&temp_dst, &temp_src);
-            }
-            if (temp_count & 16) {
-                __partial_cvt_16_u32_u8(&temp_dst, &temp_src);
-            }
-            if (temp_count & 32) {
-                __partial_cvt_32_u32_u8(&temp_dst, &temp_src);
-            } else if (temp_count & 64) {
-                __partial_cvt_32_u32_u8(&temp_dst, &temp_src);
-                __partial_cvt_32_u32_u8(&temp_dst, &temp_src);
             }
         }
         *hash_string_ptr_addr = temp_buffer;
