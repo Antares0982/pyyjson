@@ -1,9 +1,21 @@
 #ifndef SSRJSON_TLS_H
 #define SSRJSON_TLS_H
 
-#include "ssrjson.h"
-#include <threads.h>
+#include "ssrjson_config.h"
+
 #if defined(Py_GIL_DISABLED)
+
+#    include <threads.h>
+#    if defined(_POSIX_THREADS)
+#        include <pthread.h>
+#        define TLS_KEY_TYPE pthread_key_t
+#    elif defined(NT_THREADS)
+#        define WIN32_LEAN_AND_MEAN
+#        include <windows.h>
+#        define TLS_KEY_TYPE DWORD
+#    else
+#        error "Unknown thread model"
+#    endif
 
 /*==============================================================================
  * TLS related macros

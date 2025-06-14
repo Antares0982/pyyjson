@@ -12,16 +12,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#if defined(_POSIX_THREADS)
-#    include <pthread.h>
-#    define TLS_KEY_TYPE pthread_key_t
-#elif defined(NT_THREADS)
-#    define WIN32_LEAN_AND_MEAN
-#    include <windows.h>
-#    define TLS_KEY_TYPE DWORD
-#else
-#    error "Unknown thread model"
-#endif
+
 
 
 // feature checks
@@ -33,19 +24,19 @@
 #    error "Unsupported platform"
 #endif
 
-/* String buffer size for decoding. Default cost: 512 * 1024 = 512kb (per thread). */
+/* String buffer size for decoding. Default cost: 512 * 1024 = 512kb (per thread if GIL disabled). */
 #ifndef SSRJSON_STRING_BUFFER_SIZE
 #    define SSRJSON_STRING_BUFFER_SIZE (512 * 1024)
 #endif
 
-/* Buffer for key associative cache. Default cost: 2048 * sizeof(decode_cache_t) = 32kb (per thread). */
+/* Buffer for key associative cache. Default cost: 512 * sizeof(decode_cache_t) = 8kb (per thread if GIL disabled). */
 #ifndef SSRJSON_KEY_CACHE_SIZE
-#    define SSRJSON_KEY_CACHE_SIZE (1 << 11)
+#    define SSRJSON_KEY_CACHE_SIZE (1 << 9)
 #endif
 
 /*
  Buffer size for decoding object buffer.
- Cost: SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE * sizeof(void*) bytes per thread.
+ Default cost: 1024 * sizeof(void*) = 8kb (per thread if GIL disabled).
  */
 #ifndef SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE
 #    define SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE (1024)
@@ -53,15 +44,15 @@
 
 /*
  Buffer size for decode container buffer.
- Cost: SSRJSON_DECODE_CONTAINER_BUFFER_INIT_SIZE * sizeof(Py_ssize_t) bytes per thread.
+ Cost: 1024 * sizeof(Py_ssize_t) = 8kb (per thread if GIL disabled).
  */
 #ifndef SSRJSON_DECODE_MAX_RECURSION
 #    define SSRJSON_DECODE_MAX_RECURSION (1024)
 #endif
 
 /*
- Init buffer size for dst buffer. Must be multiple of 64.
- Cost: SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE bytes per thread.
+ Init buffer size for encode buffer. Must be multiple of 64.
+ Cost: 1kb (per thread if GIL disabled).
  */
 #ifndef SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE
 #    define SSRJSON_ENCODE_DST_BUFFER_INIT_SIZE (1024)
@@ -69,21 +60,10 @@
 
 /*
  Max nested structures for encoding.
- Cost: SSRJSON_ENCODE_MAX_RECURSION * sizeof(void*) * 2 bytes per thread.
+ Cost: 1024 * sizeof(EncodeCtnWithIndex) = 16kb (per thread if GIL disabled).
  */
 #ifndef SSRJSON_ENCODE_MAX_RECURSION
 #    define SSRJSON_ENCODE_MAX_RECURSION (1024)
-#endif
-
-/*
- When a character needs escape when encoding,
- the following `SSRJSON_ENCODE_ESCAPE_ONCE_BYTES`
- bytes will be processed character by character without using SIMD.
- Adjust this value if the characters that need to be escaped
- are centralized in a certain range.
- */
-#ifndef SSRJSON_ENCODE_ESCAPE_ONCE_BYTES
-#    define SSRJSON_ENCODE_ESCAPE_ONCE_BYTES (16)
 #endif
 
 /* Whether implementation of encoding ASCII/UCS1 string is inlined. */
