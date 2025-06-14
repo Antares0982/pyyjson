@@ -459,33 +459,37 @@ force_inline void init_read_state(ReadStrState *state) {
 
 #define REHASHER(_x) (((size_t)(_x)) % (SSRJSON_KEY_CACHE_SIZE))
 typedef XXH64_hash_t decode_keyhash_t;
-extern decode_cache_t AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
+extern decode_cache_t DecodeKeyCache[SSRJSON_KEY_CACHE_SIZE];
 
-force_inline void add_key_cache(decode_keyhash_t hash, PyObject *obj) {
+force_inline u64 make_key_hint(usize real_len, int kind) {
+    u64 ret = SSRJSON_CAST(u64, real_len) | (SSRJSON_CAST(u64, kind) << 32);
+    return ret;
+}
+
+force_inline void add_key_cache(decode_keyhash_t hash, PyObject *obj, usize real_len, int kind) {
     assert(PyUnicode_GET_LENGTH(obj) * PyUnicode_KIND(obj) <= 64);
     size_t index = REHASHER(hash);
     // SSRJSON_TRACE_HASH(index);
-    decode_cache_t old = AssociativeKeyCache[index];
-    if (old) {
+    decode_cache_t old = DecodeKeyCache[index];
+    if (old.key) {
         // SSRJSON_TRACE_HASH_CONFLICT(hash);
-        Py_DECREF(old);
+        Py_DECREF(old.key);
     }
     Py_INCREF(obj);
-    AssociativeKeyCache[index] = obj;
+    DecodeKeyCache[index].key = obj;
+    DecodeKeyCache[index].key_hint = make_key_hint(real_len, kind);
 }
 
-force_inline PyObject *get_key_cache(const void *unicode_str, decode_keyhash_t hash, size_t real_len, int pyunicode_kind, bool ascii) {
+force_inline PyObject *get_key_cache(const void *unicode_str, decode_keyhash_t hash, usize real_len, int kind) {
     assert(real_len <= 64);
-    decode_cache_t cache = AssociativeKeyCache[REHASHER(hash)];
-    if (!cache) return NULL;
-    PyASCIIObject *cache_ascii = SSRJSON_CAST(PyASCIIObject *, cache);
-    Py_ssize_t cache_length = cache_ascii->length;
-    Py_ssize_t cache_kind = cache_ascii->state.kind;
-    bool cache_is_ascii = cache_ascii->state.ascii;
-    Py_ssize_t cache_offset = cache_is_ascii ? sizeof(PyASCIIObject) : sizeof(PyCompactUnicodeObject);
-    if (likely(pyunicode_kind == cache_kind && ascii == cache_is_ascii && ((real_len == cache_length * cache_kind)) && (ssrjson_memcmp_neq_le64(SSRJSON_CAST(u8 *, unicode_str), SSRJSON_CAST(u8 *, cache) + cache_offset, real_len) == 0))) {
+    decode_cache_t cache = DecodeKeyCache[REHASHER(hash)];
+    if (!cache.key) return NULL;
+    u64 key_hint = make_key_hint(real_len, kind);
+    Py_ssize_t cache_offset = kind ? sizeof(PyCompactUnicodeObject) : sizeof(PyASCIIObject);
+    if (likely(key_hint == cache.key_hint && (ssrjson_memcmp_neq_le64(SSRJSON_CAST(u8 *, unicode_str), SSRJSON_CAST(u8 *, cache.key) + cache_offset, real_len) == 0))) {
         // SSRJSON_TRACE_CACHE_HIT();
-        return cache;
+        Py_INCREF(cache.key);
+        return cache.key;
     }
     return NULL;
 }

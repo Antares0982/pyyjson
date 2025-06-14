@@ -38,7 +38,7 @@
 #    define SSRJSON_STRING_BUFFER_SIZE (512 * 1024)
 #endif
 
-/* Buffer for key associative cache. Default cost: 2048 * sizeof(decode_cache_t) = 16kb (per thread). */
+/* Buffer for key associative cache. Default cost: 2048 * sizeof(decode_cache_t) = 32kb (per thread). */
 #ifndef SSRJSON_KEY_CACHE_SIZE
 #    define SSRJSON_KEY_CACHE_SIZE (1 << 11)
 #endif

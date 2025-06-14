@@ -37,7 +37,7 @@ size_t __hash_add_key_call_count = 0;
 #    define SSRJSON_TRACE_HASH_CONFLICT(_hash) (void)(0)
 #endif // SSRJSON_ENABLE_TRACE
 
-force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int type_flag, bool is_key) {
+force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int kind, bool is_key) {
     SSRJSON_TRACE_STR_LEN(len);
     PyObject *obj;
     decode_keyhash_t hash;
@@ -46,7 +46,7 @@ force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int ty
     int pyunicode_kind;
     bool ascii;
 
-    switch (type_flag) {
+    switch (kind) {
         case SSRJSON_STRING_TYPE_ASCII: {
             ascii = true;
             pyunicode_kind = 1;
@@ -83,18 +83,17 @@ force_inline PyObject *make_string(const u8 *unicode_str, Py_ssize_t len, int ty
 
     if (should_cache) {
         hash = XXH3_64bits(unicode_str, real_len);
-        obj = get_key_cache(unicode_str, hash, real_len, pyunicode_kind, ascii);
+        obj = get_key_cache(unicode_str, hash, real_len, kind);
         if (obj) {
-            Py_INCREF(obj);
             return obj;
         }
     }
 
-    obj = create_empty_unicode(len, type_flag);
+    obj = create_empty_unicode(len, kind);
     if (obj == NULL) return NULL;
     ssrjson_memcpy(SSRJSON_CAST(u8 *, obj) + offset, unicode_str, real_len);
     if (should_cache) {
-        add_key_cache(hash, obj);
+        add_key_cache(hash, obj, real_len, kind);
     }
 success:
     if (is_key) {

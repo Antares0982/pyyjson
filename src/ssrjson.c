@@ -3,9 +3,7 @@
 #include "version.h"
 
 
-typedef PyObject *decode_cache_t;
-
-extern decode_cache_t AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
+extern decode_cache_t DecodeKeyCache[SSRJSON_KEY_CACHE_SIZE];
 
 PyObject *ssrjson_Encode(PyObject *self, PyObject *args, PyObject *kwargs);
 PyObject *ssrjson_EncodeToBytes(PyObject *self, PyObject *args, PyObject *kwargs);
@@ -57,7 +55,7 @@ static struct PyModuleDef moduledef = {
 
 static void module_free(void *m) {
     for (size_t i = 0; i < SSRJSON_KEY_CACHE_SIZE; i++) {
-        Py_XDECREF(AssociativeKeyCache[i]);
+        Py_XDECREF(DecodeKeyCache[i].key);
     }
 
 #if defined(Py_GIL_DISABLED)
@@ -70,7 +68,7 @@ static void module_free(void *m) {
 #if SSRJSON_ENABLE_TRACE
     size_t cached = 0;
     for (size_t i = 0; i < SSRJSON_KEY_CACHE_SIZE; i++) {
-        if (AssociativeKeyCache[i]) cached++;
+        if (DecodeKeyCache[i].key) cached++;
     }
     printf("key cache: %zu/%d\n", cached, SSRJSON_KEY_CACHE_SIZE);
 #endif // SSRJSON_ENABLE_TRACE
@@ -131,7 +129,7 @@ PyMODINIT_FUNC PyInit_ssrjson(void) {
 #endif
 
     // do ssrjson internal init.
-    memset(AssociativeKeyCache, 0, sizeof(AssociativeKeyCache));
+    memset(DecodeKeyCache, 0, sizeof(DecodeKeyCache));
 
 #if PY_MINOR_VERSION >= 13
     _init_PyNone_Type(Py_TYPE(Py_None));

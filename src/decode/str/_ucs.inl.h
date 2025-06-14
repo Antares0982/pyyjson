@@ -112,9 +112,8 @@ force_inline PyObject *make_unicode_from_src(const _src_t *start, usize count, b
         usize hash_string_u8size;
         get_cache_key_hash_and_size(&hash_string_ptr, &hash_string_u8size, start, count, tpsize, need_size_cvt, temp_buffer);
         hash = XXH3_64bits(hash_string_ptr, hash_string_u8size);
-        ret = get_key_cache(hash_string_ptr, hash, hash_string_u8size, kind ? kind : 1, kind == 0);
+        ret = get_key_cache(hash_string_ptr, hash, hash_string_u8size, kind);
         if (ret) {
-            Py_INCREF(ret);
             goto done;
         }
     }
@@ -132,7 +131,7 @@ force_inline PyObject *make_unicode_from_src(const _src_t *start, usize count, b
             MAKE_UCS_NAME(copy_to_new_unicode)(&dst_void, ret, need_cvt, start, count, kind);
         }
         if (should_cache) {
-            add_key_cache(hash, ret);
+            add_key_cache(hash, ret, count * tpsize, kind);
         }
         if (should_hash) {
             assert(count && SSRJSON_CAST(PyASCIIObject *, ret)->hash == -1);

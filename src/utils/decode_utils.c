@@ -40,7 +40,7 @@ bool _decode_obj_stack_resize(
 
 #if !defined(Py_GIL_DISABLED)
 ssrjson_align(64) u8 _DecodeTempBuffer[SSRJSON_STRING_BUFFER_SIZE];
-decode_cache_t AssociativeKeyCache[SSRJSON_KEY_CACHE_SIZE];
+decode_cache_t DecodeKeyCache[SSRJSON_KEY_CACHE_SIZE];
 ssrjson_align(64) u8 _DecodeBytesSrcBuffer[SSRJSON_STRING_BUFFER_SIZE];
 DecodeCtnWithSize _DecodeCtnBuffer[SSRJSON_DECODE_MAX_RECURSION];
 PyObject *_DecodeObjBuffer[SSRJSON_DECODE_OBJ_BUFFER_INIT_SIZE];

@@ -23,9 +23,8 @@ force_inline PyObject *make_unicode_from_src_ascii(const _src_t *start, usize co
     bool should_hash = is_key && count > 0;
     if (should_cache) {
         hash = XXH3_64bits(start, count);
-        ret = get_key_cache(start, hash, count, PyUnicode_1BYTE_KIND, true);
+        ret = get_key_cache(start, hash, count, 0);
         if (ret) {
-            Py_INCREF(ret);
             goto done;
         }
     }
@@ -34,7 +33,7 @@ force_inline PyObject *make_unicode_from_src_ascii(const _src_t *start, usize co
         u8 *const target = PYUNICODE_ASCII_START(ret);
         ssrjson_memcpy(target, start, count);
         if (should_cache) {
-            add_key_cache(hash, ret);
+            add_key_cache(hash, ret, count, 0);
         }
         if (should_hash) {
             assert(count && SSRJSON_CAST(PyASCIIObject *, ret)->hash == -1);
