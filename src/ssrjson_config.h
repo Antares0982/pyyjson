@@ -14,7 +14,6 @@
 #include <stdint.h>
 
 
-
 // feature checks
 #if INTPTR_MAX == INT64_MAX
 #    define SSRJSON_64BIT
@@ -66,22 +65,22 @@
 #    define SSRJSON_ENCODE_MAX_RECURSION (1024)
 #endif
 
-/* Whether implementation of encoding ASCII/UCS1 string is inlined. */
-#ifndef SSRJSON_ENCODE_UCS1_IMPL_INLINE
-#    define SSRJSON_ENCODE_UCS1_IMPL_INLINE 1
+/* Whether implementation of encoding ASCII/UCS1 string to bytes is inlined. */
+#ifndef SSRJSON_ENCODE_UCS1_TO_BYTES_IMPL_INLINE
+#    define SSRJSON_ENCODE_UCS1_TO_BYTES_IMPL_INLINE 0
 #endif
 
-/* Whether implementation of encoding UCS2 string is inlined. */
-#ifndef SSRJSON_ENCODE_UCS2_IMPL_INLINE
-#    define SSRJSON_ENCODE_UCS2_IMPL_INLINE 0
+/* Whether implementation of encoding UCS2 string to bytes is inlined. */
+#ifndef SSRJSON_ENCODE_UCS2_TO_BYTES_IMPL_INLINE
+#    define SSRJSON_ENCODE_UCS2_TO_BYTES_IMPL_INLINE 0
 #endif
 
-/* Whether implementation of encoding UCS4 string is inlined. */
-#ifndef SSRJSON_ENCODE_UCS4_IMPL_INLINE
-#    define SSRJSON_ENCODE_UCS4_IMPL_INLINE 0
+/* Whether implementation of encoding UCS4 string to bytes is inlined. */
+#ifndef SSRJSON_ENCODE_UCS4_TO_BYTES_IMPL_INLINE
+#    define SSRJSON_ENCODE_UCS4_TO_BYTES_IMPL_INLINE 0
 #endif
 
-/** Type define for primitive types. */
+/** Type definition for primitive types. */
 typedef float f32;
 typedef double f64;
 typedef int8_t i8;
@@ -100,7 +99,7 @@ typedef PyObject *pyobj_ptr_t;
 
 // avx and above may be enabled.
 static_assert(sizeof(PyASCIIObject) >= 4 * SIZEOF_VOID_P, "sizeof(PyASCIIObject) == ?");
-// static_assert(offsetof(PyBytesObject, ob_sval) >= 4 * SIZEOF_VOID_P, "sizeof(PyASCIIObject) == ?");
+static_assert(offsetof(PyBytesObject, ob_sval) >= 4 * SIZEOF_VOID_P, "sizeof(PyASCIIObject) == ?");
 
 
 #endif

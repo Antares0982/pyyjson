@@ -36,19 +36,19 @@
 
 // Encode inline specifier.
 #if COMPILE_READ_UCS_LEVEL == 1
-#    if SSRJSON_ENCODE_UCS1_IMPL_INLINE
+#    if SSRJSON_ENCODE_UCS1_TO_BYTES_IMPL_INLINE
 #        define _IMPL_INLINE_SPECIFIER force_inline
 #    else
 #        define _IMPL_INLINE_SPECIFIER static force_noinline
 #    endif
 #elif COMPILE_READ_UCS_LEVEL == 2
-#    if SSRJSON_ENCODE_UCS2_IMPL_INLINE
+#    if SSRJSON_ENCODE_UCS2_TO_BYTES_IMPL_INLINE
 #        define _IMPL_INLINE_SPECIFIER force_inline
 #    else
 #        define _IMPL_INLINE_SPECIFIER static force_noinline
 #    endif
 #elif COMPILE_READ_UCS_LEVEL == 4
-#    if SSRJSON_ENCODE_UCS4_IMPL_INLINE
+#    if SSRJSON_ENCODE_UCS4_TO_BYTES_IMPL_INLINE
 #        define _IMPL_INLINE_SPECIFIER force_inline
 #    else
 #        define _IMPL_INLINE_SPECIFIER static force_noinline
