@@ -101,9 +101,7 @@ force_inline bool encode_one_ucs4(u8 **writer_addr, u32 unicode) {
         *writer_addr = writer;
     } else {
         // 4 bytes
-#ifndef SSRJSON_ASAN_CHECK
-        assert(unicode <= 0x10ffff); // cannot create such unicode object
-#endif
+        // assert(unicode <= 0x10ffff); // cannot create such unicode object in normal way
         u8 *writer = *writer_addr;
         *writer++ = (unicode >> 18) | 0xf0;
         *writer++ = (unicode >> 12) & 0x3f | 0x80;
